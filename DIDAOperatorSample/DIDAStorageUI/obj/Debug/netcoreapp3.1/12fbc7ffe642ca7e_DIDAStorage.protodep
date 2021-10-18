@@ -1,0 +1,2 @@
+obj\Debug\netcoreapp3.1\protos/DIDAStorage.cs \
+obj\Debug\netcoreapp3.1\protos/DIDAStorageGrpc.cs: protos/DIDAStorage.proto

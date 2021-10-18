@@ -1,0 +1,5 @@
+scheduler sched1 http://localhost:2000
+storage s1 http://localhost:3001 0
+worker  w1 http://localhost:4001 0
+populate app1_data
+client r1 app1

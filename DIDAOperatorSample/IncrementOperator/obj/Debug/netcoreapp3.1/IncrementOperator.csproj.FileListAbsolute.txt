@@ -1,0 +1,12 @@
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.deps.json
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.pdb
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAStorage.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAWorker.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfoInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfo.cs
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CoreCompileInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CopyComplete
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.pdb

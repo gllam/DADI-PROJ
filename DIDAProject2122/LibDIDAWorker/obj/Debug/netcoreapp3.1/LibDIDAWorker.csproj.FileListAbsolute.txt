@@ -1,0 +1,10 @@
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\bin\Debug\netcoreapp3.1\LibDIDAWorker.deps.json
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\bin\Debug\netcoreapp3.1\LibDIDAWorker.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\bin\Debug\netcoreapp3.1\LibDIDAWorker.pdb
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.csproj.AssemblyReference.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.AssemblyInfoInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.AssemblyInfo.cs
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.csproj.CoreCompileInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAProject2122\LibDIDAWorker\obj\Debug\netcoreapp3.1\LibDIDAWorker.pdb

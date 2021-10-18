@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "2s4W0BBRIuLnYyoeKktEBWfdWqznI6BN08VzzXH4JUhGJVvcZPPrvsn8kbRPkDAlDW7PKZ++muBGjpkpTFPkXw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\jog\\.nuget\\packages\\google.protobuf\\3.18.1\\google.protobuf.3.18.1.nupkg.sha512",
+    "C:\\Users\\jog\\.nuget\\packages\\grpc.core\\2.41.0\\grpc.core.2.41.0.nupkg.sha512",
+    "C:\\Users\\jog\\.nuget\\packages\\grpc.core.api\\2.41.0\\grpc.core.api.2.41.0.nupkg.sha512",
+    "C:\\Users\\jog\\.nuget\\packages\\grpc.tools\\2.41.0\\grpc.tools.2.41.0.nupkg.sha512",
+    "C:\\Users\\jog\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\jog\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
+  ],
+  "logs": []
+}

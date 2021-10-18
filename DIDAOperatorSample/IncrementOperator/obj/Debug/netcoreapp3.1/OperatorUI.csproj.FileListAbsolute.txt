@@ -1,0 +1,15 @@
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\OperatorUI.deps.json
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\OperatorUI.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\OperatorUI.pdb
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\LibDIDAStorage.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\LibDIDAWorker.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\LibDIDAStorage.pdb
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\bin\Debug\netcoreapp3.1\LibDIDAWorker.pdb
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.csproj.AssemblyReference.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.AssemblyInfoInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.AssemblyInfo.cs
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.csproj.CoreCompileInputs.cache
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.csproj.CopyComplete
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.dll
+C:\Users\jog\gdrive-ist\workspace_visual_studio\Projects\DIDAOperatorSample\OperatorUI\obj\Debug\netcoreapp3.1\OperatorUI.pdb
