@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj": {}
+    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj": {
+    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+        "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
         "projectName": "DIDAStorageUI",
-        "projectPath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
-        "packagesPath": "C:\\Users\\jog\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
+        "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+        "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\jog\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -68,12 +65,30 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[3.1.10, 3.1.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[3.1.18, 3.1.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[3.1.0, 3.1.0]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[3.1.0, 3.1.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-rc.1.21463.6\\RuntimeIdentifierGraph.json"
         }
       }
     }

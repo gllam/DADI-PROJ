@@ -578,23 +578,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\jog\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\BCV\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\OperatorRunner\\OperatorRunner.csproj",
-      "projectName": "OperatorRunner",
-      "projectPath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\OperatorRunner\\OperatorRunner.csproj",
-      "packagesPath": "C:\\Users\\jog\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\OperatorRunner\\obj\\",
+      "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
+      "projectName": "Worker",
+      "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
+      "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\OperatorRunner\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\jog\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -608,8 +604,8 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
-              "projectPath": "C:\\Users\\jog\\gdrive-ist\\workspace_visual_studio\\Projects\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj"
+            "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
+              "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj"
             }
           }
         }
@@ -633,12 +629,30 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[3.1.10, 3.1.10]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[3.1.18, 3.1.18]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-rc.1.21463.6\\RuntimeIdentifierGraph.json"
       }
     }
   }

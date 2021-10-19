@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IncrementOperator\IncrementOperator.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Client" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="LibDIDAWorker">
+      <HintPath>..\DIDALibraries\LibDIDAWorker.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="protos\DIDAWorker.proto">
+      <GrpcServices>Client</GrpcServices>
+    </None>
+  </ItemGroup>
+
+</Project>

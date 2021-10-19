@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "DIDAWorkerClient";
+
+service DIDAWorkerService {
+  rpc sendDIDAReq(sendDIDAReqRequest) returns (sendDIDAReqReply);
+}
+
+message sendDIDAReqRequest {
+	DIDARequest request = 1;
+}
+
+message sendDIDAReqReply {
+	bool ack = 1;
+}

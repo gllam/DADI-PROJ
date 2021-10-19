@@ -1,0 +1,31 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "23bcc2d4-1d25-470c-bc67-0ad31aed34f5": {
+      "ProjectGuid": "23bcc2d4-1d25-470c-bc67-0ad31aed34f5",
+      "DisplayName": "DIDAStorageUI",
+      "ColorIndex": 0
+    },
+    "a5b19d14-e921-47f5-b10d-bbc904ed7d39": {
+      "ProjectGuid": "a5b19d14-e921-47f5-b10d-bbc904ed7d39",
+      "DisplayName": "IncrementOperator",
+      "ColorIndex": 1
+    },
+    "80546a3c-113e-4935-9fc3-4568199a64a5": {
+      "ProjectGuid": "80546a3c-113e-4935-9fc3-4568199a64a5",
+      "DisplayName": "Worker",
+      "ColorIndex": 2
+    },
+    "7fd407a3-0b93-4272-b28f-86c2fb6eb75c": {
+      "ProjectGuid": "7fd407a3-0b93-4272-b28f-86c2fb6eb75c",
+      "DisplayName": "Scheduler",
+      "ColorIndex": 3
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 4
+}
