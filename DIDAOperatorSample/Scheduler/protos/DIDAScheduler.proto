@@ -1,15 +1,13 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "DIDASchedulerClient";
-
 service DIDASchedulerService {
-  rpc sendScript(sendScriptRequest) returns (sendScriptReply);
+  rpc SendScript (SendScriptRequest) returns (SendScriptReply);
 }
 
-message sendScriptRequest {
+message SendScriptRequest {
 	repeated string app = 1;
 }
 
-message sendScriptReply {
+message SendScriptReply {
 	bool ack = 1;
 }

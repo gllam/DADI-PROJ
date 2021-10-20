@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {}
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
+        "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
         "projectName": "IncrementOperator",
-        "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
+        "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
         "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\IncrementOperator\\obj\\",
+        "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -47,10 +47,6 @@
             "Grpc.Net.Client": {
               "target": "Package",
               "version": "[2.40.0, )"
-            },
-            "Grpc.Net.ClientFactory": {
-              "target": "Package",
-              "version": "[2.32.0, )"
             },
             "Grpc.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",

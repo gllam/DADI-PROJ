@@ -268,11 +268,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+      "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
       "projectName": "DIDAStorageUI",
-      "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+      "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
       "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
+      "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",

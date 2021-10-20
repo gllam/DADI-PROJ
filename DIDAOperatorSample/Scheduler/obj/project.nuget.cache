@@ -1,8 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "ifE/VlPbwf+S183UeSjv1e0wf+mu3kbrLqCannRo9WhO9kc0r9JG03MuFpVWa9jlhDJ6lCBWfvQ4OoSUUS8yUA==",
+  "dgSpecHash": "zKAN0yzaUAMbs6XKkH2SjF2mws7KH9pbKGRcgisMVBphGVS4C+VE961TeI2U4RSDfFI1qauM+p5zsDRHSa+3mQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\BCV\\.nuget\\packages\\google.protobuf\\3.18.1\\google.protobuf.3.18.1.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\grpc.core\\2.41.0\\grpc.core.2.41.0.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\grpc.core.api\\2.41.0\\grpc.core.api.2.41.0.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\grpc.net.client\\2.40.0\\grpc.net.client.2.40.0.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\grpc.net.common\\2.40.0\\grpc.net.common.2.40.0.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\grpc.tools\\2.41.0\\grpc.tools.2.41.0.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\3.0.3\\microsoft.extensions.logging.abstractions.3.0.3.nupkg.sha512",
+    "C:\\Users\\BCV\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,9 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="protos\DIDAScheduler.proto">
-      <GrpcServices>Client</GrpcServices>
-    </None>
+    <PackageReference Include="Google.Protobuf" Version="3.18.1" />
+    <PackageReference Include="Grpc.Core" Version="2.41.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.40.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.41.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	  <Protobuf Include="protos\DIDAScheduler.proto" GrpcServices="Server" />
+	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LibDIDAWorker">
+      <HintPath>..\..\LibDIDAWorker.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {}
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
+        "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
         "projectName": "Scheduler",
-        "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
+        "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
         "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\obj\\",
+        "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -39,6 +39,26 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "Google.Protobuf": {
+              "target": "Package",
+              "version": "[3.18.1, )"
+            },
+            "Grpc.Core": {
+              "target": "Package",
+              "version": "[2.41.0, )"
+            },
+            "Grpc.Net.Client": {
+              "target": "Package",
+              "version": "[2.40.0, )"
+            },
+            "Grpc.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.41.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
