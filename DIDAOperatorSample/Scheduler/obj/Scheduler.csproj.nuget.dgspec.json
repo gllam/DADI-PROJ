@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {}
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
+        "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
         "projectName": "Scheduler",
-        "projectPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
+        "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\Scheduler.csproj",
         "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BCV\\Downloads\\DIDAOperatorSample\\DIDAOperatorSample\\Scheduler\\obj\\",
+        "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\Scheduler\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -49,12 +49,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-rc.1.21463.6\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }
