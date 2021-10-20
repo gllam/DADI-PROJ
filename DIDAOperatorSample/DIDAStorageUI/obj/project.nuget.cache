@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fM27CWHGn85m/TVL3AcOisnN3BYZEqrQzDmaGTjxXg3D4Qu78VG2BXkxb2HHc/GVBIKXTatEWo4mr8iieqt/cg==",
+  "dgSpecHash": "6eoiGV5dhX8MRyGUt6vhIMWjcgatQHZpZNeLw4qVPaYZwWJJPWXJqQZsluKeDMHDVB3Ouk+VENmV6fnI7x5SWw==",
   "success": true,
   "projectFilePath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
   "expectedPackageFiles": [
@@ -9,11 +9,7 @@
     "C:\\Users\\BCV\\.nuget\\packages\\grpc.core.api\\2.41.0\\grpc.core.api.2.41.0.nupkg.sha512",
     "C:\\Users\\BCV\\.nuget\\packages\\grpc.tools\\2.41.0\\grpc.tools.2.41.0.nupkg.sha512",
     "C:\\Users\\BCV\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.18\\microsoft.netcore.app.host.win-x64.3.1.18.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512"
+    "C:\\Users\\BCV\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
   ],
   "logs": []
 }
