@@ -294,24 +294,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\david\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\BCV\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
+      "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
       "projectName": "Worker",
-      "projectPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
-      "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\obj\\",
+      "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\Worker.csproj",
+      "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\OperatorRunner\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -325,8 +320,8 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
-              "projectPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj"
+            "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
+              "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj"
             }
           }
         }
