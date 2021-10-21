@@ -54,7 +54,7 @@ namespace PuppetMaster
             scheduler = new SchedulerServer(guiWindow, serverHostname, serverPort, clientHostname);
         }
 
-        public void SendScript(String input )
+        public void sendScript(String input )
         {
             scheduler.SendScript(input);
         }
