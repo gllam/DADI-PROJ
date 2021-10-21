@@ -23,3 +23,16 @@ C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CopyComplete
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.dll
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.pdb
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.deps.json
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.dll
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.pdb
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAStorage.dll
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAWorker.dll
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.AssemblyReference.cache
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfoInputs.cache
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfo.cs
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CoreCompileInputs.cache
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CopyComplete
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.dll
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.pdb

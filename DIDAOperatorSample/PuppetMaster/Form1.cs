@@ -12,9 +12,13 @@ namespace PuppetMaster
 {
     public partial class Form1 : Form
     {
+        PuppetMasterLogic puppetMaster;
         public Form1()
         {
             InitializeComponent();
+            puppetMaster = new PuppetMasterLogic();
+            puppetMaster.createChannelWithScheduler(this, "localhost", 4001, "localhost");
+            puppetMaster.sendScript("hola");
         }
 
     }
