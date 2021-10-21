@@ -6,7 +6,8 @@ service DIDASchedulerService {
 }
 
 message SendScriptRequest {
-	repeated string app = 1;
+	string input = 1;
+	repeated string app = 2;
 }
 
 message SendScriptReply {
