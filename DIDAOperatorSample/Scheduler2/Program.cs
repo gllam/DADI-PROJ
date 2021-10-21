@@ -13,10 +13,7 @@ namespace Scheduler
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<string> workerPorts = new List<string>();
 
-        public SchedulerService()
-        {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-        }
+        public SchedulerService(){}
 
         public override Task<SendScriptReply> SendScript(SendScriptRequest request, ServerCallContext context)
         {
@@ -25,6 +22,7 @@ namespace Scheduler
 
         public SendScriptReply requestApp(SendScriptRequest request)
         {
+            Console.WriteLine(request.Input);
             MetaRecord meta = new MetaRecord
             {
                 Id = 1
@@ -84,7 +82,26 @@ namespace Scheduler
     {
         static void Main(string[] args)
         {
-            Console.ReadKey();
+            const int port = 4001;
+            const string hostname = "localhost";
+            string startupMessage;
+            ServerPort serverPort;
+
+            serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
+            startupMessage = "Insecure Scheduler server listening on port " + port;
+
+            Server server = new Server
+            {
+                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
+                Ports = { serverPort }
+            };
+
+            server.Start();
+
+            Console.WriteLine(startupMessage);
+            //Configuring HTTP for client connections in Register method
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            while (true) ;
         }
     }
 }

@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {}
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {}
   },
   "projects": {
-    "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
+    "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
+        "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
         "projectName": "IncrementOperator",
-        "projectPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
-        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\obj\\",
+        "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\IncrementOperator.csproj",
+        "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\IncrementOperator\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
