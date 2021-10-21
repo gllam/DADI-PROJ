@@ -6,7 +6,7 @@ Cenas para fazer:
   - PCS(Process creation service) (no final?) -> Todos / quem acabar primeiro
   - Storage (no final) -> TODOS
   - Worker -> Leitão
-  - Scheduler -> Bernardo
+  - Scheduler -> Bernardo PORT=4001
 
 Fazer GRPC's entre todos
 Definir o protobuff
