@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+service DIDASchedulerService {
+  rpc SendScript (SendScriptRequest) returns (SendScriptReply);
+  rpc SendWorkers (SendWorkersRequest) returns (SendWorkersReply);
+}
+
+message SendScriptRequest {
+	string input = 1;
+	repeated string app = 2;
+}
+
+message SendScriptReply {
+	bool ack = 1;
+}
+
+message SendWorkersRequest {
+	repeated string ports = 1;
+}
+
+message SendWorkersReply {
+	bool ack = 1;
+}
