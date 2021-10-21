@@ -2,27 +2,19 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-	  <TargetFramework>netcoreapp3.1</TargetFramework>
- <!--  <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>-->
-    <ApplicationIcon />
-    <StartupObject />
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-<!--
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-	</PropertyGroup>
--->
+
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.18.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.19.0" />
     <PackageReference Include="Grpc.Core" Version="2.41.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.40.0" />
     <PackageReference Include="Grpc.Tools" Version="2.41.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	  c
+	  <Protobuf Include="protos\DIDAScheduler.proto" GrpcServices="Server" />
+	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+
+service DIDAWorkerService {
+  rpc SendDIDAReq (SendDIDAReqRequest) returns (SendDIDAReqReply);
+}
+
+message SendDIDAReqRequest {
+	string request = 1;
+}
+
+message SendDIDAReqReply {
+	bool ack = 1;
+}
