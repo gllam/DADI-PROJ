@@ -10,7 +10,8 @@ namespace Scheduler
 
     public class SchedulerService : DIDASchedulerService.DIDASchedulerServiceBase
     {
-        Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
+        //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
+        List<string> workerPorts = new List<string>();
 
         public SchedulerService()
         {
@@ -24,12 +25,33 @@ namespace Scheduler
 
         public SendScriptReply requestApp(SendScriptRequest request)
         {
-            DIDARequest requestApp = new DIDARequest();
-            requestApp.chainSize = request.App.Count;
-            requestApp.chain = new DIDAAssignment[requestApp.chainSize];
-            for (int opIndex = 0; opIndex < requestApp.chainSize; opIndex++)
+            MetaRecord meta = new MetaRecord
             {
-                requestApp.chain[opIndex] = new DIDAAssignment();
+                Id = 1
+            };
+            int chainSize = request.App.Count;
+            SendDIDAReqRequest req = new SendDIDAReqRequest
+            {
+                Meta = meta,
+                Input = request.Input,
+                Next = 0,
+                ChainSize = chainSize
+            };
+            for (int opIndex = 0; opIndex < chainSize; opIndex++)
+            {
+                OperatorID op = new OperatorID
+                {
+                    Classname = request.App[opIndex].Split()[1],
+                    Order = Int32.Parse(request.App[opIndex].Split()[2])
+                };
+                Assignment ass = new Assignment
+                {
+                    Opid = op,
+                    Host = "localhost",
+                    Port = Int32.Parse(workerPorts[opIndex]),
+                    Output = null
+                };
+                req.Asschain[opIndex] = ass;
             }
             return new SendScriptReply
             {
@@ -37,15 +59,25 @@ namespace Scheduler
             };
         }
 
-        /*
-        public void setWorkers(List<string> app)
-        {
-            foreach (string worker in workers)
-            {
 
-            }
+        public override Task<SendWorkersReply> SendWorkers(SendWorkersRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(setWorkers(request));
         }
-        */
+
+        
+        public SendWorkersReply setWorkers(SendWorkersRequest request)
+        {
+            foreach (string port in request.Ports)
+            {
+                workerPorts.Add(port);
+            }
+            return new SendWorkersReply
+            {
+                Ack = true
+            };
+        }
+        
     }
 
     class Program
