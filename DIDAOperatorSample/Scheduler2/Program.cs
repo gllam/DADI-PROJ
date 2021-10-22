@@ -26,7 +26,7 @@ namespace Scheduler
             MetaRecord meta = new MetaRecord
             {
                 Id = 1
-            };
+            }; //metarecord dummy
             int chainSize = request.App.Count;
             SendDIDAReqRequest req = new SendDIDAReqRequest
             {
@@ -34,7 +34,7 @@ namespace Scheduler
                 Input = request.Input,
                 Next = 0,
                 ChainSize = chainSize
-            };
+            }; //request to worker
             for (int opIndex = 0; opIndex < chainSize; opIndex++)
             {
                 OperatorID op = new OperatorID
@@ -51,10 +51,20 @@ namespace Scheduler
                 };
                 req.Asschain[opIndex] = ass;
             }
+
             return new SendScriptReply
             {
                 Ack = true
-            };
+            }; //reply to pm
+        }
+
+        public void SendRequestToWorker(SendDIDAReqRequest request)
+        {
+            string serverHostname = "localhost";
+            GrpcChannel channel = GrpcChannel.ForAddress("http://" + serverHostname + ":" + workerPorts[0]);
+            DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+            SendDIDAReqReply reply = client.SendDIDAReq(request);
+            Console.WriteLine("Request to worker " + reply.Ack);
         }
 
 
@@ -101,7 +111,7 @@ namespace Scheduler
             Console.WriteLine(startupMessage);
             //Configuring HTTP for client connections in Register method
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            while (true) ;
+            Console.ReadKey();
         }
     }
 }
