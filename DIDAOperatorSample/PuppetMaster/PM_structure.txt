@@ -1,0 +1,13 @@
+﻿Cenas:
+	PuppetMasterLogic.cs:
+		- Contém as classes com os canais que fazem ligação aos processos(worker/scheduler/PCS)
+		- Contém a própria classe que é onde o form1.cs faz as chamadas, ou seja, esta classe 
+		server como ponte entre o form1.cs e as classes com os canais.
+
+	Form1.cs:
+		- Contém o código relativo ao GUI do PuppetMaster e a tudo o que esteja relacionado
+		(reações a clicks | receber input de ficheiros | analisar os processos | debug analysis)
+
+	utils.cs:
+		- Contém ferramentas úteis que são gerais para o PuppetMaster e dada a organização dos 
+		.cs não faz sentido estarem nesses ficheiros

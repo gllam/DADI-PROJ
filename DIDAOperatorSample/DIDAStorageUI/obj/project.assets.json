@@ -263,19 +263,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\BCV\\.nuget\\packages\\": {}
+    "C:\\Users\\david\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+      "projectUniqueName": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
       "projectName": "DIDAStorageUI",
-      "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
-      "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
+      "projectPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+      "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\BCV\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
