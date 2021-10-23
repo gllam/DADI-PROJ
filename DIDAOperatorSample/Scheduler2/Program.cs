@@ -11,23 +11,29 @@ namespace Scheduler
     public class SchedulerService : DIDASchedulerService.DIDASchedulerServiceBase
     {
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
-        List<string> workerPorts = new List<string>();
+        List<(string, string, DIDAWorkerService.DIDAWorkerServiceClient)> workerMap = new List<(string, string, DIDAWorkerService.DIDAWorkerServiceClient)>();
 
         public SchedulerService(){}
 
-        public override Task<SendScriptReply> SendScript(SendScriptRequest request, ServerCallContext context)
+        public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
             return Task.FromResult(requestApp(request));
         }
 
-        public SendScriptReply requestApp(SendScriptRequest request)
+        public SendAppDataReply requestApp(SendAppDataRequest request)
         {
+            //DEBUG
+            SendWorkersRequest swr = new SendWorkersRequest();
+            swr.Url.Add("http://localhost:5001");
+            setWorkers(swr);
+            //DEBUG
             Console.WriteLine(request.Input);
             MetaRecord meta = new MetaRecord
             {
                 Id = 1
             }; //metarecord dummy
             int chainSize = request.App.Count;
+            Console.WriteLine(chainSize);
             SendDIDAReqRequest req = new SendDIDAReqRequest
             {
                 Meta = meta,
@@ -45,14 +51,14 @@ namespace Scheduler
                 Assignment ass = new Assignment
                 {
                     Opid = op,
-                    Host = "localhost",
-                    Port = Int32.Parse(workerPorts[opIndex]),
-                    Output = null
+                    Host = workerMap[opIndex].Item1,
+                    Port = Int32.Parse(workerMap[opIndex].Item2),
+                    Output = ""
                 };
-                req.Asschain[opIndex] = ass;
+                req.Asschain.Add(ass);
             }
-
-            return new SendScriptReply
+            SendRequestToWorker(req);
+            return new SendAppDataReply
             {
                 Ack = true
             }; //reply to pm
@@ -60,10 +66,7 @@ namespace Scheduler
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
         {
-            string serverHostname = "localhost";
-            GrpcChannel channel = GrpcChannel.ForAddress("http://" + serverHostname + ":" + workerPorts[0]);
-            DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
-            SendDIDAReqReply reply = client.SendDIDAReq(request);
+            SendDIDAReqReply reply = workerMap[0].Item3.SendDIDAReq(request);
             Console.WriteLine("Request to worker " + reply.Ack);
         }
 
@@ -76,9 +79,12 @@ namespace Scheduler
         
         public SendWorkersReply setWorkers(SendWorkersRequest request)
         {
-            foreach (string port in request.Ports)
+            foreach (string url in request.Url)
             {
-                workerPorts.Add(port);
+                GrpcChannel channel = GrpcChannel.ForAddress(url);
+                DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+                string[] hostport = url.Split("//")[1].Split(":");
+                workerMap.Add((hostport[0],hostport[1], client));
             }
             return new SendWorkersReply
             {

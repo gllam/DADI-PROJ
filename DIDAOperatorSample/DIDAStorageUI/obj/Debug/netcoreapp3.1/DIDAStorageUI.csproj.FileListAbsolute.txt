@@ -41,7 +41,6 @@ C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Deb
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.AssemblyInfoInputs.cache
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.AssemblyInfo.cs
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.csproj.CoreCompileInputs.cache
-C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.csproj.CopyComplete
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.dll
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.pdb
 C:\Users\BCV\Documents\GitHub\DADI-PROJ\DIDAOperatorSample\DIDAStorageUI\obj\Debug\netcoreapp3.1\DIDAStorageUI.genruntimeconfig.cache

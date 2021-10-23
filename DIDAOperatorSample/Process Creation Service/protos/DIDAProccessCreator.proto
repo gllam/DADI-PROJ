@@ -1,0 +1,14 @@
+﻿syntax = "proto3";
+
+service DIDAProccessCreatorService {
+  rpc CreateProccessInstance (CreateProccessInstanceRequest) returns (CreateProccessInstanceReply);
+}
+
+message CreateProccessInstanceRequest {
+	string input = 1;
+	repeated string app = 2;
+}
+
+message CreateProccessInstanceReply {
+	bool ack = 1;
+}

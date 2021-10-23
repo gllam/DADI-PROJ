@@ -22,7 +22,7 @@ namespace OperatorRunner
 
         public SendDIDAReqReply SendDIDA(SendDIDAReqRequest req)
         {
-
+            Console.WriteLine(req);
             MetaRecord meta = new MetaRecord
             {
                 Id = 1
@@ -74,7 +74,7 @@ namespace OperatorRunner
         {
             static void Main(string[] args)
             {
-                const int port = 4001;
+                const int port = 5001;
                 const string host = "localhost";
                 string startupMessage;
                 ServerPort serverPort = new ServerPort(host, port, ServerCredentials.Insecure); ;
@@ -86,13 +86,15 @@ namespace OperatorRunner
                 };
 
                 server.Start();
-
+                Console.ReadLine();
+                /*
                 IDIDAOperator op = new CounterOperator();
                 DIDAMetaRecord meta = new DIDAMetaRecord { id = 1 };
                 op.ConfigureStorage(new DIDAStorageNode[] { new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" } }, MyLocationFunction);
                 string result = op.ProcessRecord(meta, "sample_input", "sample_previous_output");
                 Console.WriteLine("result: " + result);
                 Console.ReadLine();
+                */
 
             }
 
