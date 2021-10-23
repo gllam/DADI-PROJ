@@ -6,16 +6,14 @@ using Grpc.Net.Client;
 
 namespace PuppetMaster
 {
-    public class SchedulerServer
+    public class SchedulerAsServer
     {
         private readonly GrpcChannel channel;
         private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
-        private Server server;
         private readonly Form1 guiWindow;
-        private string nick;
         private string hostname;
 
-        public SchedulerServer(Form1 guiWindow, string serverHostname, int serverPort,
+        public SchedulerAsServer(Form1 guiWindow, string serverHostname, int serverPort,
                             string clientHostname)
         {
             this.hostname = clientHostname;
@@ -29,13 +27,19 @@ namespace PuppetMaster
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
         
-        public Boolean SendScript(String input)
+        public Boolean SendAppData(string appFilePath, string input)
         {
             SendScriptRequest request = new SendScriptRequest
             {
                 Input = input,
             };
-            request.App.Add("lol");
+            foreach (string line in System.IO.File.ReadLines(@appFilePath))
+            {
+                request.App.Add(line);
+            }
+
+
+            
 
             SendScriptReply reply = client.SendScript(request);
             return reply.Ack;
@@ -45,18 +49,19 @@ namespace PuppetMaster
     class PuppetMasterLogic
     {
 
-        private SchedulerServer scheduler;
+        private SchedulerAsServer scheduler;
 
         public PuppetMasterLogic() {}
 
-        public void createChannelWithScheduler(Form1 guiWindow, string serverHostname, int serverPort, string clientHostname)
+        public void CreateChannelWithScheduler(Form1 guiWindow, string serverHostname, int serverPort, string clientHostname)
         {
-            scheduler = new SchedulerServer(guiWindow, serverHostname, serverPort, clientHostname);
+            scheduler = new SchedulerAsServer(guiWindow, serverHostname, serverPort, clientHostname);
         }
 
-        public void sendScript(String input )
+
+        public void SendAppDataToScheduler(string appFilePath, string input)
         {
-            scheduler.SendScript(input);
+            scheduler.SendAppData(appFilePath, input);
         }
 
     }
