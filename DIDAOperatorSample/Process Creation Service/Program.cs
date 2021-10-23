@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -50,9 +51,10 @@ namespace Process_Creation_Service
                 urlRefined = request.Url.Split("http://")[1];
                 port = Convert.ToInt32(urlRefined.Split(':')[1]);
                 hostname = urlRefined.Split(':')[0];
+                string workingDirectory = Path.GetFullPath("Scheduler.exe");
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
-                    FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe",
+                    FileName = workingDirectory,
                     UseShellExecute = true,
                     CreateNoWindow = false,
                     Arguments = request.ServerId + " " + hostname + " " + port
