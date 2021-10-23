@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "6eoiGV5dhX8MRyGUt6vhIMWjcgatQHZpZNeLw4qVPaYZwWJJPWXJqQZsluKeDMHDVB3Ouk+VENmV6fnI7x5SWw==",
+  "dgSpecHash": "axl2DL65TY/v7lv3rzUSbQ33PTwdG4/VTSIqpe0U5VZBy5J026lNSS7OCH1efOyeoVUZZeMhK8aebtsEXbC5dw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+  "projectFilePath": "C:\\Users\\david\\Desktop\\Aulas\\Mestrado\\1º ano\\PADI\\Proj\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\BCV\\.nuget\\packages\\google.protobuf\\3.18.1\\google.protobuf.3.18.1.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\grpc.core\\2.41.0\\grpc.core.2.41.0.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\grpc.core.api\\2.41.0\\grpc.core.api.2.41.0.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\grpc.tools\\2.41.0\\grpc.tools.2.41.0.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
-    "C:\\Users\\BCV\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
+    "C:\\Users\\david\\.nuget\\packages\\google.protobuf\\3.18.1\\google.protobuf.3.18.1.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\grpc.core\\2.41.0\\grpc.core.2.41.0.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\grpc.core.api\\2.41.0\\grpc.core.api.2.41.0.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\grpc.tools\\2.41.0\\grpc.tools.2.41.0.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
   ],
   "logs": []
 }
