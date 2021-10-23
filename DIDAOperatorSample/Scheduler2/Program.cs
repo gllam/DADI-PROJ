@@ -15,12 +15,12 @@ namespace Scheduler
 
         public SchedulerService(){}
 
-        public override Task<SendScriptReply> SendScript(SendScriptRequest request, ServerCallContext context)
+        public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
             return Task.FromResult(requestApp(request));
         }
 
-        public SendScriptReply requestApp(SendScriptRequest request)
+        public SendAppDataReply requestApp(SendAppDataRequest request)
         {
             Console.WriteLine(request.Input);
             MetaRecord meta = new MetaRecord
@@ -51,7 +51,7 @@ namespace Scheduler
                 };
                 req.Asschain[opIndex] = ass;
             }
-            return new SendScriptReply
+            return new SendAppDataReply
             {
                 Ack = true
             };
@@ -66,7 +66,7 @@ namespace Scheduler
         
         public SendWorkersReply setWorkers(SendWorkersRequest request)
         {
-            foreach (string port in request.Ports)
+            foreach (string port in request.Url)//TODO
             {
                 workerPorts.Add(port);
             }
