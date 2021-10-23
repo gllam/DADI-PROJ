@@ -3,6 +3,8 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SchedulerNamespace
@@ -96,12 +98,29 @@ namespace SchedulerNamespace
 
     public class Scheduler
     {
-        private string serverId;
-        private string hostname;
-        private int port;
         public static void Main(string[] args)
         {
             Console.WriteLine("HELLO");
+            string serverId = args[0];
+            string hostname = args[1];
+            int port = Convert.ToInt32(args[2]);
+            ServerPort serverPort;
+            string startupMessage;
+            serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
+            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port ;
+
+            Server server = new Server
+            {
+                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
+                Ports = { serverPort }
+            };
+
+            server.Start();
+
+            Console.WriteLine(startupMessage);
+            //Configuring HTTP for client connections in Register method
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            Console.ReadKey();
             /*const int port = 4001;
             const string hostname = "localhost";
             string startupMessage;
@@ -126,8 +145,22 @@ namespace SchedulerNamespace
 
         public void Initialize(string serverId, string hostname, int port)
         {
+            /*ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe",
+                UseShellExecute = true,
+                CreateNoWindow = false
+            };
+            Process.Start(psi);*/
+            /*
+            Process myProcess = new Process();
+            myProcess.StartInfo.CreateNoWindow = false;
+            myProcess.StartInfo.FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe";
+            myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            myProcess.Start();*/
+
             //this.Main(args);
-            this.serverId = serverId;
+            /*this.serverId = serverId;
             this.hostname = hostname;
             this.port = port;
             ServerPort serverPort;
@@ -146,7 +179,7 @@ namespace SchedulerNamespace
             Console.WriteLine(startupMessage);
             //Configuring HTTP for client connections in Register method
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            Console.ReadKey();
+            Console.ReadKey();*/
         }
     }
 }

@@ -37,16 +37,28 @@ namespace Process_Creation_Service
                 int port;
                 string hostname;
                 string urlRefined;
-                //Process.Start(@"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe");
+                /*Process.Start(@"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe");
                 Assembly assem = typeof(Scheduler).Assembly;
                 Scheduler scheduler = (Scheduler)assem.CreateInstance("SchedulerNamespace.Scheduler");
 
                 urlRefined = request.Url.Split("http://")[1];
                 port = Convert.ToInt32(urlRefined.Split(':')[1]);
                 hostname = urlRefined.Split(':')[0];
-                //string[] args = null;
-                //Scheduler.Main(args);
-                scheduler.Initialize(request.ServerId, hostname, port);
+                string[] args = null;
+                Scheduler.Main(args);
+                scheduler.Initialize(request.ServerId, hostname, port);*/
+                urlRefined = request.Url.Split("http://")[1];
+                port = Convert.ToInt32(urlRefined.Split(':')[1]);
+                hostname = urlRefined.Split(':')[0];
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe",
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                    Arguments = request.ServerId + " " + hostname + " " + port
+                };
+                Process.Start(psi);
+
                 return new CreateProccessInstanceReply
                 {
                     Ack = true
