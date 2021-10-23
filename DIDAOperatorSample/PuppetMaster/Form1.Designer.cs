@@ -36,6 +36,7 @@ namespace PuppetMaster
             this.textAppInput = new System.Windows.Forms.TextBox();
             this.buttonSendAppData = new System.Windows.Forms.Button();
             this.buttonCreateConnectionWithScheduler = new System.Windows.Forms.Button();
+            this.buttonDebugCreateScheduler = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonBrowseConfigScript
@@ -101,11 +102,22 @@ namespace PuppetMaster
             this.buttonCreateConnectionWithScheduler.UseVisualStyleBackColor = true;
             this.buttonCreateConnectionWithScheduler.Click += new System.EventHandler(this.ButtonCreateConnectionWithScheduler_Click);
             // 
+            // buttonDebugCreateScheduler
+            // 
+            this.buttonDebugCreateScheduler.Location = new System.Drawing.Point(354, 194);
+            this.buttonDebugCreateScheduler.Name = "buttonDebugCreateScheduler";
+            this.buttonDebugCreateScheduler.Size = new System.Drawing.Size(123, 56);
+            this.buttonDebugCreateScheduler.TabIndex = 7;
+            this.buttonDebugCreateScheduler.Text = "Debug -> Create a Scheduler";
+            this.buttonDebugCreateScheduler.UseVisualStyleBackColor = true;
+            this.buttonDebugCreateScheduler.Click += new System.EventHandler(this.ButtonDebugCreateScheduler_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonDebugCreateScheduler);
             this.Controls.Add(this.buttonCreateConnectionWithScheduler);
             this.Controls.Add(this.buttonSendAppData);
             this.Controls.Add(this.textAppInput);
@@ -129,6 +141,7 @@ namespace PuppetMaster
         private System.Windows.Forms.TextBox textAppInput;
         private System.Windows.Forms.Button buttonSendAppData;
         private System.Windows.Forms.Button buttonCreateConnectionWithScheduler;
+        private System.Windows.Forms.Button buttonDebugCreateScheduler;
     }
 }
 

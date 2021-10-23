@@ -43,22 +43,60 @@ namespace PuppetMaster
         }
     }
 
+    public class ProcessCreatorAsServer
+    {
+        private readonly GrpcChannel channel;
+        private readonly DIDAProccessCreatorService.DIDAProccessCreatorServiceClient client;
+        private readonly Form1 guiWindow;
+
+        public ProcessCreatorAsServer(Form1 guiWindow)
+        {
+            this.guiWindow = guiWindow;
+            // setup the client side
+
+            AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            channel = GrpcChannel.ForAddress("http://localhost:10000");
+
+            client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
+        }
+
+        public Boolean SendCreateProccessInstanceRequest(string serverId, string url)
+        {
+            CreateProccessInstanceRequest request = new CreateProccessInstanceRequest
+            {
+                ServerId = serverId,
+                Url = url
+            };
+
+            CreateProccessInstanceReply reply = client.CreateProccessInstance(request);
+            return reply.Ack;
+        }
+    }
+
     class PuppetMasterLogic
     {
 
         private SchedulerAsServer scheduler;
+        private ProcessCreatorAsServer pcs;
 
-        public PuppetMasterLogic() {}
-
+        public PuppetMasterLogic(Form1 guiWindow) {
+            pcs = new ProcessCreatorAsServer(guiWindow);
+        }
+        
         public void CreateChannelWithScheduler(Form1 guiWindow, string serverHostname, int serverPort, string clientHostname)
         {
             scheduler = new SchedulerAsServer(guiWindow, serverHostname, serverPort, clientHostname);
         }
 
-
         public void SendAppDataToScheduler(string appFilePath, string input)
         {
             scheduler.SendAppData(appFilePath, input);
+        }
+
+        public void SendCreateProccessInstanceRequest(string serverId, string url)
+        {
+            pcs.SendCreateProccessInstanceRequest(serverId, url);
         }
 
     }

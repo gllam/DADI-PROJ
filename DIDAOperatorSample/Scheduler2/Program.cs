@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Scheduler
+namespace SchedulerNamespace
 {
 
     public class SchedulerService : DIDASchedulerService.DIDASchedulerServiceBase
@@ -94,15 +94,44 @@ namespace Scheduler
         
     }
 
-    class Program
+    public class Scheduler
     {
-        static void Main(string[] args)
+        private string serverId;
+        private string hostname;
+        private int port;
+        public static void Main(string[] args)
         {
-            const int port = 4001;
+            Console.WriteLine("HELLO");
+            /*const int port = 4001;
             const string hostname = "localhost";
             string startupMessage;
             ServerPort serverPort;
 
+            serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
+            startupMessage = "Insecure Scheduler server listening on port " + port;
+
+            Server server = new Server
+            {
+                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
+                Ports = { serverPort }
+            };
+
+            server.Start();
+
+            Console.WriteLine(startupMessage);
+            //Configuring HTTP for client connections in Register method
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            Console.ReadKey();*/
+        }
+
+        public void Initialize(string serverId, string hostname, int port)
+        {
+            //this.Main(args);
+            this.serverId = serverId;
+            this.hostname = hostname;
+            this.port = port;
+            ServerPort serverPort;
+            string startupMessage;
             serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
             startupMessage = "Insecure Scheduler server listening on port " + port;
 

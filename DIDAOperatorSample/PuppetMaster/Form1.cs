@@ -16,6 +16,7 @@ namespace PuppetMaster
         public Form1()
         {
             InitializeComponent();
+            puppetMaster = new PuppetMasterLogic(this);
         }
 
         private void ButtonBrowseConfigScript_Click(object sender, EventArgs e)
@@ -67,8 +68,12 @@ namespace PuppetMaster
 
         private void ButtonCreateConnectionWithScheduler_Click(object sender, EventArgs e)
         {
-            puppetMaster = new PuppetMasterLogic();
             puppetMaster.CreateChannelWithScheduler(this, "localhost", 4001, "localhost");
+        }
+
+        private void ButtonDebugCreateScheduler_Click(object sender, EventArgs e)
+        {
+            puppetMaster.SendCreateProccessInstanceRequest("sched1", "http://localhost:2000");
         }
     }
 }
