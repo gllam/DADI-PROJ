@@ -38,9 +38,6 @@ namespace PuppetMaster
                 request.App.Add(line);
             }
 
-
-            
-
             SendAppDataReply reply = client.SendAppData(request);
             return reply.Ack;
         }

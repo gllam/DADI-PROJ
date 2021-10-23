@@ -22,12 +22,13 @@ namespace Process_Creation_Service
                 Console.WriteLine("Host: " + context.Host);
                 Console.WriteLine("Method: " + context.Method);
                 Console.WriteLine("Peer: " + context.Peer);*/
+                //return Task.FromResult(Reg(request)); This is used to make the calls assynchronous
                 CreateProccessInstanceReply reply = new CreateProccessInstanceReply
                 {
                     Ack = true
                 };
                 return Task.FromResult(reply);
-                //return Task.FromResult(Reg(request)); This is used to make the calls assynchronous
+                
             }
 
         }
