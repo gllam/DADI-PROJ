@@ -1,15 +1,33 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "DIDAWorkerClient";
-
 service DIDAWorkerService {
-  rpc sendDIDAReq(sendDIDAReqRequest) returns (sendDIDAReqReply);
+  rpc SendDIDAReq (SendDIDAReqRequest) returns (SendDIDAReqReply);
 }
 
-message sendDIDAReqRequest {
-	DIDARequest request = 1;
+message SendDIDAReqRequest {
+	MetaRecord meta = 1;
+	string input = 2;
+	int32 next = 3;
+	int32 chainSize = 4;
+	repeated Assignment asschain= 5;
 }
 
-message sendDIDAReqReply {
+message MetaRecord{
+	int32 id = 1;
+}
+
+message Assignment {
+	OperatorID opid = 1;
+	string host = 2;
+	int32 port = 3;
+	string output = 4;
+}
+
+message OperatorID {
+	string classname = 1;
+	int32 order = 2;
+}
+
+message SendDIDAReqReply {
 	bool ack = 1;
 }

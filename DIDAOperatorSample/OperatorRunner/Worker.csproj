@@ -6,20 +6,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.19.0" />
+    <PackageReference Include="Grpc.Core" Version="2.41.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.40.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.41.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IncrementOperator\IncrementOperator.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Client" />
+    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Server" />
+	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Both" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="LibDIDAWorker">
       <HintPath>..\DIDALibraries\LibDIDAWorker.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="protos\DIDAWorker.proto">
-      <GrpcServices>Client</GrpcServices>
-    </None>
   </ItemGroup>
 
 </Project>
