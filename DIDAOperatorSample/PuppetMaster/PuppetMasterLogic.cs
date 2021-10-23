@@ -29,7 +29,7 @@ namespace PuppetMaster
         
         public Boolean SendAppData(string appFilePath, string input)
         {
-            SendScriptRequest request = new SendScriptRequest
+            SendAppDataRequest request = new SendAppDataRequest
             {
                 Input = input,
             };
@@ -41,7 +41,7 @@ namespace PuppetMaster
 
             
 
-            SendScriptReply reply = client.SendScript(request);
+            SendAppDataReply reply = client.SendAppData(request);
             return reply.Ack;
         }
     }
