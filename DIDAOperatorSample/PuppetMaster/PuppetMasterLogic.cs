@@ -27,17 +27,18 @@ namespace PuppetMaster
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
         
-        public Boolean SendAppData(String appData,String input)
+        public Boolean SendAppData(string appFilePath, string input)
         {
             SendScriptRequest request = new SendScriptRequest
             {
                 Input = input,
             };
-            String[] appDataArray = appData.Split("\r\n");
-            foreach (String appLine in appDataArray)
+            foreach (string line in System.IO.File.ReadLines(@appFilePath))
             {
-                request.App.Add(appLine);
+                request.App.Add(line);
             }
+
+
             
 
             SendScriptReply reply = client.SendScript(request);
@@ -58,10 +59,9 @@ namespace PuppetMaster
         }
 
 
-        public void SendAppDataToScheduler(String appData, String input)
+        public void SendAppDataToScheduler(string appFilePath, string input)
         {
-
-            scheduler.SendAppData(appData,input);
+            scheduler.SendAppData(appFilePath, input);
         }
 
     }

@@ -56,7 +56,7 @@ namespace PuppetMaster
         private void ButtonSendAppData_Click(object sender, EventArgs e)
         {
             puppetMaster.SendAppDataToScheduler(
-                Utils.ReadFromFile(textAppDataFile.Text),
+                textAppDataFile.Text,
                 textAppInput.Text);
         }
 
