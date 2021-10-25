@@ -38,14 +38,28 @@ namespace PuppetMaster
                     if (line == "")
                         continue;
                     string[] buffer = line.Split(' ');
-                    puppetMaster.CreateNewConfigEvent(buffer);
+                    switch (buffer[0])
+                    {
+                        case "client":
+                            puppetMaster.SendAppDataToScheduler(buffer);
+                            break;
+                        case "scheduler":
+                            puppetMaster.CreateChannelWithScheduler(this, buffer[1],buffer[2]);
+                            puppetMaster.CreateNewConfigEvent(buffer);
+                            break;
+                        default:
+                            puppetMaster.CreateNewConfigEvent(buffer);
+                            break;
+
+                    }
+                    
                 }
             }
         }
 
         private void ButtonBrowseAppData_Click(object sender, EventArgs e)
         {
-            OpenFileDialog fdlg = new OpenFileDialog
+            /*OpenFileDialog fdlg = new OpenFileDialog
             {
                 Title = "C# Corner Open File Dialog",
                 InitialDirectory = @"c:\",
@@ -56,15 +70,15 @@ namespace PuppetMaster
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
                 textAppDataFile.Text = fdlg.FileName;
-            }
+            }*/
 
         }
 
         private void ButtonSendAppData_Click(object sender, EventArgs e)
         {
-            puppetMaster.SendAppDataToScheduler(
+            /*puppetMaster.SendAppDataToScheduler(
                 textAppDataFile.Text,
-                textAppInput.Text);
+                textAppInput.Text);*/
         }
 
         private void TextAppInput_Click(object sender, EventArgs e)
@@ -74,7 +88,7 @@ namespace PuppetMaster
 
         private void ButtonCreateConnectionWithScheduler_Click(object sender, EventArgs e)
         {
-            puppetMaster.CreateChannelWithScheduler(this, "localhost", 4001, "localhost");
+            //puppetMaster.CreateChannelWithScheduler(this, "localhost", 4001, "localhost");
         }
 
         private void ButtonDebugCreateScheduler_Click(object sender, EventArgs e)

@@ -42,8 +42,9 @@ namespace Process_Creation_Service
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                if(request.Type.Equals("scheduler"))
-                { psi.Arguments = request.ServerId + " " + hostname + " " + port; }
+                if(request.Type.Equals("scheduler")){ 
+                    psi.Arguments = request.ServerId + " " + hostname + " " + port; 
+                }
                 else { psi.Arguments = request.ServerId + " " + hostname + " " + port + " " + request.GossipDelay; }
 
                 Process.Start(psi);

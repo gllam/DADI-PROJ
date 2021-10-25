@@ -1,3 +1,4 @@
 scheduler sched1 http://localhost:2000
-worker w1 http://localhost:4001
-
+storage s1 http://localhost:3001 0
+worker w1 http://localhost:4001 0
+client r1 app1
