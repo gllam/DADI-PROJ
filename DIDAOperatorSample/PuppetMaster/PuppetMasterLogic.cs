@@ -61,13 +61,29 @@ namespace PuppetMaster
             client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
         }
 
-        public Boolean SendCreateProccessInstanceRequest(string serverId, string url)
+        public Boolean SendCreateProccessInstanceRequest(string[] parsedInput)
         {
-            CreateProccessInstanceRequest request = new CreateProccessInstanceRequest
+            CreateProccessInstanceRequest request;
+            if (parsedInput[0].Equals("scheduler")) { 
+                request = new CreateProccessInstanceRequest
+                {
+                    Type = parsedInput[0],
+                    ServerId = parsedInput[1],
+                    Url = parsedInput[2],
+                    GossipDelay = 0
+                };
+            }
+            else
             {
-                ServerId = serverId,
-                Url = url
-            };
+                request = new CreateProccessInstanceRequest
+                {
+                    Type = parsedInput[0],
+                    ServerId = parsedInput[1],
+                    Url = parsedInput[2],
+                    GossipDelay = Convert.ToInt32(parsedInput[3])
+                };
+
+            }
 
             CreateProccessInstanceReply reply = client.CreateProccessInstance(request);
             return reply.Ack;
@@ -94,10 +110,14 @@ namespace PuppetMaster
             scheduler.SendAppData(appFilePath, input);
         }
 
-        public void SendCreateProccessInstanceRequest(string serverId, string url)
+        /*public void SendCreateProccessInstanceRequest(string serverId, string url)
         {
             pcs.SendCreateProccessInstanceRequest(serverId, url);
-        }
+        }*/
 
+        internal void CreateNewConfigEvent(string[] parsedInput)
+        {
+            pcs.SendCreateProccessInstanceRequest(parsedInput);
+        }
     }
 }
