@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "Google.Protobuf/3.18.1": {
+      "Google.Protobuf/3.19.0": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3",
@@ -90,14 +90,14 @@
     }
   },
   "libraries": {
-    "Google.Protobuf/3.18.1": {
-      "sha512": "7lP9/TAFa27uJC5Udbybnb8twoXDIjA5gGjmsrwJqyNIRoJ3VKKrJhQwrsQAIzwT54l7DwlpWm5vGDH5hW/Dig==",
+    "Google.Protobuf/3.19.0": {
+      "sha512": "WHfgqb0R6IaoB2bN18OkaDABA2bP4gz9NPYD41nKhaporyBclQlXThQtxGic7Hc4Ip0B/Avw6xZDjx9vb/3XuQ==",
       "type": "package",
-      "path": "google.protobuf/3.18.1",
+      "path": "google.protobuf/3.19.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "google.protobuf.3.18.1.nupkg.sha512",
+        "google.protobuf.3.19.0.nupkg.sha512",
         "google.protobuf.nuspec",
         "lib/net45/Google.Protobuf.dll",
         "lib/net45/Google.Protobuf.pdb",
@@ -257,7 +257,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "Google.Protobuf >= 3.18.1",
+      "Google.Protobuf >= 3.19.0",
       "Grpc.Core >= 2.41.0",
       "Grpc.Tools >= 2.41.0"
     ]
@@ -268,9 +268,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
-      "projectName": "DIDAStorageUI",
-      "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\DIDAStorageUI.csproj",
+      "projectUniqueName": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\Storage.csproj",
+      "projectName": "Storage",
+      "projectPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\Storage.csproj",
       "packagesPath": "C:\\Users\\BCV\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\BCV\\Documents\\GitHub\\DADI-PROJ\\DIDAOperatorSample\\DIDAStorageUI\\obj\\",
       "projectStyle": "PackageReference",
@@ -303,7 +303,7 @@
         "dependencies": {
           "Google.Protobuf": {
             "target": "Package",
-            "version": "[3.18.1, )"
+            "version": "[3.19.0, )"
           },
           "Grpc.Core": {
             "target": "Package",
