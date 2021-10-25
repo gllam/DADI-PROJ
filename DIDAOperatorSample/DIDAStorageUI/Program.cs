@@ -11,6 +11,8 @@ namespace DIDAStorageUI {
         int maxVersions = 5; //dummy
         readonly int replicaid;
 
+        //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance 
+
         public StorageService(int replicaid)
         {
             this.replicaid = replicaid;
@@ -56,7 +58,18 @@ namespace DIDAStorageUI {
         }
 
         private DIDAVersion UpdateData(DIDAUpdateIfRequest request) {
-            return new DIDAVersion { ReplicaId = -1, VersionNumber = -1 };
+            lock (this)
+            {
+                if (data[request.Id][data[request.Id].Count - 1].val == request.Oldvalue)
+                {
+                    return WriteData(new DIDAWriteRequest
+                    {
+                        Id = request.Id,
+                        Val = request.Newvalue
+                    });
+                }
+                return new DIDAVersion { ReplicaId = -1, VersionNumber = -1 }; //null version
+            }
         }
 
         public override Task<DIDAVersion> write(DIDAWriteRequest request, ServerCallContext context) {
