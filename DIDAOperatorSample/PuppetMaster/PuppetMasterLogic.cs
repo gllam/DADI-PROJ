@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -11,29 +12,29 @@ namespace PuppetMaster
         private readonly GrpcChannel channel;
         private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
         private readonly Form1 guiWindow;
-        private string hostname;
+        private readonly string serverId;
 
-        public SchedulerAsServer(Form1 guiWindow, string serverHostname, int serverPort,
-                            string clientHostname)
+        public SchedulerAsServer(Form1 guiWindow, string serverId, string hostname, string port)
         {
-            this.hostname = clientHostname;
             this.guiWindow = guiWindow;
+            this.serverId = serverId;
             // setup the client side
 
             AppContext.SetSwitch(
                 "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            channel = GrpcChannel.ForAddress("http://" + serverHostname + ":" + serverPort.ToString());
+            channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
 
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
         
-        public Boolean SendAppData(string appFilePath, string input)
+        public Boolean SendAppData(string[] data)
         {
             SendAppDataRequest request = new SendAppDataRequest
             {
-                Input = input,
+                Input = data[1],
             };
-            foreach (string line in System.IO.File.ReadLines(@appFilePath))
+            //need to check where we put the input files
+            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
             {
                 request.App.Add(line);
             }
@@ -100,14 +101,17 @@ namespace PuppetMaster
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
         
-        public void CreateChannelWithScheduler(Form1 guiWindow, string serverHostname, int serverPort, string clientHostname)
+        public void CreateChannelWithScheduler(Form1 guiWindow, string serverId, string url)
         {
-            scheduler = new SchedulerAsServer(guiWindow, serverHostname, serverPort, clientHostname);
+            string urlRefined = url.Split("http://")[1];
+            string port = urlRefined.Split(':')[1];
+            string hostname = urlRefined.Split(':')[0];
+            scheduler = new SchedulerAsServer(guiWindow, serverId,hostname, port);
         }
 
-        public void SendAppDataToScheduler(string appFilePath, string input)
+        public void SendAppDataToScheduler(string[] buffer)
         {
-            scheduler.SendAppData(appFilePath, input);
+            scheduler.SendAppData(buffer);
         }
 
         /*public void SendCreateProccessInstanceRequest(string serverId, string url)
@@ -115,8 +119,7 @@ namespace PuppetMaster
             pcs.SendCreateProccessInstanceRequest(serverId, url);
         }*/
 
-        internal void CreateNewConfigEvent(string[] parsedInput)
-        {
+        internal void CreateNewConfigEvent(string[] parsedInput) {
             pcs.SendCreateProccessInstanceRequest(parsedInput);
         }
     }
