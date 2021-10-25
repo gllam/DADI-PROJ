@@ -16,6 +16,7 @@ namespace PuppetMaster
         public Form1()
         {
             InitializeComponent();
+            puppetMaster = new PuppetMasterLogic(this);
         }
 
         private void ButtonBrowseConfigScript_Click(object sender, EventArgs e)
@@ -30,9 +31,15 @@ namespace PuppetMaster
             };
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
-                //Missing -> process the script and then send to the correspondent PCS's
-                Utils.ReadFromFile(fdlg.FileName);
                 textFileScript.Text = fdlg.FileName;
+                //Missing -> process the script and then send to the correspondent PCS's
+                foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
+                {
+                    if (line == "")
+                        continue;
+                    string[] buffer = line.Split(' ');
+                    puppetMaster.CreateNewConfigEvent(buffer);
+                }
             }
         }
 
@@ -67,8 +74,12 @@ namespace PuppetMaster
 
         private void ButtonCreateConnectionWithScheduler_Click(object sender, EventArgs e)
         {
-            puppetMaster = new PuppetMasterLogic();
             puppetMaster.CreateChannelWithScheduler(this, "localhost", 4001, "localhost");
+        }
+
+        private void ButtonDebugCreateScheduler_Click(object sender, EventArgs e)
+        {
+            //puppetMaster.SendCreateProccessInstanceRequest("sched1", "http://localhost:2000");
         }
     }
 }

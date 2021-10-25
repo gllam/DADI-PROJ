@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
+using SchedulerNamespace;
 
 namespace Process_Creation_Service
 {
@@ -18,18 +22,37 @@ namespace Process_Creation_Service
             public override Task<CreateProccessInstanceReply> CreateProccessInstance(
                 CreateProccessInstanceRequest request, ServerCallContext context)
             {
-                /*Console.WriteLine("Deadline: " + context.Deadline);
-                Console.WriteLine("Host: " + context.Host);
-                Console.WriteLine("Method: " + context.Method);
-                Console.WriteLine("Peer: " + context.Peer);*/
-                CreateProccessInstanceReply reply = new CreateProccessInstanceReply
+                Console.WriteLine("Creating " + request.Type);
+                return Task.FromResult(CreateProcInstance(request));
+                
+            }
+
+            private CreateProccessInstanceReply CreateProcInstance(CreateProccessInstanceRequest request)
+            {
+                int port;
+                string hostname;
+                string urlRefined;
+                urlRefined = request.Url.Split("http://")[1];
+                port = Convert.ToInt32(urlRefined.Split(':')[1]);
+                hostname = urlRefined.Split(':')[0];
+                string workingDirectory = Path.GetFullPath(request.Type + ".exe");
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = workingDirectory,
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                };
+                if(request.Type.Equals("scheduler"))
+                { psi.Arguments = request.ServerId + " " + hostname + " " + port; }
+                else { psi.Arguments = request.ServerId + " " + hostname + " " + port + " " + request.GossipDelay; }
+
+                Process.Start(psi);
+
+                return new CreateProccessInstanceReply
                 {
                     Ack = true
                 };
-                return Task.FromResult(reply);
-                //return Task.FromResult(Reg(request)); This is used to make the calls assynchronous
             }
-
         }
         public static void Main(string[] args)
         {
