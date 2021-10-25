@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IncrementOperator", "IncrementOperator\IncrementOperator.csproj", "{A5B19D14-E921-47F5-B10D-BBC904ED7D39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DIDAStorageUI", "DIDAStorageUI\DIDAStorageUI.csproj", "{23BCC2D4-1D25-470C-BC67-0AD31AED34F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "DIDAStorageUI\Storage.csproj", "{23BCC2D4-1D25-470C-BC67-0AD31AED34F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Worker", "OperatorRunner\Worker.csproj", "{80546A3C-113E-4935-9FC3-4568199A64A5}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler", "Scheduler2\Sch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuppetMaster", "PuppetMaster\PuppetMaster.csproj", "{2E746518-768D-41FA-9510-3EF89D7D9B83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessCreationService", "Process Creation Service\ProcessCreationService.csproj", "{715C92C0-1656-418C-9B83-6CE9D074F94B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessCreationService", "Process Creation Service\ProcessCreationService.csproj", "{715C92C0-1656-418C-9B83-6CE9D074F94B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

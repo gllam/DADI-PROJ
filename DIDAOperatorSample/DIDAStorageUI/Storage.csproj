@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Process_Creation_Service</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,12 +12,17 @@
     <PackageReference Include="Grpc.Tools" Version="2.41.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-    <ProjectReference Include="..\DIDAStorageUI\Storage.csproj" />
-    <ProjectReference Include="..\OperatorRunner\Worker.csproj" />
-    <ProjectReference Include="..\Scheduler2\Scheduler.csproj" />
-	  <Protobuf Include="protos\DIDAProccessCreator.proto" GrpcServices="Server" />
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Server" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="LibDIDAStorage">
+      <HintPath>..\DIDALibraries\LibDIDAStorage.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
-  
 </Project>
