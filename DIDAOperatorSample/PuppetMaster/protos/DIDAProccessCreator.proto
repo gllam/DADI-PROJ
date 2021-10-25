@@ -5,8 +5,10 @@ service DIDAProccessCreatorService {
 }
 
 message CreateProccessInstanceRequest {
-	string serverId = 1;
-	string url = 2;
+	string type = 1;
+	string serverId = 2;
+	string url = 3;
+	int32 gossipDelay = 4;
 }
 
 message CreateProccessInstanceReply {

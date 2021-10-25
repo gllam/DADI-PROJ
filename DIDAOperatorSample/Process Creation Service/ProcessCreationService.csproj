@@ -14,6 +14,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
+    <ProjectReference Include="..\DIDAStorageUI\DIDAStorageUI.csproj" />
     <ProjectReference Include="..\OperatorRunner\Worker.csproj" />
     <ProjectReference Include="..\Scheduler2\Scheduler.csproj" />
 	  <Protobuf Include="protos\DIDAProccessCreator.proto" GrpcServices="Server" />

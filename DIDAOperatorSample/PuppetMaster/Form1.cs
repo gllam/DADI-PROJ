@@ -31,9 +31,15 @@ namespace PuppetMaster
             };
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
-                //Missing -> process the script and then send to the correspondent PCS's
-                Utils.ReadFromFile(fdlg.FileName);
                 textFileScript.Text = fdlg.FileName;
+                //Missing -> process the script and then send to the correspondent PCS's
+                foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
+                {
+                    if (line == "")
+                        continue;
+                    string[] buffer = line.Split(' ');
+                    puppetMaster.CreateNewConfigEvent(buffer);
+                }
             }
         }
 
@@ -73,7 +79,7 @@ namespace PuppetMaster
 
         private void ButtonDebugCreateScheduler_Click(object sender, EventArgs e)
         {
-            puppetMaster.SendCreateProccessInstanceRequest("sched1", "http://localhost:2000");
+            //puppetMaster.SendCreateProccessInstanceRequest("sched1", "http://localhost:2000");
         }
     }
 }
