@@ -13,7 +13,7 @@ namespace SchedulerNamespace
     public class SchedulerService : DIDASchedulerService.DIDASchedulerServiceBase
     {
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
-        List<(string, string, DIDAWorkerService.DIDAWorkerServiceClient)> workerMap = new List<(string, string, DIDAWorkerService.DIDAWorkerServiceClient)>();
+        List<(string, string)> workerMap = new List<(string, string)>();
 
         public SchedulerService(){}
 
@@ -68,7 +68,11 @@ namespace SchedulerNamespace
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
         {
-            SendDIDAReqReply reply = workerMap[0].Item3.SendDIDAReq(request);
+            string host = request.Asschain[request.Next].Host;
+            int port = request.Asschain[request.Next].Port;
+            GrpcChannel channel = GrpcChannel.ForAddress(host + ":" + port);
+            DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+            SendDIDAReqReply reply = client.SendDIDAReq(request);
             Console.WriteLine("Request to worker " + reply.Ack);
         }
 
@@ -83,10 +87,8 @@ namespace SchedulerNamespace
         {
             foreach (string url in request.Url)
             {
-                GrpcChannel channel = GrpcChannel.ForAddress(url);
-                DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
                 string[] hostport = url.Split("//")[1].Split(":");
-                workerMap.Add((hostport[0],hostport[1], client));
+                workerMap.Add((hostport[0],hostport[1]));
             }
             return new SendWorkersReply
             {
