@@ -19,58 +19,67 @@ namespace SchedulerNamespace
 
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
-            return Task.FromResult(requestApp(request));
+            return Task.FromResult(RequestApp(request));
         }
 
-        public SendAppDataReply requestApp(SendAppDataRequest request)
+        public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
-            //DEBUG
-            SendWorkersRequest swr = new SendWorkersRequest();
-            swr.Url.Add("http://localhost:5001");
-            setWorkers(swr);
-            //DEBUG
-            Console.WriteLine(request.Input);
-            MetaRecord meta = new MetaRecord
+            try
             {
-                Id = 1
-            }; //metarecord dummy
-            int chainSize = request.App.Count;
-            Console.WriteLine(chainSize);
-            SendDIDAReqRequest req = new SendDIDAReqRequest
-            {
-                Meta = meta,
-                Input = request.Input,
-                Next = 0,
-                ChainSize = chainSize
-            }; //request to worker
-            for (int opIndex = 0; opIndex < chainSize; opIndex++)
-            {
-                OperatorID op = new OperatorID
+                Console.WriteLine("hi");
+                Console.WriteLine(request.Input);
+                MetaRecord meta = new MetaRecord
                 {
-                    Classname = request.App[opIndex].Split()[1],
-                    Order = Int32.Parse(request.App[opIndex].Split()[2])
-                };
-                Assignment ass = new Assignment
+                    Id = 1
+                }; //metarecord dummy
+                int chainSize = request.App.Count;
+                Console.WriteLine(chainSize);
+                SendDIDAReqRequest req = new SendDIDAReqRequest
                 {
-                    Opid = op,
-                    Host = workerMap[opIndex].Item1,
-                    Port = Int32.Parse(workerMap[opIndex].Item2),
-                    Output = ""
-                };
-                req.Asschain.Add(ass);
+                    Meta = meta,
+                    Input = request.Input,
+                    Next = 0,
+                    ChainSize = chainSize
+                }; //request to worker
+                for (int opIndex = 0; opIndex < chainSize; opIndex++)
+                {
+                    OperatorID op = new OperatorID
+                    {
+                        Classname = request.App[opIndex].Split()[1],
+                        Order = Int32.Parse(request.App[opIndex].Split()[2])
+                    };
+                    Assignment ass = new Assignment
+                    {
+                        Opid = op,
+                        Host = "localhost",
+                        Port = 5001,
+                        //Host = workerMap[opIndex].Item1,
+                        //Port = Int32.Parse(workerMap[opIndex].Item2),
+                        Output = ""
+                    };
+                    req.Asschain.Add(ass);
+                }
+                Console.WriteLine("hi");
+                SendRequestToWorker(req);
+                return new SendAppDataReply
+                {
+                    Ack = true
+                }; //reply to pm
+            } catch(Exception e)
+            {
+                Console.WriteLine("error " + e);
+                return new SendAppDataReply
+                {
+                    Ack = true
+                }; //reply to pm
             }
-            SendRequestToWorker(req);
-            return new SendAppDataReply
-            {
-                Ack = true
-            }; //reply to pm
         }
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
         {
             string host = request.Asschain[request.Next].Host;
             int port = request.Asschain[request.Next].Port;
-            GrpcChannel channel = GrpcChannel.ForAddress(host + ":" + port);
+            GrpcChannel channel = GrpcChannel.ForAddress("http://" + host + ":" + port);
             DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
             SendDIDAReqReply reply = client.SendDIDAReq(request);
             Console.WriteLine("Request to worker " + reply.Ack);
