@@ -19,41 +19,110 @@ namespace Process_Creation_Service
             {
             }
 
-            public override Task<CreateProccessInstanceReply> CreateProccessInstance(
-                CreateProccessInstanceRequest request, ServerCallContext context)
+            public override Task<CreateProccessInstanceReply> CreateSchedulerInstance(
+                CreateSchedulerInstanceRequest request, ServerCallContext context)
             {
-                Console.WriteLine("Creating " + request.Type);
-                return Task.FromResult(CreateProcInstance(request));
+                Console.WriteLine("Creating Scheduler: " + request.MyData.ServerId);
+                return Task.FromResult(CreateSchedInstance(request));
                 
             }
-
-            private CreateProccessInstanceReply CreateProcInstance(CreateProccessInstanceRequest request)
+            private CreateProccessInstanceReply CreateSchedInstance(CreateSchedulerInstanceRequest request)
             {
                 int port;
                 string hostname;
                 string urlRefined;
-                urlRefined = request.Url.Split("http://")[1];
+                urlRefined = request.MyData.Url.Split("http://")[1];
                 port = Convert.ToInt32(urlRefined.Split(':')[1]);
                 hostname = urlRefined.Split(':')[0];
-                string workingDirectory = Path.GetFullPath(request.Type + ".exe");
+                string workingDirectory = Path.GetFullPath("scheduler.exe");
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = workingDirectory,
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                if(request.Type.Equals("scheduler")){ 
-                    psi.Arguments = request.ServerId + " " + hostname + " " + port; 
+                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port;
+                foreach(ProccessData data in request.DependenciesData)
+                {
+                    psi.Arguments = psi.Arguments + " " + data.ServerId + "|" + data.Url;
                 }
-                else { psi.Arguments = request.ServerId + " " + hostname + " " + port + " " + request.GossipDelay; }
 
                 Process.Start(psi);
-
                 return new CreateProccessInstanceReply
                 {
                     Ack = true
                 };
             }
+
+            public override Task<CreateProccessInstanceReply> CreateWorkerInstance(
+                                    CreateWorkerInstanceRequest request, ServerCallContext context)
+            {
+                Console.WriteLine("Creating Worker: " + request.MyData.ServerId);
+                return Task.FromResult(CreateWorkInstance(request));
+
+            }
+
+            private CreateProccessInstanceReply CreateWorkInstance(CreateWorkerInstanceRequest request)
+            {
+                int port;
+                string hostname;
+                string urlRefined;
+                urlRefined = request.MyData.Url.Split("http://")[1];
+                port = Convert.ToInt32(urlRefined.Split(':')[1]);
+                hostname = urlRefined.Split(':')[0];
+                string workingDirectory = Path.GetFullPath("worker.exe");
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = workingDirectory,
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                };
+                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
+                foreach (ProccessData data in request.DependenciesData)
+                {
+                    psi.Arguments = psi.Arguments + " " + data.ServerId + "|" + data.Url;
+                }
+
+                Process.Start(psi);
+                return new CreateProccessInstanceReply
+                {
+                    Ack = true
+                };
+            }
+
+            public override Task<CreateProccessInstanceReply> CreateStorageInstance(
+                                    CreateStorageInstanceRequest request, ServerCallContext context)
+            {
+                Console.WriteLine("Creating Storage: " + request.MyData.ServerId);
+                return Task.FromResult(CreateStorInstance(request));
+
+            }
+
+            private CreateProccessInstanceReply CreateStorInstance(CreateStorageInstanceRequest request)
+            {
+                int port;
+                string hostname;
+                string urlRefined;
+                urlRefined = request.MyData.Url.Split("http://")[1];
+                port = Convert.ToInt32(urlRefined.Split(':')[1]);
+                hostname = urlRefined.Split(':')[0];
+                string workingDirectory = Path.GetFullPath("storage.exe");
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = workingDirectory,
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                };
+                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
+                Process.Start(psi);
+                return new CreateProccessInstanceReply
+                {
+                    Ack = true
+                };
+            }
+
+
+
         }
         public static void Main(string[] args)
         {

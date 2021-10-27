@@ -11,12 +11,10 @@ namespace PuppetMaster
     {
         private readonly GrpcChannel channel;
         private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
-        private readonly Form1 guiWindow;
         private readonly string serverId;
 
-        public SchedulerAsServer(Form1 guiWindow, string serverId, string hostname, string port)
+        public SchedulerAsServer(string serverId, string hostname, string port)
         {
-            this.guiWindow = guiWindow;
             this.serverId = serverId;
             // setup the client side
 
@@ -62,31 +60,66 @@ namespace PuppetMaster
             client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
         }
 
-        public Boolean SendCreateProccessInstanceRequest(string[] parsedInput)
+        internal Boolean SendCreateSchedulerRequest(string[] scheduler, string[][] workers)
         {
-            CreateProccessInstanceRequest request;
-            if (parsedInput[0].Equals("scheduler")) { 
-                request = new CreateProccessInstanceRequest
-                {
-                    Type = parsedInput[0],
-                    ServerId = parsedInput[1],
-                    Url = parsedInput[2],
-                    GossipDelay = 0
-                };
-            }
-            else
+            CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
-                request = new CreateProccessInstanceRequest
+                MyData = new ProccessData
                 {
-                    Type = parsedInput[0],
-                    ServerId = parsedInput[1],
-                    Url = parsedInput[2],
-                    GossipDelay = Convert.ToInt32(parsedInput[3])
-                };
-
+                    ServerId = scheduler[1],
+                    Url = scheduler[2]
+                }
+            };
+            foreach (string[] worker in workers)
+            {
+                request.DependenciesData.Add(new ProccessData
+                { 
+                    ServerId = worker[1] ,
+                    Url = worker[2]
+                });
             }
 
-            CreateProccessInstanceReply reply = client.CreateProccessInstance(request);
+            CreateProccessInstanceReply reply = client.CreateSchedulerInstance(request);
+            return reply.Ack;
+        }
+
+        internal Boolean SendCreateWorkerRequest(string[] worker, string[][] storages)
+        {
+            CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
+            {
+                MyData = new ProccessData
+                {
+                    ServerId = worker[1],
+                    Url = worker[2],
+                },
+                GossipDelay = worker[3] 
+            };
+            foreach (string[] storage in storages)
+            {
+                request.DependenciesData.Add(new ProccessData
+                {
+                    ServerId = storage[1],
+                    Url = storage[2]
+                });
+            }
+
+            CreateProccessInstanceReply reply = client.CreateWorkerInstance(request);
+            return reply.Ack;
+        }
+
+        internal Boolean SendCreateStorageRequest(string[] storage)
+        {
+            CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
+            {
+                MyData = new ProccessData
+                {
+                    ServerId = storage[1],
+                    Url = storage[2],
+                },
+                GossipDelay = storage[3]
+            };
+
+            CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
             return reply.Ack;
         }
     }
@@ -101,12 +134,12 @@ namespace PuppetMaster
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
         
-        public void CreateChannelWithScheduler(Form1 guiWindow, string serverId, string url)
+        public void CreateChannelWithScheduler(string serverId, string url)
         {
             string urlRefined = url.Split("http://")[1];
             string port = urlRefined.Split(':')[1];
             string hostname = urlRefined.Split(':')[0];
-            scheduler = new SchedulerAsServer(guiWindow, serverId,hostname, port);
+            scheduler = new SchedulerAsServer(serverId,hostname, port);
         }
 
         public void SendAppDataToScheduler(string[] buffer)
@@ -114,13 +147,28 @@ namespace PuppetMaster
             scheduler.SendAppData(buffer);
         }
 
+        internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
+        {
+            //Create Scheduler
+            pcs.SendCreateSchedulerRequest(scheduler, workers);
+            this.CreateChannelWithScheduler(scheduler[1],scheduler[2]);
+            //Create workers
+            foreach(string[] worker in workers)
+            {
+                pcs.SendCreateWorkerRequest(worker, storages);
+            }
+
+            //Create Storages
+            foreach (string[] storage in storages)
+            {
+                pcs.SendCreateStorageRequest(storage);
+            }
+
+        }
+
         /*public void SendCreateProccessInstanceRequest(string serverId, string url)
         {
             pcs.SendCreateProccessInstanceRequest(serverId, url);
         }*/
-
-        internal void CreateNewConfigEvent(string[] parsedInput) {
-            pcs.SendCreateProccessInstanceRequest(parsedInput);
-        }
     }
 }
