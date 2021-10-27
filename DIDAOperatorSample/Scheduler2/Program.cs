@@ -15,7 +15,7 @@ namespace SchedulerNamespace
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<(string, string)> workerMap = new List<(string, string)>();
 
-        public SchedulerService(){}
+        public SchedulerService() { }
 
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
@@ -24,55 +24,43 @@ namespace SchedulerNamespace
 
         public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
-            try
+            Console.WriteLine(request.Input);
+            MetaRecord meta = new MetaRecord
             {
-                Console.WriteLine("hi");
-                Console.WriteLine(request.Input);
-                MetaRecord meta = new MetaRecord
-                {
-                    Id = 1
-                }; //metarecord dummy
-                int chainSize = request.App.Count;
-                Console.WriteLine(chainSize);
-                SendDIDAReqRequest req = new SendDIDAReqRequest
-                {
-                    Meta = meta,
-                    Input = request.Input,
-                    Next = 0,
-                    ChainSize = chainSize
-                }; //request to worker
-                for (int opIndex = 0; opIndex < chainSize; opIndex++)
-                {
-                    OperatorID op = new OperatorID
-                    {
-                        Classname = request.App[opIndex].Split()[1],
-                        Order = Int32.Parse(request.App[opIndex].Split()[2])
-                    };
-                    Assignment ass = new Assignment
-                    {
-                        Opid = op,
-                        Host = "localhost",
-                        Port = 5001,
-                        //Host = workerMap[opIndex].Item1,
-                        //Port = Int32.Parse(workerMap[opIndex].Item2),
-                        Output = ""
-                    };
-                    req.Asschain.Add(ass);
-                }
-                Console.WriteLine("hi");
-                SendRequestToWorker(req);
-                return new SendAppDataReply
-                {
-                    Ack = true
-                }; //reply to pm
-            } catch(Exception e)
+                Id = 1
+            }; //metarecord dummy
+            int chainSize = request.App.Count;
+            Console.WriteLine(chainSize);
+            SendDIDAReqRequest req = new SendDIDAReqRequest
             {
-                Console.WriteLine("error " + e);
-                return new SendAppDataReply
+                Meta = meta,
+                Input = request.Input,
+                Next = 0,
+                ChainSize = chainSize
+            }; //request to worker
+            for (int opIndex = 0; opIndex < chainSize; opIndex++)
+            {
+                OperatorID op = new OperatorID
                 {
-                    Ack = true
-                }; //reply to pm
+                    Classname = request.App[opIndex].Split()[1],
+                    Order = Int32.Parse(request.App[opIndex].Split()[2])
+                };
+                Assignment ass = new Assignment
+                {
+                    Opid = op,
+                    Host = "localhost",
+                    Port = 5001,
+                    //Host = workerMap[opIndex].Item1,
+                    //Port = Int32.Parse(workerMap[opIndex].Item2),
+                    Output = ""
+                };
+                req.Asschain.Add(ass);
             }
+            SendRequestToWorker(req);
+            return new SendAppDataReply
+            {
+                Ack = true
+            }; //reply to pm
         }
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
@@ -91,20 +79,20 @@ namespace SchedulerNamespace
             return Task.FromResult(setWorkers(request));
         }
 
-        
+
         public SendWorkersReply setWorkers(SendWorkersRequest request)
         {
             foreach (string url in request.Url)
             {
                 string[] hostport = url.Split("//")[1].Split(":");
-                workerMap.Add((hostport[0],hostport[1]));
+                workerMap.Add((hostport[0], hostport[1]));
             }
             return new SendWorkersReply
             {
                 Ack = true
             };
         }
-        
+
     }
 
     public class Scheduler
@@ -118,7 +106,7 @@ namespace SchedulerNamespace
             ServerPort serverPort;
             string startupMessage;
             serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
-            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port ;
+            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port;
 
             Server server = new Server
             {

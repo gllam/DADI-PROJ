@@ -24,44 +24,33 @@ namespace OperatorRunner
 
         public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //out of range
         {
-            try
+            Console.WriteLine(request);
+            string classname = request.Asschain[request.Next].Opid.Classname;
+            Console.WriteLine(classname);
+            DIDAMetaRecord metarecord = new DIDAMetaRecord
             {
-                Console.WriteLine(request);
-                string classname = request.Asschain[request.Next].Opid.Classname;
-                Console.WriteLine(classname);
-                DIDAMetaRecord metarecord = new DIDAMetaRecord
-                {
-                    id = request.Meta.Id
-                }; //dummy meta record
-                string input = request.Input;
-                string previousoutput = null;
-                if (request.Next != 0)
-                {
-                    previousoutput = request.Asschain[request.Next - 1].Output;
-                }
-                request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
-                request.Next += 1;
-                if(request.Next < request.Asschain.Count)
-                {
-                    SendRequestToWorker(request);
-                }
-                Console.WriteLine("gg");
-                return new SendDIDAReqReply
-                {
-                    Ack = true
-                };
-            } catch ( Exception e)
+                id = request.Meta.Id
+            }; //dummy meta record
+            string input = request.Input;
+            string previousoutput = null;
+            if (request.Next != 0)
             {
-                Console.WriteLine("error " + e);
-                return new SendDIDAReqReply
-                {
-                    Ack = true
-                };
+                previousoutput = request.Asschain[request.Next - 1].Output;
             }
+            request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
+            request.Next += 1;
+            if (request.Next < request.Asschain.Count)
+            {
+                SendRequestToWorker(request);
+            }
+            return new SendDIDAReqReply
+            {
+                Ack = true
+            };
         }
 
         string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
-        { //operator error
+        {
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
@@ -69,7 +58,7 @@ namespace OperatorRunner
             Assembly _dll = Assembly.LoadFrom(filename);
             Type[] types = _dll.GetTypes();
             Type t = null;
-            foreach(Type type in types)
+            foreach (Type type in types)
             {
                 if (type.Name == "CounterOperator")
                 {
@@ -79,7 +68,7 @@ namespace OperatorRunner
             Console.WriteLine(t);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(new DIDAStorageNode[] { new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" } }, MyLocationFunction);
-            string output = _opLoadedByReflection.ProcessRecord(meta,input,previousoutput);
+            string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
             return output;
         }
 
@@ -115,7 +104,7 @@ namespace OperatorRunner
 
                 server.Start();
                 Console.ReadLine();
-            }         
+            }
         }
     }
 }
