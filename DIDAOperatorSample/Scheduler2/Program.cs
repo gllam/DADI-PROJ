@@ -15,20 +15,15 @@ namespace SchedulerNamespace
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<(string, string)> workerMap = new List<(string, string)>();
 
-        public SchedulerService(){}
+        public SchedulerService() { }
 
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
-            return Task.FromResult(requestApp(request));
+            return Task.FromResult(RequestApp(request));
         }
 
-        public SendAppDataReply requestApp(SendAppDataRequest request)
+        public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
-            //DEBUG
-            SendWorkersRequest swr = new SendWorkersRequest();
-            swr.Url.Add("http://localhost:5001");
-            setWorkers(swr);
-            //DEBUG
             Console.WriteLine(request.Input);
             MetaRecord meta = new MetaRecord
             {
@@ -53,8 +48,10 @@ namespace SchedulerNamespace
                 Assignment ass = new Assignment
                 {
                     Opid = op,
-                    Host = workerMap[opIndex].Item1,
-                    Port = Int32.Parse(workerMap[opIndex].Item2),
+                    Host = "localhost",
+                    Port = 5001,
+                    //Host = workerMap[opIndex].Item1,
+                    //Port = Int32.Parse(workerMap[opIndex].Item2),
                     Output = ""
                 };
                 req.Asschain.Add(ass);
@@ -70,7 +67,7 @@ namespace SchedulerNamespace
         {
             string host = request.Asschain[request.Next].Host;
             int port = request.Asschain[request.Next].Port;
-            GrpcChannel channel = GrpcChannel.ForAddress(host + ":" + port);
+            GrpcChannel channel = GrpcChannel.ForAddress("http://" + host + ":" + port);
             DIDAWorkerService.DIDAWorkerServiceClient client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
             SendDIDAReqReply reply = client.SendDIDAReq(request);
             Console.WriteLine("Request to worker " + reply.Ack);
@@ -82,20 +79,20 @@ namespace SchedulerNamespace
             return Task.FromResult(setWorkers(request));
         }
 
-        
+
         public SendWorkersReply setWorkers(SendWorkersRequest request)
         {
             foreach (string url in request.Url)
             {
                 string[] hostport = url.Split("//")[1].Split(":");
-                workerMap.Add((hostport[0],hostport[1]));
+                workerMap.Add((hostport[0], hostport[1]));
             }
             return new SendWorkersReply
             {
                 Ack = true
             };
         }
-        
+
     }
 
     public class Scheduler
@@ -109,7 +106,7 @@ namespace SchedulerNamespace
             ServerPort serverPort;
             string startupMessage;
             serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
-            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port ;
+            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port;
 
             Server server = new Server
             {
