@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -32,8 +33,8 @@ namespace PuppetMaster
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
                 textFileScript.Text = fdlg.FileName;
-                string[][] workers = null;
-                string[][] storages = null;
+                List<string[]> workers = new List<string[]>();
+                List<string[]> storages = new List<string[]>();
                 string[] scheduler = null;
 
                 foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
@@ -44,7 +45,8 @@ namespace PuppetMaster
                     switch (buffer[0])
                     {
                         case "client":
-                            puppetMaster.SendAppDataToScheduler(buffer);
+                            /*var t = new Thread(new ThreadStart(() => puppetMaster.SendAppDataToScheduler(buffer)));
+                            t.Start();*/
                             break;
                         case "scheduler":
                             if (scheduler != null)//Only allowed 1 scheduler per script
@@ -52,10 +54,10 @@ namespace PuppetMaster
                             scheduler = buffer;
                             break;
                         case "worker":
-                            workers.Append(buffer);
+                            workers.Add(buffer);
                             break;
                         case "storage":
-                            storages.Append(buffer);
+                            storages.Add(buffer);
                             break;
                         default:
                             break;
@@ -63,9 +65,29 @@ namespace PuppetMaster
                     }
                     
                 }
+                puppetMaster.CreateAllConfigEvents(scheduler, workers.ToArray(), storages.ToArray());
+                //Check the other lines that are not needed to setup the Proccesses
+                foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
+                {
+                    if (line == "")
+                        continue;
+                    string[] buffer = line.Split(' ');
+                    switch (buffer[0])
+                    {
+                        case "client":
+                            /*var t = new Thread(new ThreadStart(() => puppetMaster.SendAppDataToScheduler(buffer)));
+                            t.Start();*/
+                            puppetMaster.SendAppDataToScheduler(buffer);
+                            break;
 
-                //Missing -> process the script and then send to the correspondent PCS's
-                puppetMaster.CreateAllConfigEvents(scheduler, workers, storages);
+                        default:
+                            break;
+
+                    }
+
+                }
+
+
             }
         }
 

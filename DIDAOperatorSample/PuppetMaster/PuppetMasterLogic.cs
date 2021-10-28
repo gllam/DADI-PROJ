@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
 
@@ -142,9 +143,13 @@ namespace PuppetMaster
             scheduler = new SchedulerAsServer(serverId,hostname, port);
         }
 
-        public void SendAppDataToScheduler(string[] buffer)
+        public Boolean SendAppDataToScheduler(string[] buffer)
         {
-            scheduler.SendAppData(buffer);
+            while(scheduler == null) {
+                Task.Delay(100);
+            }
+            return scheduler.SendAppData(buffer);
+
         }
 
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
