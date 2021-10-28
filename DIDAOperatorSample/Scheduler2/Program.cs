@@ -48,10 +48,10 @@ namespace SchedulerNamespace
                 Assignment ass = new Assignment
                 {
                     Opid = op,
-                    Host = "localhost",
-                    Port = 5001,
-                    //Host = workerMap[opIndex].Item1,
-                    //Port = Int32.Parse(workerMap[opIndex].Item2),
+                    //Host = "localhost",
+                    //Port = 5001,
+                    Host = workerMap[opIndex].Item1,
+                    Port = Int32.Parse(workerMap[opIndex].Item2),
                     Output = ""
                 };
                 req.Asschain.Add(ass);
@@ -74,13 +74,13 @@ namespace SchedulerNamespace
         }
 
 
-        public override Task<SendWorkersReply> SendWorkers(SendWorkersRequest request, ServerCallContext context)
+        /*public override Task<SendWorkersReply> SendWorkers(SendWorkersRequest request, ServerCallContext context)
         {
             return Task.FromResult(setWorkers(request));
-        }
+        }*/
 
 
-        public SendWorkersReply setWorkers(SendWorkersRequest request)
+        /*public SendWorkersReply setWorkers(SendWorkersRequest request)
         {
             foreach (string url in request.Url)
             {
@@ -91,26 +91,37 @@ namespace SchedulerNamespace
             {
                 Ack = true
             };
-        }
+        }*/
 
+        internal void AddWorker(string workerUrl)
+        {
+            string[] hostport = workerUrl.Split("//")[1].Split(":");
+            workerMap.Add((hostport[0], hostport[1]));
+            Console.WriteLine(hostport[0], hostport[1]);
+        }
     }
 
     public class Scheduler
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("HELLO");
-            string serverId = args[0];
+            Console.WriteLine(args.Length);
+            SchedulerService scheduler = new SchedulerService();
+            int serverId = Convert.ToInt32(args[0]);
             string hostname = args[1];
             int port = Convert.ToInt32(args[2]);
+            for(int i = 3; i < args.Length; i++)
+            {
+                scheduler.AddWorker(args[i]);
+            }
             ServerPort serverPort;
             string startupMessage;
             serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
             startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port;
-
+            
             Server server = new Server
             {
-                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
+                Services = { DIDASchedulerService.BindService(scheduler) },
                 Ports = { serverPort }
             };
 
@@ -120,65 +131,6 @@ namespace SchedulerNamespace
             //Configuring HTTP for client connections in Register method
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             Console.ReadKey();
-            /*const int port = 4001;
-            const string hostname = "localhost";
-            string startupMessage;
-            ServerPort serverPort;
-
-            serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
-            startupMessage = "Insecure Scheduler server listening on port " + port;
-
-            Server server = new Server
-            {
-                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
-                Ports = { serverPort }
-            };
-
-            server.Start();
-
-            Console.WriteLine(startupMessage);
-            //Configuring HTTP for client connections in Register method
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            Console.ReadKey();*/
-        }
-
-        public void Initialize(string serverId, string hostname, int port)
-        {
-            /*ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe",
-                UseShellExecute = true,
-                CreateNoWindow = false
-            };
-            Process.Start(psi);*/
-            /*
-            Process myProcess = new Process();
-            myProcess.StartInfo.CreateNoWindow = false;
-            myProcess.StartInfo.FileName = @"C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\Scheduler2\bin\Debug\netcoreapp3.1\Scheduler.exe";
-            myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            myProcess.Start();*/
-
-            //this.Main(args);
-            /*this.serverId = serverId;
-            this.hostname = hostname;
-            this.port = port;
-            ServerPort serverPort;
-            string startupMessage;
-            serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
-            startupMessage = "Insecure Scheduler server listening on port " + port;
-
-            Server server = new Server
-            {
-                Services = { DIDASchedulerService.BindService(new SchedulerService()) },
-                Ports = { serverPort }
-            };
-
-            server.Start();
-
-            Console.WriteLine(startupMessage);
-            //Configuring HTTP for client connections in Register method
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            Console.ReadKey();*/
         }
     }
 }
