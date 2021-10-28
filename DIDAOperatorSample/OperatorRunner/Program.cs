@@ -13,9 +13,12 @@ namespace OperatorRunner
 
     public class WorkerService : DIDAWorkerService.DIDAWorkerServiceBase
     {
-        List<string> workerPorts = new List<string>();
+        List<(string, string)> storageMap = new List<(string, string)>();
+        int gossipDelay;
 
-        public WorkerService() { }
+        public WorkerService(int gossipDelay) {
+            this.gossipDelay = gossipDelay;
+        }
 
         public override Task<SendDIDAReqReply> SendDIDAReq(SendDIDAReqRequest request, ServerCallContext context)
         {
@@ -87,24 +90,38 @@ namespace OperatorRunner
             return new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" };
         }
 
-        class Program
+        internal void AddStorage(string storageUrl)
         {
-            static void Main(string[] args)
+            string[] hostport = storageUrl.Split("//")[1].Split(":");
+            storageMap.Add((hostport[0], hostport[1]));
+            Console.WriteLine(hostport[0], hostport[1]);
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int replicaId = Convert.ToInt32(args[0]);
+            int port = Convert.ToInt32(args[2]);
+            string host = args[1];
+            int gossipDelay = Convert.ToInt32(args[3]);
+            WorkerService workerService = new WorkerService(gossipDelay);
+            for (int i = 4; i < args.Length; i++)
             {
-                const int port = 5001;
-                const string host = "localhost";
-
-                ServerPort serverPort = new ServerPort(host, port, ServerCredentials.Insecure); ;
-
-                Server server = new Server
-                {
-                    Services = { DIDAWorkerService.BindService(new WorkerService()) },
-                    Ports = { serverPort }
-                };
-
-                server.Start();
-                Console.ReadLine();
+                workerService.AddStorage(args[i]);
             }
+            ServerPort serverPort = new ServerPort(host, port, ServerCredentials.Insecure);
+
+            Console.WriteLine("Insecure Worker server '" + replicaId + "' | hostname: " + host + " | port " + port);
+
+            Server server = new Server
+            {
+                Services = { DIDAWorkerService.BindService(workerService) },
+                Ports = { serverPort }
+            };
+
+            server.Start();
+            Console.ReadLine();
         }
     }
 }

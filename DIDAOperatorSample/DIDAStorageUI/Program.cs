@@ -12,11 +12,13 @@ namespace DIDAStorageUI
         Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         int maxVersions = 5; //dummy
         readonly int replicaid;
+        int gossipDelay;
 
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance 
 
-        public StorageService(int replicaid)
+        public StorageService(int replicaid, int gossipDelay)
         {
+            this.gossipDelay = gossipDelay;
             this.replicaid = replicaid;
         }
 
@@ -120,12 +122,16 @@ namespace DIDAStorageUI
     {
         static void Main(string[] args)
         {
-            int Port = 2001;
-            int replicaid = 1;
+            int port = Convert.ToInt32(args[2]);
+            string host = args[1];
+            int replicaid = Convert.ToInt32(args[0]);
+            int gossipDelay = Convert.ToInt32(args[3]);
+
+            Console.WriteLine("Insecure Storage server '" + replicaid + "' | hostname: " + host + " | port " + port);
             Server server = new Server
             {
-                Services = { DIDAStorageService.BindService(new StorageService(replicaid)) },
-                Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
+                Services = { DIDAStorageService.BindService(new StorageService(replicaid,gossipDelay)) },
+                Ports = { new ServerPort(host, port, ServerCredentials.Insecure) }
             };
             server.Start();
             Console.ReadKey();

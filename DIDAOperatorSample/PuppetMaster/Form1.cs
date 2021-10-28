@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -32,7 +33,40 @@ namespace PuppetMaster
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
                 textFileScript.Text = fdlg.FileName;
-                //Missing -> process the script and then send to the correspondent PCS's
+                List<string[]> workers = new List<string[]>();
+                List<string[]> storages = new List<string[]>();
+                string[] scheduler = null;
+
+                foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
+                {
+                    if (line == "")
+                        continue;
+                    string[] buffer = line.Split(' ');
+                    switch (buffer[0])
+                    {
+                        case "client":
+                            /*var t = new Thread(new ThreadStart(() => puppetMaster.SendAppDataToScheduler(buffer)));
+                            t.Start();*/
+                            break;
+                        case "scheduler":
+                            if (scheduler != null)//Only allowed 1 scheduler per script
+                                break;
+                            scheduler = buffer;
+                            break;
+                        case "worker":
+                            workers.Add(buffer);
+                            break;
+                        case "storage":
+                            storages.Add(buffer);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    
+                }
+                puppetMaster.CreateAllConfigEvents(scheduler, workers.ToArray(), storages.ToArray());
+                //Check the other lines that are not needed to setup the Proccesses
                 foreach (string line in System.IO.File.ReadLines(@fdlg.FileName))
                 {
                     if (line == "")
@@ -43,17 +77,18 @@ namespace PuppetMaster
                         case "client":
                             puppetMaster.SendAppDataToScheduler(buffer);
                             break;
-                        case "scheduler":
-                            puppetMaster.CreateChannelWithScheduler(this, buffer[1],buffer[2]);
-                            puppetMaster.CreateNewConfigEvent(buffer);
+                        case "populate":
+                            puppetMaster.StartPopulateStoragesOperation(buffer[1]);
                             break;
+
                         default:
-                            puppetMaster.CreateNewConfigEvent(buffer);
                             break;
 
                     }
-                    
+
                 }
+
+
             }
         }
 
