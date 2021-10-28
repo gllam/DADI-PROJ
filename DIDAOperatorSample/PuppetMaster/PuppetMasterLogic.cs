@@ -244,6 +244,7 @@ namespace PuppetMaster
         private void SendDataToStorage(string key, string value)
         {
             //Calculate which storage needs to receive the Data
+            //storagesAsServers[0]
 
         }
 
