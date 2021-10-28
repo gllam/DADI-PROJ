@@ -57,13 +57,13 @@ namespace OperatorRunner
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
-            string filename = classname + ".dll";
+            string filename = "LibOperators.dll";
             Assembly _dll = Assembly.LoadFrom(filename);
             Type[] types = _dll.GetTypes();
             Type t = null;
             foreach (Type type in types)
             {
-                if (type.Name == "CounterOperator")
+                if (type.Name == classname)
                 {
                     t = type;
                 }
@@ -77,6 +77,7 @@ namespace OperatorRunner
 
         void SendRequestToWorker(SendDIDAReqRequest request)
         {
+            System.Threading.Thread.Sleep(gossipDelay);
             string host = request.Asschain[request.Next].Host;
             int port = request.Asschain[request.Next].Port;
             GrpcChannel channel = GrpcChannel.ForAddress("http://" + host + ":" + port);
@@ -86,7 +87,7 @@ namespace OperatorRunner
         }
 
         private static DIDAStorageNode MyLocationFunction(string id, OperationType type)
-        {
+        { //TODO
             return new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" };
         }
 

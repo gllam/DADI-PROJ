@@ -48,8 +48,6 @@ namespace SchedulerNamespace
                 Assignment ass = new Assignment
                 {
                     Opid = op,
-                    //Host = "localhost",
-                    //Port = 5001,
                     Host = workerMap[opIndex].Item1,
                     Port = Int32.Parse(workerMap[opIndex].Item2),
                     Output = ""

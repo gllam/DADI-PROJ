@@ -14,7 +14,7 @@ namespace DIDAStorageUI
         readonly int replicaid;
         int gossipDelay;
 
-        //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance 
+        //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
         public StorageService(int replicaid, int gossipDelay)
         {
@@ -29,15 +29,15 @@ namespace DIDAStorageUI
 
         private DIDARecordReply ReadData(DIDAReadRequest request)
         {
-            try
+            DIDARecordReply reply = new DIDARecordReply
             {
-                DIDARecordReply reply = new DIDARecordReply
-                {
-                    Id = request.Id,
-                    Version = request.Version
-                };
-                if (request.Version == null) reply.Version.VersionNumber = 0;
-                lock (this)
+                Id = request.Id,
+                Version = request.Version
+            };
+            if (request.Version == null) reply.Version.VersionNumber = 0;
+            lock (this)
+            {
+                if (data.ContainsKey(request.Id))
                 {
                     foreach (DIDARecord record in data[request.Id])
                     {
@@ -57,12 +57,8 @@ namespace DIDAStorageUI
                         }
                     }
                 }
-                return reply;
             }
-            catch (Exception e)
-            {
-                return new DIDARecordReply();
-            }
+            return reply;
         }
 
         public override Task<DIDAVersion> updateIfValueIs(DIDAUpdateIfRequest request, ServerCallContext context)
@@ -74,13 +70,16 @@ namespace DIDAStorageUI
         {
             lock (this)
             {
-                if (data[request.Id][data[request.Id].Count - 1].val == request.Oldvalue)
+                if (data.ContainsKey(request.Id))
                 {
-                    return WriteData(new DIDAWriteRequest
+                    if (data[request.Id][data[request.Id].Count - 1].val == request.Oldvalue)
                     {
-                        Id = request.Id,
-                        Val = request.Newvalue
-                    });
+                        return WriteData(new DIDAWriteRequest
+                        {
+                            Id = request.Id,
+                            Val = request.Newvalue
+                        });
+                    }
                 }
                 return new DIDAVersion { ReplicaId = -1, VersionNumber = -1 }; //null version
             }
@@ -102,11 +101,11 @@ namespace DIDAStorageUI
                 {
                     replicaId = replicaid
                 };
-                try
+                if (data.ContainsKey(request.Id))
                 {
                     newRecord.version.versionNumber = data[request.Id][data[request.Id].Count - 1].version.versionNumber + 1;
                 }
-                catch (Exception e)
+                else
                 {
                     newRecord.version.versionNumber = 1;
                     data.Add(request.Id, new List<DIDARecord>());
@@ -130,7 +129,7 @@ namespace DIDAStorageUI
             Console.WriteLine("Insecure Storage server '" + replicaid + "' | hostname: " + host + " | port " + port);
             Server server = new Server
             {
-                Services = { DIDAStorageService.BindService(new StorageService(replicaid,gossipDelay)) },
+                Services = { DIDAStorageService.BindService(new StorageService(replicaid, gossipDelay)) },
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) }
             };
             server.Start();
