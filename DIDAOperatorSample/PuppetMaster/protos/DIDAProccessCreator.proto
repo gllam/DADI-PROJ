@@ -11,7 +11,7 @@ message CreateSchedulerInstanceRequest {
 	repeated ProccessData dependenciesData = 2; //serverId|url 
 }
 message ProccessData{
-	string serverId = 1;
+	int32 serverId = 1;
 	string url = 2;
 }
 message CreateWorkerInstanceRequest {
@@ -22,6 +22,7 @@ message CreateWorkerInstanceRequest {
 message CreateStorageInstanceRequest {
 	ProccessData myData = 1;
 	string gossipDelay = 2;
+	repeated string storageUrl = 3; //serverId|url 
 }
 message CreateProccessInstanceReply {
 	bool ack = 1;

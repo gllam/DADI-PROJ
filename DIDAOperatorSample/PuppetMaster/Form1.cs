@@ -75,9 +75,10 @@ namespace PuppetMaster
                     switch (buffer[0])
                     {
                         case "client":
-                            /*var t = new Thread(new ThreadStart(() => puppetMaster.SendAppDataToScheduler(buffer)));
-                            t.Start();*/
                             puppetMaster.SendAppDataToScheduler(buffer);
+                            break;
+                        case "populate":
+                            puppetMaster.StartPopulateStoragesOperation(buffer[1]);
                             break;
 
                         default:

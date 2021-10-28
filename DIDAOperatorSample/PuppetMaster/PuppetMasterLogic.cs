@@ -61,21 +61,23 @@ namespace PuppetMaster
             client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
         }
 
-        internal Boolean SendCreateSchedulerRequest(string[] scheduler, string[][] workers)
+        internal Boolean SendCreateSchedulerRequest(int replicaId, string[] scheduler, string[][] workers, List<String> workersMap)
         {
             CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
                 MyData = new ProccessData
                 {
-                    ServerId = scheduler[1],
+                    ServerId = replicaId,
                     Url = scheduler[2]
                 }
             };
+            int workerId;
             foreach (string[] worker in workers)
             {
+                workerId = workersMap.BinarySearch(worker[0]);
                 request.DependenciesData.Add(new ProccessData
                 { 
-                    ServerId = worker[1] ,
+                    ServerId = workerId ,
                     Url = worker[2]
                 });
             }
@@ -84,22 +86,24 @@ namespace PuppetMaster
             return reply.Ack;
         }
 
-        internal Boolean SendCreateWorkerRequest(string[] worker, string[][] storages)
+        internal Boolean SendCreateWorkerRequest(int replicaId,string[] worker, string[][] storages, List<string> storageMap)
         {
             CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
             {
                 MyData = new ProccessData
                 {
-                    ServerId = worker[1],
+                    ServerId = replicaId,
                     Url = worker[2],
                 },
                 GossipDelay = worker[3] 
             };
+            int storageId;
             foreach (string[] storage in storages)
             {
+                storageId = storageMap.BinarySearch(storage[0]);
                 request.DependenciesData.Add(new ProccessData
                 {
-                    ServerId = storage[1],
+                    ServerId = storageId,
                     Url = storage[2]
                 });
             }
@@ -108,28 +112,73 @@ namespace PuppetMaster
             return reply.Ack;
         }
 
-        internal Boolean SendCreateStorageRequest(string[] storage)
+        internal Boolean SendCreateStorageRequest(int replicaId,string[] storage, string[][] storages)
         {
             CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
             {
                 MyData = new ProccessData
                 {
-                    ServerId = storage[1],
+                    ServerId = replicaId,
                     Url = storage[2],
                 },
                 GossipDelay = storage[3]
             };
 
+            foreach (string[] storageData in storages)
+            {
+                request.StorageUrl.Add(storageData[2]);
+            }
+
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
             return reply.Ack;
         }
     }
+    //TODO
+    public class StorageAsServer
+    {
+        private readonly GrpcChannel channel;
+        private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
+        private readonly string serverId;
+
+        public StorageAsServer(string serverId, string hostname, string port)
+        {
+            this.serverId = serverId;
+            // setup the client side
+
+            AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
+
+            client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
+        }
+
+        public Boolean SendAppData(string[] data)
+        {
+            SendAppDataRequest request = new SendAppDataRequest
+            {
+                Input = data[1],
+            };
+            //need to check where we put the input files
+            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
+            {
+                request.App.Add(line);
+            }
+
+            SendAppDataReply reply = client.SendAppData(request);
+            return reply.Ack;
+        }
+    }
+
 
     class PuppetMasterLogic
     {
 
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
+        private List<StorageAsServer> storagesAsServers;
+        private List<string> schedulerMap = new List<string>();
+        private List<string> workerMap = new List<string>();
+        private List<string> storageMap = new List<string>();
 
         public PuppetMasterLogic(Form1 guiWindow) {
             pcs = new ProcessCreatorAsServer(guiWindow);
@@ -155,19 +204,46 @@ namespace PuppetMaster
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
             //Create Scheduler
-            pcs.SendCreateSchedulerRequest(scheduler, workers);
+            schedulerMap.Add(scheduler[0]);
+            foreach(string[] worker in workers)
+            {
+                workerMap.Add(worker[0]);
+            }
+            foreach (string[] storage in storages)
+            {
+                storageMap.Add(storage[0]);
+            }
+            int replicaId = schedulerMap.BinarySearch(scheduler[0]);
+            pcs.SendCreateSchedulerRequest(replicaId,scheduler, workers,workerMap);
             this.CreateChannelWithScheduler(scheduler[1],scheduler[2]);
             //Create workers
             foreach(string[] worker in workers)
             {
-                pcs.SendCreateWorkerRequest(worker, storages);
+                replicaId = workerMap.BinarySearch(worker[0]);
+                pcs.SendCreateWorkerRequest(replicaId,worker, storages, storageMap);
             }
 
             //Create Storages
             foreach (string[] storage in storages)
             {
-                pcs.SendCreateStorageRequest(storage);
+                replicaId = storageMap.BinarySearch(storage[0]);
+                pcs.SendCreateStorageRequest(replicaId,storage,storages);
             }
+
+        }
+
+        internal void StartPopulateStoragesOperation(string storageDataFileName)
+        {
+            foreach (string line in System.IO.File.ReadLines(storageDataFileName))
+            {
+                string[] data = line.Split(',');
+                this.SendDataToStorage(data[0],data[1]);
+            }
+        }
+
+        private void SendDataToStorage(string key, string value)
+        {
+            //Calculate which storage needs to receive the Data
 
         }
 

@@ -22,7 +22,7 @@ namespace Process_Creation_Service
             public override Task<CreateProccessInstanceReply> CreateSchedulerInstance(
                 CreateSchedulerInstanceRequest request, ServerCallContext context)
             {
-                Console.WriteLine("Creating Scheduler: " + request.MyData.ServerId);
+                Console.WriteLine("Creating Scheduler: " + Convert.ToString(request.MyData.ServerId));
                 return Task.FromResult(CreateSchedInstance(request));
                 
             }
@@ -41,10 +41,10 @@ namespace Process_Creation_Service
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port;
+                psi.Arguments = Convert.ToString(request.MyData.ServerId) + " " + hostname + " " + port;
                 foreach(ProccessData data in request.DependenciesData)
                 {
-                    psi.Arguments = psi.Arguments + " " + data.ServerId + "|" + data.Url;
+                    psi.Arguments = psi.Arguments + " " + data.Url;
                 }
 
                 Process.Start(psi);
@@ -80,7 +80,7 @@ namespace Process_Creation_Service
                 psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
                 foreach (ProccessData data in request.DependenciesData)
                 {
-                    psi.Arguments = psi.Arguments + " " + data.ServerId + "|" + data.Url;
+                    psi.Arguments = psi.Arguments + " " + data.Url;
                 }
 
                 Process.Start(psi);
