@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -194,9 +195,9 @@ namespace PuppetMaster
 
         public Boolean SendAppDataToScheduler(string[] buffer)
         {
-            while(scheduler == null) {
+            /*while(scheduler == null) {
                 Task.Delay(100);
-            }
+            }*/
             return scheduler.SendAppData(buffer);
 
         }
@@ -232,8 +233,31 @@ namespace PuppetMaster
 
         }
 
+        internal void ExecuteCommand(string commandLine)
+        {
+            Thread t;
+            string[] buffer = commandLine.Split(' ');
+            switch (buffer[0])
+            {
+                case "client":
+                    t = new Thread(new ThreadStart(() => this.SendAppDataToScheduler(buffer)));
+                    t.Start();
+                    break;
+                case "populate":
+                    t = new Thread(new ThreadStart(() => this.StartPopulateStoragesOperation(buffer[1])));
+                    t.Start();
+                    break;
+
+                default:
+                    break;
+
+            }
+
+        }
+
         internal void StartPopulateStoragesOperation(string storageDataFileName)
         {
+            return;
             foreach (string line in System.IO.File.ReadLines(storageDataFileName))
             {
                 string[] data = line.Split(',');
