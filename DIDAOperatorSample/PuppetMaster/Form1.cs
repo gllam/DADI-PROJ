@@ -39,6 +39,8 @@ namespace PuppetMaster
             };
             if (fdlg.ShowDialog() == DialogResult.OK)
             {
+                textBoxScript.Text = "";
+                currentCommandLineIndex = 0;
                 int highlightStartPoint = 0;
                 textFileScript.Text = fdlg.FileName;
                 List<string> list = new List<string>();
@@ -86,7 +88,7 @@ namespace PuppetMaster
 
                 textBoxScript.SelectionStart = highlightStartPoint;
                 textBoxScript.SelectionLength = scriptLines[currentCommandLineIndex].Length;
-                Console.WriteLine(currentCommandLineIndex);
+                //Console.WriteLine(scriptLines[0]);
                 textBoxScript.SelectionBackColor = Color.Yellow;
             }
         }
