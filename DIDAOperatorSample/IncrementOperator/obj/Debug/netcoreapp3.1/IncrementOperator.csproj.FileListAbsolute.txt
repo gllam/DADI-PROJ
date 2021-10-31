@@ -34,3 +34,4 @@ C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSa
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.CopyComplete
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.dll
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.pdb
+C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.AssemblyReference.cache
