@@ -27,7 +27,6 @@ C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSa
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\IncrementOperator.pdb
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAStorage.dll
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\bin\Debug\netcoreapp3.1\LibDIDAWorker.dll
-C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.csproj.AssemblyReference.cache
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfoInputs.cache
 C:\Users\david\Desktop\Aulas\Mestrado\1º ano\PADI\Proj\DADI-PROJ\DIDAOperatorSample\IncrementOperator\obj\Debug\netcoreapp3.1\IncrementOperator.AssemblyInfo.cs

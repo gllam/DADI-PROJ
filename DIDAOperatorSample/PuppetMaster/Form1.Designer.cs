@@ -35,8 +35,8 @@ namespace PuppetMaster
             this.buttonBrowseAppData = new System.Windows.Forms.Button();
             this.textAppInput = new System.Windows.Forms.TextBox();
             this.buttonSendAppData = new System.Windows.Forms.Button();
-            this.buttonCreateConnectionWithScheduler = new System.Windows.Forms.Button();
-            this.buttonDebugCreateScheduler = new System.Windows.Forms.Button();
+            this.textBoxScript = new System.Windows.Forms.RichTextBox();
+            this.buttonNextStep = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonBrowseConfigScript
@@ -58,14 +58,14 @@ namespace PuppetMaster
             // 
             // textAppDataFile
             // 
-            this.textAppDataFile.Location = new System.Drawing.Point(204, 20);
+            this.textAppDataFile.Location = new System.Drawing.Point(31, 139);
             this.textAppDataFile.Name = "textAppDataFile";
             this.textAppDataFile.Size = new System.Drawing.Size(110, 23);
             this.textAppDataFile.TabIndex = 2;
             // 
             // buttonBrowseAppData
             // 
-            this.buttonBrowseAppData.Location = new System.Drawing.Point(203, 49);
+            this.buttonBrowseAppData.Location = new System.Drawing.Point(31, 168);
             this.buttonBrowseAppData.Name = "buttonBrowseAppData";
             this.buttonBrowseAppData.Size = new System.Drawing.Size(111, 25);
             this.buttonBrowseAppData.TabIndex = 3;
@@ -75,7 +75,7 @@ namespace PuppetMaster
             // 
             // textAppInput
             // 
-            this.textAppInput.Location = new System.Drawing.Point(338, 20);
+            this.textAppInput.Location = new System.Drawing.Point(31, 208);
             this.textAppInput.Name = "textAppInput";
             this.textAppInput.Size = new System.Drawing.Size(110, 23);
             this.textAppInput.TabIndex = 4;
@@ -84,7 +84,7 @@ namespace PuppetMaster
             // 
             // buttonSendAppData
             // 
-            this.buttonSendAppData.Location = new System.Drawing.Point(338, 49);
+            this.buttonSendAppData.Location = new System.Drawing.Point(31, 237);
             this.buttonSendAppData.Name = "buttonSendAppData";
             this.buttonSendAppData.Size = new System.Drawing.Size(111, 25);
             this.buttonSendAppData.TabIndex = 5;
@@ -92,33 +92,31 @@ namespace PuppetMaster
             this.buttonSendAppData.UseVisualStyleBackColor = true;
             this.buttonSendAppData.Click += new System.EventHandler(this.ButtonSendAppData_Click);
             // 
-            // buttonCreateConnectionWithScheduler
+            // textBoxScript
             // 
-            this.buttonCreateConnectionWithScheduler.Location = new System.Drawing.Point(66, 194);
-            this.buttonCreateConnectionWithScheduler.Name = "buttonCreateConnectionWithScheduler";
-            this.buttonCreateConnectionWithScheduler.Size = new System.Drawing.Size(130, 56);
-            this.buttonCreateConnectionWithScheduler.TabIndex = 6;
-            this.buttonCreateConnectionWithScheduler.Text = "Create Connection With Scheduler ";
-            this.buttonCreateConnectionWithScheduler.UseVisualStyleBackColor = true;
-            this.buttonCreateConnectionWithScheduler.Click += new System.EventHandler(this.ButtonCreateConnectionWithScheduler_Click);
+            this.textBoxScript.Location = new System.Drawing.Point(533, 12);
+            this.textBoxScript.Name = "textBoxScript";
+            this.textBoxScript.Size = new System.Drawing.Size(242, 350);
+            this.textBoxScript.TabIndex = 6;
+            this.textBoxScript.Text = "";
             // 
-            // buttonDebugCreateScheduler
+            // buttonNextStep
             // 
-            this.buttonDebugCreateScheduler.Location = new System.Drawing.Point(354, 194);
-            this.buttonDebugCreateScheduler.Name = "buttonDebugCreateScheduler";
-            this.buttonDebugCreateScheduler.Size = new System.Drawing.Size(123, 56);
-            this.buttonDebugCreateScheduler.TabIndex = 7;
-            this.buttonDebugCreateScheduler.Text = "Debug -> Create a Scheduler";
-            this.buttonDebugCreateScheduler.UseVisualStyleBackColor = true;
-            this.buttonDebugCreateScheduler.Click += new System.EventHandler(this.ButtonDebugCreateScheduler_Click);
+            this.buttonNextStep.Location = new System.Drawing.Point(417, 19);
+            this.buttonNextStep.Name = "buttonNextStep";
+            this.buttonNextStep.Size = new System.Drawing.Size(75, 23);
+            this.buttonNextStep.TabIndex = 7;
+            this.buttonNextStep.Text = "Next Step";
+            this.buttonNextStep.UseVisualStyleBackColor = true;
+            this.buttonNextStep.Click += new System.EventHandler(this.ButtonNextStep_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.buttonDebugCreateScheduler);
-            this.Controls.Add(this.buttonCreateConnectionWithScheduler);
+            this.Controls.Add(this.buttonNextStep);
+            this.Controls.Add(this.textBoxScript);
             this.Controls.Add(this.buttonSendAppData);
             this.Controls.Add(this.textAppInput);
             this.Controls.Add(this.buttonBrowseAppData);
@@ -140,8 +138,8 @@ namespace PuppetMaster
         private System.Windows.Forms.Button buttonBrowseAppData;
         private System.Windows.Forms.TextBox textAppInput;
         private System.Windows.Forms.Button buttonSendAppData;
-        private System.Windows.Forms.Button buttonCreateConnectionWithScheduler;
-        private System.Windows.Forms.Button buttonDebugCreateScheduler;
+        private System.Windows.Forms.RichTextBox textBoxScript;
+        private System.Windows.Forms.Button buttonNextStep;
     }
 }
 

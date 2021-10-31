@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -137,7 +138,7 @@ namespace PuppetMaster
     public class StorageAsServer
     {
         private readonly GrpcChannel channel;
-        private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
+        private readonly DIDAStorageService.DIDAStorageServiceClient client;
         private readonly string serverId;
 
         public StorageAsServer(string serverId, string hostname, string port)
@@ -149,23 +150,20 @@ namespace PuppetMaster
                 "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
 
-            client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
+            client = new DIDAStorageService.DIDAStorageServiceClient(channel);
         }
 
-        public Boolean SendAppData(string[] data)
+        public Boolean SendWriteRequest(string key, string value)
         {
-            SendAppDataRequest request = new SendAppDataRequest
+            DIDAWriteRequest request = new DIDAWriteRequest
             {
-                Input = data[1],
+                Id = key,
+                Val = value
             };
-            //need to check where we put the input files
-            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
-            {
-                request.App.Add(line);
-            }
-
-            SendAppDataReply reply = client.SendAppData(request);
-            return reply.Ack;
+            DIDAVersion data = client.write(request);
+            if (data == null)
+                return false;
+            return true;
         }
     }
 
@@ -175,7 +173,7 @@ namespace PuppetMaster
 
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
-        private List<StorageAsServer> storagesAsServers;
+        private List<StorageAsServer> storagesAsServers = new List<StorageAsServer>();
         private List<string> schedulerMap = new List<string>();
         private List<string> workerMap = new List<string>();
         private List<string> storageMap = new List<string>();
@@ -183,20 +181,46 @@ namespace PuppetMaster
         public PuppetMasterLogic(Form1 guiWindow) {
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
-        
-        public void CreateChannelWithScheduler(string serverId, string url)
+        public void CreateChannelWithServer(string serverId, string url, string type)
         {
             string urlRefined = url.Split("http://")[1];
             string port = urlRefined.Split(':')[1];
             string hostname = urlRefined.Split(':')[0];
-            scheduler = new SchedulerAsServer(serverId,hostname, port);
-        }
+            if (type == "scheduler")
+                scheduler = new SchedulerAsServer(serverId, hostname, port);
+            else if (type == "storage")
+            {
+                StorageAsServer storage = new StorageAsServer(serverId, hostname, port);
+                storagesAsServers.Add(storage);
+            }
 
+        }
+        internal void ExecuteCommand(string commandLine)
+        {
+            Thread t;
+            string[] buffer = commandLine.Split(' ');
+            switch (buffer[0])
+            {
+                case "client":
+                    t = new Thread(new ThreadStart(() => this.SendAppDataToScheduler(buffer)));
+                    t.Start();
+                    break;
+                case "populate":
+                    t = new Thread(new ThreadStart(() => this.StartPopulateStoragesOperation(buffer[1])));
+                    t.Start();
+                    break;
+
+                default:
+                    break;
+
+            }
+
+        }
         public Boolean SendAppDataToScheduler(string[] buffer)
         {
-            while(scheduler == null) {
+            /*while(scheduler == null) {
                 Task.Delay(100);
-            }
+            }*/
             return scheduler.SendAppData(buffer);
 
         }
@@ -205,7 +229,7 @@ namespace PuppetMaster
         {
             //Create Scheduler
             schedulerMap.Add(scheduler[0]);
-            foreach(string[] worker in workers)
+            foreach (string[] worker in workers)
             {
                 workerMap.Add(worker[0]);
             }
@@ -214,20 +238,22 @@ namespace PuppetMaster
                 storageMap.Add(storage[0]);
             }
             int replicaId = schedulerMap.BinarySearch(scheduler[0]);
-            pcs.SendCreateSchedulerRequest(replicaId,scheduler, workers,workerMap);
-            this.CreateChannelWithScheduler(scheduler[1],scheduler[2]);
-            //Create workers
-            foreach(string[] worker in workers)
+            pcs.SendCreateSchedulerRequest(replicaId, scheduler, workers, workerMap);
+            this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
+
+            //Create Workers
+            foreach (string[] worker in workers)
             {
                 replicaId = workerMap.BinarySearch(worker[0]);
-                pcs.SendCreateWorkerRequest(replicaId,worker, storages, storageMap);
+                pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
             }
 
             //Create Storages
             foreach (string[] storage in storages)
             {
                 replicaId = storageMap.BinarySearch(storage[0]);
-                pcs.SendCreateStorageRequest(replicaId,storage,storages);
+                pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                this.CreateChannelWithServer(storage[1], storage[2], "storage");
             }
 
         }
@@ -243,8 +269,8 @@ namespace PuppetMaster
 
         private void SendDataToStorage(string key, string value)
         {
-            //Calculate which storage needs to receive the Data
-            //storagesAsServers[0]
+            //Calculate which storage needs to receive the Data TODO
+            storagesAsServers[0].SendWriteRequest(key, value);
 
         }
 
