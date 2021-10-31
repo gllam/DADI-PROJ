@@ -31,19 +31,19 @@ namespace PuppetMaster
         {
             CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = scheduler[1],
                     Url = scheduler[2]
                 }
             };
-            int workerId;
+;
             foreach (string[] worker in workers)
             {
-                workerId = workersMap.BinarySearch(worker[0]);
                 request.DependenciesData.Add(new ProccessData
                 { 
-                    ServerId = workerId,
+                    ServerName = worker[1],
                     Url = worker[2]
                 });
             }
@@ -56,20 +56,20 @@ namespace PuppetMaster
         {
             CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = worker[1],
                     Url = worker[2],
                 },
                 GossipDelay = worker[3] 
             };
-            int storageId;
+
             foreach (string[] storage in storages)
             {
-                storageId = storageMap.BinarySearch(storage[0]);
                 request.DependenciesData.Add(new ProccessData
                 {
-                    ServerId = storageId,
+                    ServerName = storage[1],
                     Url = storage[2]
                 });
             }
@@ -82,9 +82,10 @@ namespace PuppetMaster
         {
             CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = storage[1],
                     Url = storage[2],
                 },
                 GossipDelay = storage[3]
@@ -92,7 +93,11 @@ namespace PuppetMaster
 
             foreach (string[] storageData in storages)
             {
-                request.StorageUrl.Add(storageData[2]);
+                request.DependenciesData.Add(new ProccessData
+                {
+                    ServerName = storageData[1],
+                    Url = storageData[2]
+                });
             }
 
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
