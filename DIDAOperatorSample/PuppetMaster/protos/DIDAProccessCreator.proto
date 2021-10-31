@@ -7,22 +7,25 @@ service DIDAProccessCreatorService {
 }
 
 message CreateSchedulerInstanceRequest {
-	ProccessData myData = 1;
-	repeated ProccessData dependenciesData = 2; //serverId|url 
+	int32 serverId = 1;
+	ProccessData myData = 2;
+	repeated ProccessData dependenciesData = 3; //serverName|url 
 }
 message ProccessData{
-	int32 serverId = 1;
+	string serverName = 1;
 	string url = 2;
 }
 message CreateWorkerInstanceRequest {
-	ProccessData myData = 1;
-	string gossipDelay = 2;
-	repeated ProccessData dependenciesData = 3; //serverId|url 
+	int32 serverId = 1;
+	ProccessData myData = 2;
+	string gossipDelay = 3;
+	repeated ProccessData dependenciesData = 4; //serverName|url 
 }
 message CreateStorageInstanceRequest {
-	ProccessData myData = 1;
-	string gossipDelay = 2;
-	repeated string storageUrl = 3; //serverId|url 
+	int32 serverId = 1;
+	ProccessData myData = 2;
+	string gossipDelay = 3;
+	repeated ProccessData dependenciesData = 4; //serverName|url 
 }
 message CreateProccessInstanceReply {
 	bool ack = 1;

@@ -22,7 +22,7 @@ namespace Process_Creation_Service
             public override Task<CreateProccessInstanceReply> CreateSchedulerInstance(
                 CreateSchedulerInstanceRequest request, ServerCallContext context)
             {
-                Console.WriteLine("Creating Scheduler: " + Convert.ToString(request.MyData.ServerId));
+                Console.WriteLine("Creating Scheduler: " + request.MyData.ServerName);
                 return Task.FromResult(CreateSchedInstance(request));
                 
             }
@@ -41,10 +41,10 @@ namespace Process_Creation_Service
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                psi.Arguments = Convert.ToString(request.MyData.ServerId) + " " + hostname + " " + port;
+                psi.Arguments = Convert.ToString(request.ServerId) + " " + request.MyData.ServerName + " " + hostname + " " + port;
                 foreach(ProccessData data in request.DependenciesData)
                 {
-                    psi.Arguments = psi.Arguments + " " + data.Url;
+                    psi.Arguments = psi.Arguments + " " + data.ServerName + "|" + data.Url;
                 }
 
                 Process.Start(psi);
@@ -57,7 +57,7 @@ namespace Process_Creation_Service
             public override Task<CreateProccessInstanceReply> CreateWorkerInstance(
                                     CreateWorkerInstanceRequest request, ServerCallContext context)
             {
-                Console.WriteLine("Creating Worker: " + request.MyData.ServerId);
+                Console.WriteLine("Creating Worker: " + request.MyData.ServerName);
                 return Task.FromResult(CreateWorkInstance(request));
 
             }
@@ -77,10 +77,10 @@ namespace Process_Creation_Service
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
+                psi.Arguments = Convert.ToString(request.ServerId) + " " + request.MyData.ServerName + " " + hostname + " " + port + " " + request.GossipDelay;
                 foreach (ProccessData data in request.DependenciesData)
                 {
-                    psi.Arguments = psi.Arguments + " " + data.Url;
+                    psi.Arguments = psi.Arguments + " " + data.ServerName + "|"+ data.Url;
                 }
 
                 Process.Start(psi);
@@ -93,7 +93,7 @@ namespace Process_Creation_Service
             public override Task<CreateProccessInstanceReply> CreateStorageInstance(
                                     CreateStorageInstanceRequest request, ServerCallContext context)
             {
-                Console.WriteLine("Creating Storage: " + request.MyData.ServerId);
+                Console.WriteLine("Creating Storage: " + request.MyData.ServerName);
                 return Task.FromResult(CreateStorInstance(request));
 
             }
@@ -113,10 +113,10 @@ namespace Process_Creation_Service
                     UseShellExecute = true,
                     CreateNoWindow = false,
                 };
-                psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
-                foreach (string url in request.StorageUrl)
+                psi.Arguments = Convert.ToString(request.ServerId) + " " + request.MyData.ServerName + " " + hostname + " " + port + " " + request.GossipDelay;
+                foreach (ProccessData data in request.DependenciesData)
                 {
-                    psi.Arguments = psi.Arguments + " " + url;
+                    psi.Arguments = psi.Arguments + " " + data.ServerName + "|" + data.Url;
                 }
                 Process.Start(psi);
                 return new CreateProccessInstanceReply
