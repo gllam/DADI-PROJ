@@ -114,6 +114,10 @@ namespace Process_Creation_Service
                     CreateNoWindow = false,
                 };
                 psi.Arguments = request.MyData.ServerId + " " + hostname + " " + port + " " + request.GossipDelay;
+                foreach (string url in request.StorageUrl)
+                {
+                    psi.Arguments = psi.Arguments + " " + url;
+                }
                 Process.Start(psi);
                 return new CreateProccessInstanceReply
                 {
