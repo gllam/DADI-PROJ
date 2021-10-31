@@ -136,7 +136,7 @@ namespace PuppetMaster
         {
 
             if (currentCommandLineIndex + 1 > scriptLines.Length) { return; }
-            Console.WriteLine(scriptLines[0], currentCommandLineIndex);
+            //Console.WriteLine(scriptLines[0], currentCommandLineIndex);
             int index = currentCommandLineIndex;
             Thread t = new Thread(new ThreadStart(() =>
                                    puppetMaster.ExecuteCommand(scriptLines[index])));
@@ -146,7 +146,7 @@ namespace PuppetMaster
             textBoxScript.SelectionBackColor = Color.White;
             textBoxScript.SelectionStart += textBoxScript.SelectionLength + 1;
 
-            if (currentCommandLineIndex + 1 == scriptLines.Length)
+            if (currentCommandLineIndex + 1 <= scriptLines.Length)
                 textBoxScript.SelectionLength = scriptLines[currentCommandLineIndex].Length;
             else { textBoxScript.SelectionLength = 3; }
             textBoxScript.SelectionBackColor = Color.Yellow;

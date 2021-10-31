@@ -17,13 +17,25 @@ namespace OperatorRunner
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
         int gossipDelay;
 
-        public WorkerService(int gossipDelay) {
+        public WorkerService(int gossipDelay, string id) {
             this.gossipDelay = gossipDelay;
         }
 
         public override Task<SendDIDAReqReply> SendDIDAReq(SendDIDAReqRequest request, ServerCallContext context)
         {
             return Task.FromResult(SendDIDA(request));
+        }
+
+        public override Task<WorkerStatusReply> Status(WorkerStatusEmpty request, ServerCallContext context)
+        {
+            return Task.FromResult(StatusOperation());
+        }
+
+        private WorkerStatusReply StatusOperation()
+        {
+            Console.WriteLine("I am a nice and well alive Worker!");
+            WorkerStatusReply reply = new WorkerStatusReply { Success = true };
+            return reply;
         }
 
         public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //out of range
@@ -106,11 +118,11 @@ namespace OperatorRunner
     {
         static void Main(string[] args)
         {
-            int replicaId = Convert.ToInt32(args[0]);
+            string replicaId = args[0];
             int port = Convert.ToInt32(args[2]);
             string host = args[1];
             int gossipDelay = Convert.ToInt32(args[3]);
-            WorkerService workerService = new WorkerService(gossipDelay);
+            WorkerService workerService = new WorkerService(gossipDelay,replicaId);
             for (int i = 4; i < args.Length; i++)
             {
                 workerService.AddStorage(args[i]);

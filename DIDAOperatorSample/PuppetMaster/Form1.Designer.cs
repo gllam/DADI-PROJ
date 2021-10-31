@@ -37,6 +37,8 @@ namespace PuppetMaster
             this.buttonSendAppData = new System.Windows.Forms.Button();
             this.textBoxScript = new System.Windows.Forms.RichTextBox();
             this.buttonNextStep = new System.Windows.Forms.Button();
+            this.textBoxDebug = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonBrowseConfigScript
@@ -110,11 +112,30 @@ namespace PuppetMaster
             this.buttonNextStep.UseVisualStyleBackColor = true;
             this.buttonNextStep.Click += new System.EventHandler(this.ButtonNextStep_Click);
             // 
+            // textBoxDebug
+            // 
+            this.textBoxDebug.Location = new System.Drawing.Point(310, 139);
+            this.textBoxDebug.Multiline = true;
+            this.textBoxDebug.Name = "textBoxDebug";
+            this.textBoxDebug.Size = new System.Drawing.Size(110, 162);
+            this.textBoxDebug.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(310, 118);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(42, 15);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Debug";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.textBoxDebug);
             this.Controls.Add(this.buttonNextStep);
             this.Controls.Add(this.textBoxScript);
             this.Controls.Add(this.buttonSendAppData);
@@ -140,6 +161,8 @@ namespace PuppetMaster
         private System.Windows.Forms.Button buttonSendAppData;
         private System.Windows.Forms.RichTextBox textBoxScript;
         private System.Windows.Forms.Button buttonNextStep;
+        private System.Windows.Forms.TextBox textBoxDebug;
+        private System.Windows.Forms.Label label1;
     }
 }
 
