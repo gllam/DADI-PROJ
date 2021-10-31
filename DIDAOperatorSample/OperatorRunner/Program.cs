@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Worker;
 
 namespace OperatorRunner
 {
 
     public class WorkerService : DIDAWorkerService.DIDAWorkerServiceBase
     {
-        List<(string, string)> storageMap = new List<(string, string)>();
+        List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
         int gossipDelay;
 
         public WorkerService(int gossipDelay, string id) {
@@ -44,7 +45,7 @@ namespace OperatorRunner
             Console.WriteLine(classname);
             DIDAMetaRecord metarecord = new DIDAMetaRecord
             {
-                id = request.Meta.Id
+                Id = request.Meta.Id
             }; //dummy meta record
             string input = request.Input;
             string previousoutput = null;
@@ -66,29 +67,31 @@ namespace OperatorRunner
 
         string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
         {
+
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
-            string filename = classname + ".dll";
+            string filename = "LibOperators.dll";
             Assembly _dll = Assembly.LoadFrom(filename);
             Type[] types = _dll.GetTypes();
             Type t = null;
             foreach (Type type in types)
             {
-                if (type.Name == "CounterOperator")
+                if (type.Name == classname)
                 {
                     t = type;
                 }
             }
             Console.WriteLine(t);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
-            _opLoadedByReflection.ConfigureStorage(new DIDAStorageNode[] { new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" } }, MyLocationFunction);
+            _opLoadedByReflection.ConfigureStorage(new StorageProxy(storageMap.ToArray(), meta));
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
             return output;
         }
 
         void SendRequestToWorker(SendDIDAReqRequest request)
         {
+            System.Threading.Thread.Sleep(gossipDelay);
             string host = request.Asschain[request.Next].Host;
             int port = request.Asschain[request.Next].Port;
             GrpcChannel channel = GrpcChannel.ForAddress("http://" + host + ":" + port);
@@ -97,18 +100,20 @@ namespace OperatorRunner
             Console.WriteLine("Request to worker " + reply.Ack);
         }
 
-        private static DIDAStorageNode MyLocationFunction(string id, OperationType type)
+        internal void AddStorage(string storage)
         {
-            return new DIDAStorageNode { host = "localhost", port = 2001, serverId = "s1" };
-        }
-
-        internal void AddStorage(string storageUrl)
-        {
-            string[] hostport = storageUrl.Split("//")[1].Split(":");
-            storageMap.Add((hostport[0], hostport[1]));
-            Console.WriteLine(hostport[0], hostport[1]);
+            string[] storageUrl = storage.Split("|");
+            string[] hostport = storageUrl[1].Split("//")[1].Split(":");
+            DIDAStorageNode node = new DIDAStorageNode
+            {
+                serverId = storageUrl[0],
+                host = hostport[0],
+                port = Convert.ToInt32(hostport[1])
+            };
+            storageMap.Add(node);
         }
     }
+
     class Program
     {
         static void Main(string[] args)

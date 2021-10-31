@@ -19,12 +19,15 @@
     <ProjectReference Include="..\IncrementOperator\IncrementOperator.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Client" />
 	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Both" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="LibDIDAStorage">
+      <HintPath>..\..\LibDIDAStorage.dll</HintPath>
+    </Reference>
     <Reference Include="LibDIDAWorker">
-      <HintPath>..\DIDALibraries\LibDIDAWorker.dll</HintPath>
+      <HintPath>..\..\LibDIDAWorker.dll</HintPath>
     </Reference>
   </ItemGroup>
 
