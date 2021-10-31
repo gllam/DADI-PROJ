@@ -9,53 +9,6 @@ using Grpc.Net.Client;
 
 namespace PuppetMaster
 {
-    public class SchedulerAsServer
-    {
-        private readonly GrpcChannel channel;
-        private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
-        private readonly string serverId;
-
-        public SchedulerAsServer(string serverId, string hostname, string port)
-        {
-            this.serverId = serverId;
-            // setup the client side
-
-            AppContext.SetSwitch(
-                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
-
-            client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
-        }
-
-        public Boolean SendAppData(string[] data)
-        {
-            SendAppDataRequest request = new SendAppDataRequest
-            {
-                Input = data[1],
-            };
-            //need to check where we put the input files
-            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
-            {
-                request.App.Add(line);
-            }
-
-            SendAppDataReply reply = client.SendAppData(request);
-            return reply.Ack;
-        }
-
-        public string[] SendStatusRequest()
-        {
-            Empty request = new Empty { };
-            StatusReply reply = client.Status(request);
-            List<string> deadWorkersId = new List<string>();
-            foreach(string deadWorkerId in reply.DeadWorkerId)
-            {
-                deadWorkersId.Add(deadWorkerId);
-            }
-            return deadWorkersId.ToArray();
-        }
-    }
-
     public class ProcessCreatorAsServer
     {
         private readonly GrpcChannel channel;
@@ -90,7 +43,7 @@ namespace PuppetMaster
                 workerId = workersMap.BinarySearch(worker[0]);
                 request.DependenciesData.Add(new ProccessData
                 { 
-                    ServerId = workerId ,
+                    ServerId = workerId,
                     Url = worker[2]
                 });
             }
@@ -146,6 +99,56 @@ namespace PuppetMaster
             return reply.Ack;
         }
     }
+
+    public class SchedulerAsServer
+    {
+        private readonly GrpcChannel channel;
+        private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
+        private readonly string serverId;
+
+        public SchedulerAsServer(string serverId, string hostname, string port)
+        {
+            this.serverId = serverId;
+            // setup the client side
+
+            AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
+
+            client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
+        }
+
+        public Boolean SendAppData(string[] data)
+        {
+            SendAppDataRequest request = new SendAppDataRequest
+            {
+                Input = data[1],
+            };
+            //need to check where we put the input files
+            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
+            {
+                request.App.Add(line);
+            }
+
+            SendAppDataReply reply = client.SendAppData(request);
+            return reply.Ack;
+        }
+
+        public bool SendStatusRequest()
+        {
+            Empty request = new Empty { };
+            try
+            {
+                StatusReply reply = client.Status(request);
+
+                return reply.Success;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
     //Only used to populate and status
     public class StorageAsServer
     {
@@ -177,6 +180,55 @@ namespace PuppetMaster
                 return false;
             return true;
         }
+
+        public bool SendStatusRequest()
+        {
+            StorageStatusEmpty request = new StorageStatusEmpty { };
+            try
+            {
+                StorageStatusReply reply = client.Status(request);
+
+                return reply.Success;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
+
+    public class WorkerAsServer
+    {
+        private readonly GrpcChannel channel;
+        private readonly DIDAWorkerService.DIDAWorkerServiceClient client;
+        private readonly string serverId;
+
+        public WorkerAsServer(string serverId, string hostname, string port)
+        {
+            this.serverId = serverId;
+            // setup the client side
+
+            AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
+
+            client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+        }
+
+        public bool SendStatusRequest()
+        {
+            WorkerStatusEmpty request = new WorkerStatusEmpty { };
+            try
+            {
+                WorkerStatusReply reply = client.Status(request);
+
+                return reply.Success;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 
 
@@ -185,6 +237,7 @@ namespace PuppetMaster
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
         private List<StorageAsServer> storagesAsServers = new List<StorageAsServer>();
+        private List<WorkerAsServer> workersAsServers = new List<WorkerAsServer>();
         private List<string> schedulerMap = new List<string>();
         private List<string> workerMap = new List<string>();
         private List<string> storageMap = new List<string>();
@@ -203,6 +256,10 @@ namespace PuppetMaster
             {
                 StorageAsServer storage = new StorageAsServer(serverId, hostname, port);
                 storagesAsServers.Add(storage);
+            }else if (type == "worker")
+            {
+                WorkerAsServer worker = new WorkerAsServer(serverId, hostname, port);
+                workersAsServers.Add(worker);
             }
 
         }
@@ -234,10 +291,39 @@ namespace PuppetMaster
 
         private async void StartStatusOperation()
         {
-            Task<string[]> schedulerTask = Task.Run(() => scheduler.SendStatusRequest());
-            string[] workersDown = await schedulerTask;
-            Console.WriteLine(workersDown);
-            //Task outputStorages = 
+            Task<bool> schedulerTask = Task.Run(() => scheduler.SendStatusRequest());
+            List<Task<bool>> workersTask = new List<Task<bool>>();
+            foreach(WorkerAsServer worker in workersAsServers)
+            {
+                Task<bool> workerTask = Task.Run(() => worker.SendStatusRequest());
+                workersTask.Add(workerTask);
+
+            }
+            List<Task<bool>> storagesTask = new List<Task<bool>>();
+            foreach (StorageAsServer storage in storagesAsServers)
+            {
+                Task<bool> storageTask = Task.Run(() => storage.SendStatusRequest());
+                storagesTask.Add(storageTask);
+
+            }
+
+            //TODO
+            //CHECKING VALUES
+            bool schedulerAlive = await schedulerTask;
+            if (!schedulerAlive) {/*Write in the DebugTextBox*/ }
+
+            foreach (Task<bool> workerTask in workersTask)
+            {
+                bool workerAlive = await workerTask;
+                if (!workerAlive) {/*Write in the DebugTextBox*/}
+            }
+            foreach (Task<bool> storageTask in storagesTask)
+            {
+                bool storageAlive = await storageTask;
+                if (!storageAlive) {/*Write in the DebugTextBox*/}
+            }
+
+            Console.WriteLine(schedulerAlive);
         }
 
         public Boolean SendAppDataToScheduler(string[] buffer)
@@ -274,6 +360,7 @@ namespace PuppetMaster
             {
                 int replicaId = workerMap.BinarySearch(worker[0]);
                 pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
+                this.CreateChannelWithServer(worker[1], worker[2], "worker");
             }
 
             //Create Scheduler

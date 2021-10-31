@@ -5,6 +5,13 @@ service DIDAStorageService {
   rpc read(DIDAReadRequest) returns (DIDARecordReply);
   rpc write(DIDAWriteRequest) returns (DIDAVersion);
   rpc updateIfValueIs(DIDAUpdateIfRequest) returns (DIDAVersion);
+  rpc Status(StorageStatusEmpty) returns (StorageStatusReply);
+}
+
+message StorageStatusEmpty{}
+
+message StorageStatusReply{
+	bool success = 1;
 }
 
 message DIDAReadRequest {

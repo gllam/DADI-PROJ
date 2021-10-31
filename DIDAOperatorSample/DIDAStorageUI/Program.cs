@@ -22,6 +22,18 @@ namespace DIDAStorageUI
             this.replicaid = replicaid;
         }
 
+        public override Task<StorageStatusReply> Status(StorageStatusEmpty request, ServerCallContext context)
+        {
+            return Task.FromResult(StatusOperation());
+        }
+
+        private StorageStatusReply StatusOperation()
+        {
+            Console.WriteLine("I am a nice and well alive Storage!");
+            StorageStatusReply reply = new StorageStatusReply { Success = true };
+            return reply;
+        }
+
         public override Task<DIDARecordReply> read(DIDAReadRequest request, ServerCallContext context)
         {
             return Task.FromResult<DIDARecordReply>(ReadData(request));
@@ -59,7 +71,7 @@ namespace DIDAStorageUI
                 }
                 return reply;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new DIDARecordReply();
             }
@@ -106,7 +118,7 @@ namespace DIDAStorageUI
                 {
                     newRecord.version.versionNumber = data[request.Id][data[request.Id].Count - 1].version.versionNumber + 1;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     newRecord.version.versionNumber = 1;
                     data.Add(request.Id, new List<DIDARecord>());

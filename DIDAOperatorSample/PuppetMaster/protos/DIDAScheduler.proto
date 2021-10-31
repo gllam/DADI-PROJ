@@ -7,7 +7,7 @@ service DIDASchedulerService {
 }
 
 message StatusReply{
-	repeated string deadWorkerId = 1;
+	bool success = 1;
 }
 message Empty{}
 

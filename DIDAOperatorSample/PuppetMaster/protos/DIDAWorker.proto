@@ -1,0 +1,11 @@
+﻿syntax = "proto3";
+
+service DIDAWorkerService {
+  rpc Status (WorkerStatusEmpty) returns (WorkerStatusReply);
+}
+
+message WorkerStatusEmpty{}
+
+message WorkerStatusReply{
+	bool success = 1;
+}
