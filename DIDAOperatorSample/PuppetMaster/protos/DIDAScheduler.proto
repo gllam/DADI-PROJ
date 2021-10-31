@@ -3,7 +3,13 @@
 service DIDASchedulerService {
   rpc SendAppData (SendAppDataRequest) returns (SendAppDataReply);
   rpc SendWorkers (SendWorkersRequest) returns (SendWorkersReply);
+  rpc Status (Empty) returns (StatusReply);
 }
+
+message StatusReply{
+	repeated string deadWorkerId = 1;
+}
+message Empty{}
 
 message SendAppDataRequest {
 	string input = 1;

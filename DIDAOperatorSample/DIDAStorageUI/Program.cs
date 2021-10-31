@@ -113,7 +113,7 @@ namespace DIDAStorageUI
                 }
                 data[request.Id].Add(newRecord);
                 if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
-                Console.WriteLine("Write successful -> " + newRecord.Id + ":" + newRecord.Val);
+                Console.WriteLine("Write successful -> " + newRecord.id + ":" + newRecord.val);
             }
             return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
         }

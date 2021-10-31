@@ -26,7 +26,7 @@ namespace PuppetMaster
 
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
-        
+
         public Boolean SendAppData(string[] data)
         {
             SendAppDataRequest request = new SendAppDataRequest
@@ -41,6 +41,18 @@ namespace PuppetMaster
 
             SendAppDataReply reply = client.SendAppData(request);
             return reply.Ack;
+        }
+
+        public string[] SendStatusRequest()
+        {
+            Empty request = new Empty { };
+            StatusReply reply = client.Status(request);
+            List<string> deadWorkersId = new List<string>();
+            foreach(string deadWorkerId in reply.DeadWorkerId)
+            {
+                deadWorkersId.Add(deadWorkerId);
+            }
+            return deadWorkersId.ToArray();
         }
     }
 
@@ -134,7 +146,7 @@ namespace PuppetMaster
             return reply.Ack;
         }
     }
-    //TODO
+    //Only used to populate and status
     public class StorageAsServer
     {
         private readonly GrpcChannel channel;
@@ -170,7 +182,6 @@ namespace PuppetMaster
 
     class PuppetMasterLogic
     {
-
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
         private List<StorageAsServer> storagesAsServers = new List<StorageAsServer>();
@@ -209,6 +220,10 @@ namespace PuppetMaster
                     t = new Thread(new ThreadStart(() => this.StartPopulateStoragesOperation(buffer[1])));
                     t.Start();
                     break;
+                case "status":
+                    t = new Thread(new ThreadStart(() => this.StartStatusOperation()));
+                    t.Start();
+                    break;
 
                 default:
                     break;
@@ -216,6 +231,15 @@ namespace PuppetMaster
             }
 
         }
+
+        private async void StartStatusOperation()
+        {
+            Task<string[]> schedulerTask = Task.Run(() => scheduler.SendStatusRequest());
+            string[] workersDown = await schedulerTask;
+            Console.WriteLine(workersDown);
+            //Task outputStorages = 
+        }
+
         public Boolean SendAppDataToScheduler(string[] buffer)
         {
             /*while(scheduler == null) {
@@ -227,7 +251,7 @@ namespace PuppetMaster
 
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
-            //Create Scheduler
+            //Save nodes data
             schedulerMap.Add(scheduler[0]);
             foreach (string[] worker in workers)
             {
@@ -237,24 +261,24 @@ namespace PuppetMaster
             {
                 storageMap.Add(storage[0]);
             }
-            int replicaId = schedulerMap.BinarySearch(scheduler[0]);
-            pcs.SendCreateSchedulerRequest(replicaId, scheduler, workers, workerMap);
-            this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
+            //Create Storages
+            foreach (string[] storage in storages)
+            {
+                int replicaId = storageMap.BinarySearch(storage[0]);
+                pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                this.CreateChannelWithServer(storage[1], storage[2], "storage");
+            }
 
             //Create Workers
             foreach (string[] worker in workers)
             {
-                replicaId = workerMap.BinarySearch(worker[0]);
+                int replicaId = workerMap.BinarySearch(worker[0]);
                 pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
             }
 
-            //Create Storages
-            foreach (string[] storage in storages)
-            {
-                replicaId = storageMap.BinarySearch(storage[0]);
-                pcs.SendCreateStorageRequest(replicaId, storage, storages);
-                this.CreateChannelWithServer(storage[1], storage[2], "storage");
-            }
+            //Create Scheduler
+            pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[0]), scheduler, workers, workerMap);
+            this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
 
         }
 
