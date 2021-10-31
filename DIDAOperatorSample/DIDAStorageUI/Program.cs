@@ -113,7 +113,7 @@ namespace DIDAStorageUI
                 {
                     replicaId = replicaid
                 };
-                if (data.ContainsKey(request.Id))
+                if (!data.ContainsKey(request.Id))
                 {
                     newRecord.version.versionNumber = data[request.Id][data[request.Id].Count - 1].version.versionNumber + 1;
                 }
