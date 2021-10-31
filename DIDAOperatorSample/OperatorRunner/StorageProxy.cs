@@ -37,19 +37,23 @@ namespace Worker
         // 3) CHECK IN THE METARECORD WHICH ARE THE PREVIOUSLY READ VERSIONS OF DATA 
         // 4) RECORD ACCESSED DATA INTO THE METARECORD
 
-        public virtual DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
+        public virtual DIDAWorker.DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
         {
-            return _clients["s1"].read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
+            var res = _clients["s1"].read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
+            return new DIDAWorker.DIDARecordReply { Id = res.Id, Val = res.Val, Version = { VersionNumber = res.Version.VersionNumber, ReplicaId = res.Version.ReplicaId } };
         }
 
-        public virtual DIDAVersion write(DIDAWorker.DIDAWriteRequest r)
+        public virtual DIDAWorker.DIDAVersion write(DIDAWorker.DIDAWriteRequest r)
         {
-            return _clients["s1"].write(new DIDAWriteRequest { Id = r.Id, Val = r.Val });
+            var res = _clients["s1"].write(new DIDAWriteRequest { Id = r.Id, Val = r.Val });
+            return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
         }
 
-        public virtual DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
+        public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
         {
-            return _clients["s1"].updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+            var res = _clients["s1"].updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+            return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
         }
     }
+    
 }
