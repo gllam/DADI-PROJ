@@ -1,8 +1,6 @@
 ﻿using System;
-using DIDAStorage;
 using DIDAWorker;
 using DIDAStorageClient;
-using Grpc.Core;
 using Grpc.Net.Client;
 using System.Collections.Generic;
 
