@@ -152,5 +152,10 @@ namespace PuppetMaster
             textBoxScript.SelectionBackColor = Color.Yellow;
 
         }
+
+        public void WriteOnDebugTextBox(string line)
+        {
+            textBoxDebug.Text += line + "\r\n";
+        }
     }
 }
