@@ -56,7 +56,7 @@ namespace Worker
             int closer = 0;
             foreach(int i in _clients.Keys)
             {
-                if (Math.Abs(hash - i) < Math.Abs(hash - closer))
+                if (Math.Abs(hash - i) < Math.Abs(hash - closer) || closer == 0)
                 {
                     closer = i;
 
