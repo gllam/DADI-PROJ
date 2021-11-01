@@ -40,7 +40,9 @@ namespace SchedulerNamespace
     {
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<Worker> workerMap = new List<Worker>();
+        int lastWorkerIndex = 0;
         string name;
+
 
         public SchedulerService(string name) { this.name = name; }
 
@@ -77,7 +79,7 @@ namespace SchedulerNamespace
                 Next = 0,
                 ChainSize = chainSize
             }; //request to worker
-            for (int opIndex = 0; opIndex < chainSize; opIndex++)
+            for (int opIndex = lastWorkerIndex + 1 % workerMap.Count; opIndex < chainSize; opIndex = opIndex + 1 % workerMap.Count)
             {
                 OperatorID op = new OperatorID
                 {
@@ -92,6 +94,7 @@ namespace SchedulerNamespace
                     Output = ""
                 };
                 req.Asschain.Add(ass);
+                lastWorkerIndex = opIndex;
             }
             SendRequestToWorker(req);
             return new SendAppDataReply
