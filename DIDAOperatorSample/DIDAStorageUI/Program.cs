@@ -12,16 +12,16 @@ namespace DIDAStorageUI
         Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         int maxVersions = 5; //dummy
         readonly int replicaid;
-        string storageName;
+        string name;
         int gossipDelay;
 
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
-        public StorageService(int replicaid, int gossipDelay, string storageName)
+        public StorageService(int replicaid, int gossipDelay, string name)
         {
             this.gossipDelay = gossipDelay;
             this.replicaid = replicaid;
-            this.storageName = storageName;
+            this.name = name;
         }
 
         public override Task<StorageStatusReply> Status(StorageStatusEmpty request, ServerCallContext context)
@@ -31,7 +31,7 @@ namespace DIDAStorageUI
 
         private StorageStatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Storage!");
+            Console.WriteLine("Storage: " + this.name + " -> I am alive!");
             StorageStatusReply reply = new StorageStatusReply { Success = true };
             return reply;
         }

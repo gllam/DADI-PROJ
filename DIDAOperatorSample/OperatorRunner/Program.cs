@@ -16,11 +16,11 @@ namespace OperatorRunner
     {
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
         int gossipDelay;
-        string workerName;
+        string name;
 
-        public WorkerService(int gossipDelay, string workerName) {
+        public WorkerService(int gossipDelay, string name) {
             this.gossipDelay = gossipDelay;
-            this.workerName = workerName;
+            this.name = name;
         }
 
         public override Task<SendDIDAReqReply> SendDIDAReq(SendDIDAReqRequest request, ServerCallContext context)
@@ -35,7 +35,7 @@ namespace OperatorRunner
 
         private WorkerStatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Worker!");
+            Console.WriteLine("Worker: " + this.name + " -> I am alive!");
             WorkerStatusReply reply = new WorkerStatusReply { Success = true };
             return reply;
         }

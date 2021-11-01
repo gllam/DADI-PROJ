@@ -40,8 +40,9 @@ namespace SchedulerNamespace
     {
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<Worker> workerMap = new List<Worker>();
+        string name;
 
-        public SchedulerService() {}
+        public SchedulerService(string name) { this.name = name; }
 
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
@@ -55,8 +56,7 @@ namespace SchedulerNamespace
 
         private StatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Scheduler!");
-            Empty request = new Empty { };
+            Console.WriteLine("Scheduler: " + this.name + " -> I am alive!");
             StatusReply reply = new StatusReply { Success = true };
             return reply;
         }
@@ -148,7 +148,7 @@ namespace SchedulerNamespace
             string schedulerName = args[1];
             string hostname = args[2];
             int port = Convert.ToInt32(args[3]);
-            SchedulerService scheduler = new SchedulerService();
+            SchedulerService scheduler = new SchedulerService(schedulerName);
             for (int i = 4; i < args.Length; i++)
             {
                 scheduler.AddWorker(args[i]);

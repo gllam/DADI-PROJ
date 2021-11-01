@@ -96,7 +96,7 @@ namespace PuppetMaster
             // 
             // textBoxScript
             // 
-            this.textBoxScript.Location = new System.Drawing.Point(533, 12);
+            this.textBoxScript.Location = new System.Drawing.Point(533, 41);
             this.textBoxScript.Name = "textBoxScript";
             this.textBoxScript.Size = new System.Drawing.Size(242, 350);
             this.textBoxScript.TabIndex = 6;
@@ -104,7 +104,7 @@ namespace PuppetMaster
             // 
             // buttonNextStep
             // 
-            this.buttonNextStep.Location = new System.Drawing.Point(417, 19);
+            this.buttonNextStep.Location = new System.Drawing.Point(617, 12);
             this.buttonNextStep.Name = "buttonNextStep";
             this.buttonNextStep.Size = new System.Drawing.Size(75, 23);
             this.buttonNextStep.TabIndex = 7;
@@ -114,16 +114,16 @@ namespace PuppetMaster
             // 
             // textBoxDebug
             // 
-            this.textBoxDebug.Location = new System.Drawing.Point(310, 139);
+            this.textBoxDebug.Location = new System.Drawing.Point(228, 41);
             this.textBoxDebug.Multiline = true;
             this.textBoxDebug.Name = "textBoxDebug";
-            this.textBoxDebug.Size = new System.Drawing.Size(110, 162);
+            this.textBoxDebug.Size = new System.Drawing.Size(218, 369);
             this.textBoxDebug.TabIndex = 8;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(310, 118);
+            this.label1.Location = new System.Drawing.Point(228, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(42, 15);
             this.label1.TabIndex = 9;
