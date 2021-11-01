@@ -12,14 +12,16 @@ namespace DIDAStorageUI
         Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         int maxVersions = 5; //dummy
         readonly int replicaid;
+        string name;
         int gossipDelay;
 
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
-        public StorageService(int replicaid, int gossipDelay)
+        public StorageService(int replicaid, int gossipDelay, string name)
         {
             this.gossipDelay = gossipDelay;
             this.replicaid = replicaid;
+            this.name = name;
         }
 
         public override Task<StorageStatusReply> Status(StorageStatusEmpty request, ServerCallContext context)
@@ -29,7 +31,7 @@ namespace DIDAStorageUI
 
         private StorageStatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Storage!");
+            Console.WriteLine("Storage: " + this.name + " -> I am alive!");
             StorageStatusReply reply = new StorageStatusReply { Success = true };
             return reply;
         }
@@ -134,15 +136,16 @@ namespace DIDAStorageUI
     {
         static void Main(string[] args)
         {
-            int port = Convert.ToInt32(args[2]);
-            string host = args[1];
             int replicaid = Convert.ToInt32(args[0]);
-            int gossipDelay = Convert.ToInt32(args[3]);
+            string storageName = args[1];
+            string host = args[2];
+            int port = Convert.ToInt32(args[3]);
+            int gossipDelay = Convert.ToInt32(args[4]);
 
-            Console.WriteLine("Insecure Storage server '" + replicaid + "' | hostname: " + host + " | port " + port);
+            Console.WriteLine("Insecure Storage server '" + storageName + "' | hostname: " + host + " | port " + port);
             Server server = new Server
             {
-                Services = { DIDAStorageService.BindService(new StorageService(replicaid, gossipDelay)) },
+                Services = { DIDAStorageService.BindService(new StorageService(replicaid, gossipDelay, storageName)) },
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) }
             };
             server.Start();

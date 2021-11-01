@@ -31,19 +31,19 @@ namespace PuppetMaster
         {
             CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = scheduler[1],
                     Url = scheduler[2]
                 }
             };
-            int workerId;
+;
             foreach (string[] worker in workers)
             {
-                workerId = workersMap.BinarySearch(worker[0]);
                 request.DependenciesData.Add(new ProccessData
                 { 
-                    ServerId = workerId,
+                    ServerName = worker[1],
                     Url = worker[2]
                 });
             }
@@ -56,20 +56,20 @@ namespace PuppetMaster
         {
             CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = worker[1],
                     Url = worker[2],
                 },
                 GossipDelay = worker[3] 
             };
-            int storageId;
+
             foreach (string[] storage in storages)
             {
-                storageId = storageMap.BinarySearch(storage[0]);
                 request.DependenciesData.Add(new ProccessData
                 {
-                    ServerId = storageId,
+                    ServerName = storage[1],
                     Url = storage[2]
                 });
             }
@@ -82,9 +82,10 @@ namespace PuppetMaster
         {
             CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
             {
+                ServerId = replicaId,
                 MyData = new ProccessData
                 {
-                    ServerId = replicaId,
+                    ServerName = storage[1],
                     Url = storage[2],
                 },
                 GossipDelay = storage[3]
@@ -92,7 +93,11 @@ namespace PuppetMaster
 
             foreach (string[] storageData in storages)
             {
-                request.StorageUrl.Add(storageData[2]);
+                request.DependenciesData.Add(new ProccessData
+                {
+                    ServerName = storageData[1],
+                    Url = storageData[2]
+                });
             }
 
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
@@ -231,7 +236,7 @@ namespace PuppetMaster
         }
     }
 
-
+    public delegate void DelAddMsg(string line);
     class PuppetMasterLogic
     {
         private SchedulerAsServer scheduler;
@@ -241,8 +246,10 @@ namespace PuppetMaster
         private List<string> schedulerMap = new List<string>();
         private List<string> workerMap = new List<string>();
         private List<string> storageMap = new List<string>();
+        Form1 guiWindow;
 
         public PuppetMasterLogic(Form1 guiWindow) {
+            this.guiWindow = guiWindow;
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
         public void CreateChannelWithServer(string serverId, string url, string type)
@@ -289,6 +296,11 @@ namespace PuppetMaster
 
         }
 
+        private void WriteOnDebugTextBox(string line)
+        {
+            guiWindow.BeginInvoke(new DelAddMsg(guiWindow.WriteOnDebugTextBox), new object[] {line});
+        }
+
         private async void StartStatusOperation()
         {
             Task<bool> schedulerTask = Task.Run(() => scheduler.SendStatusRequest());
@@ -308,22 +320,37 @@ namespace PuppetMaster
             }
 
             //TODO
-            //CHECKING VALUES
+            //Checking if the tasks return or if the proccesses are dead
+            
+            this.WriteOnDebugTextBox("---------------- STATUS ----------------");
             bool schedulerAlive = await schedulerTask;
-            if (!schedulerAlive) {/*Write in the DebugTextBox*/ }
+            if (!schedulerAlive) {/*Write in the DebugTextBox*/
+                this.guiWindow.BeginInvoke(new DelAddMsg(guiWindow.WriteOnDebugTextBox), new object[] {
+                                                                        "Scheduler: " + schedulerMap[0] + " is probably dead!"});
+                //guiWindow.WriteOnDebugTextBox("Scheduler: " + schedulerMap[0] + " is probably dead!");
+            }
 
+            int index = 0;
             foreach (Task<bool> workerTask in workersTask)
             {
                 bool workerAlive = await workerTask;
-                if (!workerAlive) {/*Write in the DebugTextBox*/}
+                if (!workerAlive) {/*Write in the DebugTextBox*/
+                    this.WriteOnDebugTextBox("Worker: " + workerMap[index] + " is probably dead!");
+                }
+                index++;
             }
+
+            index = 0;
             foreach (Task<bool> storageTask in storagesTask)
             {
                 bool storageAlive = await storageTask;
-                if (!storageAlive) {/*Write in the DebugTextBox*/}
+                if (!storageAlive) {/*Write in the DebugTextBox*/
+                    guiWindow.WriteOnDebugTextBox("Storage: " + storageMap[index] + " is probably dead!");
+                }
+                index++;
             }
 
-            Console.WriteLine(schedulerAlive);
+            //Console.WriteLine(schedulerAlive); probably breakpoint here if some errors pop up
         }
 
         public Boolean SendAppDataToScheduler(string[] buffer)
@@ -338,19 +365,19 @@ namespace PuppetMaster
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
             //Save nodes data
-            schedulerMap.Add(scheduler[0]);
+            schedulerMap.Add(scheduler[1]);
             foreach (string[] worker in workers)
             {
-                workerMap.Add(worker[0]);
+                workerMap.Add(worker[1]);
             }
             foreach (string[] storage in storages)
             {
-                storageMap.Add(storage[0]);
+                storageMap.Add(storage[1]);
             }
             //Create Storages
             foreach (string[] storage in storages)
             {
-                int replicaId = storageMap.BinarySearch(storage[0]);
+                int replicaId = storageMap.BinarySearch(storage[1]);
                 pcs.SendCreateStorageRequest(replicaId, storage, storages);
                 this.CreateChannelWithServer(storage[1], storage[2], "storage");
             }
@@ -358,13 +385,13 @@ namespace PuppetMaster
             //Create Workers
             foreach (string[] worker in workers)
             {
-                int replicaId = workerMap.BinarySearch(worker[0]);
+                int replicaId = workerMap.BinarySearch(worker[1]);
                 pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
                 this.CreateChannelWithServer(worker[1], worker[2], "worker");
             }
 
             //Create Scheduler
-            pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[0]), scheduler, workers, workerMap);
+            pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
             this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
 
         }

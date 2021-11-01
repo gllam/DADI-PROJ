@@ -16,9 +16,11 @@ namespace OperatorRunner
     {
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
         int gossipDelay;
+        string name;
 
-        public WorkerService(int gossipDelay, string id) {
+        public WorkerService(int gossipDelay, string name) {
             this.gossipDelay = gossipDelay;
+            this.name = name;
         }
 
         public override Task<SendDIDAReqReply> SendDIDAReq(SendDIDAReqRequest request, ServerCallContext context)
@@ -33,7 +35,7 @@ namespace OperatorRunner
 
         private WorkerStatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Worker!");
+            Console.WriteLine("Worker: " + this.name + " -> I am alive!");
             WorkerStatusReply reply = new WorkerStatusReply { Success = true };
             return reply;
         }
@@ -118,18 +120,19 @@ namespace OperatorRunner
     {
         static void Main(string[] args)
         {
-            string replicaId = args[0];
-            int port = Convert.ToInt32(args[2]);
-            string host = args[1];
-            int gossipDelay = Convert.ToInt32(args[3]);
-            WorkerService workerService = new WorkerService(gossipDelay,replicaId);
-            for (int i = 4; i < args.Length; i++)
+            int replicaId = Convert.ToInt32(args[0]);
+            string workerName = args[1];
+            string host = args[2];
+            int port = Convert.ToInt32(args[3]);
+            int gossipDelay = Convert.ToInt32(args[4]);
+            WorkerService workerService = new WorkerService(gossipDelay,workerName);
+            for (int i = 5; i < args.Length; i++)
             {
                 workerService.AddStorage(args[i]);
             }
             ServerPort serverPort = new ServerPort(host, port, ServerCredentials.Insecure);
 
-            Console.WriteLine("Insecure Worker server '" + replicaId + "' | hostname: " + host + " | port " + port);
+            Console.WriteLine("Insecure Worker server '" + workerName + "' | hostname: " + host + " | port " + port);
 
             Server server = new Server
             {

@@ -13,12 +13,14 @@ namespace SchedulerNamespace
     {
         public string host;
         public string port;
+        private string name;
         private DIDAWorkerService.DIDAWorkerServiceClient client;
 
-        public Worker(string host, string port)
+        public Worker(string name,string host, string port)
         {
             this.host = host;
             this.port = port;
+            this.name = name;
         }
         public void SetClient(DIDAWorkerService.DIDAWorkerServiceClient client)
         {
@@ -39,8 +41,10 @@ namespace SchedulerNamespace
         //Dictionary<string, GrpcChannel> _workerChannels = new Dictionary<string, GrpcChannel>();
         List<Worker> workerMap = new List<Worker>();
         int lastWorkerIndex = 0;
+        string name;
 
-        public SchedulerService() {}
+
+        public SchedulerService(string name) { this.name = name; }
 
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
@@ -54,8 +58,7 @@ namespace SchedulerNamespace
 
         private StatusReply StatusOperation()
         {
-            Console.WriteLine("I am a nice and well alive Scheduler!");
-            Empty request = new Empty { };
+            Console.WriteLine("Scheduler: " + this.name + " -> I am alive!");
             StatusReply reply = new StatusReply { Success = true };
             return reply;
         }
@@ -130,10 +133,11 @@ namespace SchedulerNamespace
             };
         }*/
 
-        internal void AddWorker(string workerUrl)
+        internal void AddWorker(string input)
         {
-            string[] hostport = workerUrl.Split("//")[1].Split(":");
-            workerMap.Add(new Worker(hostport[0], hostport[1]));
+            string[] data = input.Split("|");
+            string[] hostport = data[1].Split("//")[1].Split(":");
+            workerMap.Add(new Worker(data[0], hostport[0], hostport[1]));
             Console.WriteLine(hostport[0], hostport[1]);
         }
     }
@@ -143,18 +147,19 @@ namespace SchedulerNamespace
         public static void Main(string[] args)
         {
             Console.WriteLine(args.Length);
-            string serverId = args[0];
-            string hostname = args[1];
-            int port = Convert.ToInt32(args[2]);
-            SchedulerService scheduler = new SchedulerService();
-            for (int i = 3; i < args.Length; i++)
+            int serverId = Convert.ToInt32(args[0]);
+            string schedulerName = args[1];
+            string hostname = args[2];
+            int port = Convert.ToInt32(args[3]);
+            SchedulerService scheduler = new SchedulerService(schedulerName);
+            for (int i = 4; i < args.Length; i++)
             {
                 scheduler.AddWorker(args[i]);
             }
             ServerPort serverPort;
             string startupMessage;
             serverPort = new ServerPort(hostname, port, ServerCredentials.Insecure);
-            startupMessage = "Insecure Scheduler server '" + serverId + "' | hostname: " + hostname + " | port " + port;
+            startupMessage = "Insecure Scheduler server '" + schedulerName + "' | hostname: " + hostname + " | port " + port;
 
             Server server = new Server
             {
