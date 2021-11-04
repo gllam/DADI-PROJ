@@ -54,30 +54,22 @@ namespace DIDAStorageUI
                 {
                     if (request.Version.VersionNumber == -1)
                     {
-                        var d = data[request.Id][data[request.Id].Count - 1];
-                        reply.Val = d.val;
-                        reply.Version.VersionNumber = d.version.versionNumber;
-                        reply.Version.ReplicaId = d.version.replicaId;
+                        var lastRecord = data[request.Id][data[request.Id].Count - 1];
+                        reply.Val = lastRecord.val;
+                        reply.Version.VersionNumber = lastRecord.version.versionNumber;
+                        reply.Version.ReplicaId = lastRecord.version.replicaId;
                     }
                     else
                     {
-                        foreach (DIDARecord record in data[request.Id])
+                        DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
+                        if(record.id == request.Id) { //not tested
+                            reply.Val = record.val;
+                        } else
                         {
-                            if (record.version.versionNumber == reply.Version.VersionNumber && request.Version.VersionNumber != -1)
-                            {
-                                reply.Val = record.val;
-                                break;
-                            }
-                            if (record.version.versionNumber > reply.Version.VersionNumber && request.Version.VersionNumber == -1)
-                            {
-                                reply.Val = record.val;
-                                reply.Version = new DIDAVersion
-                                {
-                                    VersionNumber = record.version.versionNumber,
-                                    ReplicaId = record.version.replicaId
-                                };
-                            }
+                            reply.Version.VersionNumber = -1;
+                            reply.Version.ReplicaId = -1;
                         }
+                        
                     }
                 }
             }
@@ -144,7 +136,7 @@ namespace DIDAStorageUI
 
         public override string ToString()
         {
-            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + " Items " + ListData();
+            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + "\nItems:\n" + ListData();
         }
 
         public string ListData()

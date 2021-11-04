@@ -44,6 +44,7 @@ namespace OperatorRunner
         {
             try
             {
+                Console.WriteLine(this);
                 Console.WriteLine(request);
                 string classname = request.Asschain[request.Next].Opid.Classname;
                 Console.WriteLine(classname);
@@ -128,7 +129,17 @@ namespace OperatorRunner
 
         public override string ToString()
         {
-            return "Worker " + name + " GossipDelay " + gossipDelay + " Storages " + storageMap.ToArray();
+            return "Worker " + name + " GossipDelay " + gossipDelay + " Storages: " + ListStorages();
+        }
+
+        public string ListStorages()
+        {
+            string s_data = "";
+            foreach (var storage in storageMap)
+            {
+                s_data += storage.serverId + "-" + storage.host + ":" + storage.port + " ";
+            }
+            return s_data;
         }
     }
 

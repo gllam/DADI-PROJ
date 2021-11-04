@@ -13,7 +13,7 @@ namespace SchedulerNamespace
     {
         public string host;
         public string port;
-        private string name;
+        public string name;
         private DIDAWorkerService.DIDAWorkerServiceClient client;
 
         public Worker(string name,string host, string port)
@@ -65,6 +65,7 @@ namespace SchedulerNamespace
 
         public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
+            Console.WriteLine(this);
             try
             {
                 Console.WriteLine(request.Input);
@@ -132,32 +133,27 @@ namespace SchedulerNamespace
             }
         }
 
-
-        /*public override Task<SendWorkersReply> SendWorkers(SendWorkersRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(setWorkers(request));
-        }*/
-
-
-        /*public SendWorkersReply setWorkers(SendWorkersRequest request)
-        {
-            foreach (string url in request.Url)
-            {
-                string[] hostport = url.Split("//")[1].Split(":");
-                workerMap.Add((hostport[0], hostport[1]));
-            }
-            return new SendWorkersReply
-            {
-                Ack = true
-            };
-        }*/
-
         internal void AddWorker(string input)
         {
             string[] data = input.Split("|");
             string[] hostport = data[1].Split("//")[1].Split(":");
             workerMap.Add(new Worker(data[0], hostport[0], hostport[1]));
             Console.WriteLine(hostport[0], hostport[1]);
+        }
+
+        public override string ToString()
+        {
+            return "Scheduler " + name + " Workers: " + ListWorkers();
+        }
+
+        public string ListWorkers()
+        {
+            string s_data = "";
+            foreach (var worker in workerMap)
+            {
+                s_data += worker.name + "-" + worker.host + ":" + worker.port + " ";
+            }
+            return s_data;
         }
     }
 
