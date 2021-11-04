@@ -82,7 +82,7 @@ namespace SchedulerNamespace
                     Next = 0,
                     ChainSize = chainSize
                 }; //request to worker
-                for (int opIndex = lastWorkerIndex + 1; opIndex != chainSize + lastWorkerIndex + 1; opIndex = opIndex + 1)
+                for (int opIndex = lastWorkerIndex + 1; opIndex != chainSize + lastWorkerIndex + 1; opIndex += 1)
                 { 
                     var app = request.App[opIndex % workerMap.Count];
                     Worker worker = workerMap[opIndex % workerMap.Count];
