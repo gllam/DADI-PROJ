@@ -109,7 +109,7 @@ namespace PuppetMaster
     {
         private readonly GrpcChannel channel;
         private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public SchedulerAsServer(string serverId, string hostname, string port)
         {
@@ -153,13 +153,28 @@ namespace PuppetMaster
                 return false;
             }
         }
+
+        internal string SendListServerRequest()
+        {
+            Empty request = new Empty { };
+            try
+            {
+                ListServerSchedReply reply = client.ListServer(request);
+
+                return reply.SereverDataToSTring;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
+            }
+        }
     }
     //Only used to populate and status
     public class StorageAsServer
     {
         private readonly GrpcChannel channel;
         private readonly DIDAStorageService.DIDAStorageServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public StorageAsServer(string serverId, string hostname, string port)
         {
@@ -200,13 +215,28 @@ namespace PuppetMaster
                 return false;
             }
         }
+
+        internal string SendListServerRequest()
+        {
+            StorageStatusEmpty request = new StorageStatusEmpty { };
+            try
+            {
+                ListServerStorageReply reply = client.ListServer(request);
+
+                return reply.SereverDataToSTring;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
+            }
+        }
     }
 
     public class WorkerAsServer
     {
         private readonly GrpcChannel channel;
         private readonly DIDAWorkerService.DIDAWorkerServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public WorkerAsServer(string serverId, string hostname, string port)
         {
@@ -232,6 +262,21 @@ namespace PuppetMaster
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        internal string SendListServerRequest()
+        {
+            WorkerStatusEmpty request = new WorkerStatusEmpty { };
+            try
+            {
+                ListServerWorkerReply reply = client.ListServer(request);
+
+                return reply.SereverDataToSTring;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
             }
         }
     }
@@ -288,12 +333,41 @@ namespace PuppetMaster
                     t = new Thread(new ThreadStart(() => this.StartStatusOperation()));
                     t.Start();
                     break;
-
+                case "listServer":
+                    t = new Thread(new ThreadStart(() => this.StartListServerOperation(buffer[1])));
+                    t.Start();
+                    break;
                 default:
                     break;
 
             }
 
+        }
+
+        private void StartListServerOperation(string serverName)
+        {
+            if(serverName == scheduler.serverId) {
+                WriteOnDebugTextBox(scheduler.SendListServerRequest());
+                return;
+            }
+
+            foreach(WorkerAsServer work in workersAsServers)
+            {
+                if(serverName == work.serverId) {
+                    WriteOnDebugTextBox(work.SendListServerRequest());
+                    return;
+                }
+            }
+            foreach (StorageAsServer stor in storagesAsServers)
+            {
+                if (serverName == stor.serverId)
+                {
+                    WriteOnDebugTextBox(stor.SendListServerRequest());
+                    return;
+                }
+            }
+
+            WriteOnDebugTextBox(serverName + " not found!");
         }
 
         private void WriteOnDebugTextBox(string line)
@@ -318,9 +392,6 @@ namespace PuppetMaster
                 storagesTask.Add(storageTask);
 
             }
-
-            //TODO
-            //Checking if the tasks return or if the proccesses are dead
             
             this.WriteOnDebugTextBox("---------------- STATUS ----------------");
             bool schedulerAlive = await schedulerTask;
@@ -362,6 +433,7 @@ namespace PuppetMaster
 
         }
 
+        //Sync function
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
             //Save nodes data

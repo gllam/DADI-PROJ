@@ -61,6 +61,8 @@ public static partial class DIDAStorageService
   static readonly grpc::Marshaller<global::StorageStatusEmpty> __Marshaller_StorageStatusEmpty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::StorageStatusEmpty.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::StorageStatusReply> __Marshaller_StorageStatusReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::StorageStatusReply.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::ListServerStorageReply> __Marshaller_ListServerStorageReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::ListServerStorageReply.Parser));
 
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Method<global::DIDAReadRequest, global::DIDARecordReply> __Method_read = new grpc::Method<global::DIDAReadRequest, global::DIDARecordReply>(
@@ -93,6 +95,14 @@ public static partial class DIDAStorageService
       "Status",
       __Marshaller_StorageStatusEmpty,
       __Marshaller_StorageStatusReply);
+
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::StorageStatusEmpty, global::ListServerStorageReply> __Method_ListServer = new grpc::Method<global::StorageStatusEmpty, global::ListServerStorageReply>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "ListServer",
+      __Marshaller_StorageStatusEmpty,
+      __Marshaller_ListServerStorageReply);
 
   /// <summary>Service descriptor</summary>
   public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -128,6 +138,12 @@ public static partial class DIDAStorageService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::ListServerStorageReply> ListServer(global::StorageStatusEmpty request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
   }
 
   /// <summary>Creates service definition that can be registered with a server</summary>
@@ -139,7 +155,8 @@ public static partial class DIDAStorageService
         .AddMethod(__Method_read, serviceImpl.read)
         .AddMethod(__Method_write, serviceImpl.write)
         .AddMethod(__Method_updateIfValueIs, serviceImpl.updateIfValueIs)
-        .AddMethod(__Method_Status, serviceImpl.Status).Build();
+        .AddMethod(__Method_Status, serviceImpl.Status)
+        .AddMethod(__Method_ListServer, serviceImpl.ListServer).Build();
   }
 
   /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
@@ -153,6 +170,7 @@ public static partial class DIDAStorageService
     serviceBinder.AddMethod(__Method_write, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAWriteRequest, global::DIDAVersion>(serviceImpl.write));
     serviceBinder.AddMethod(__Method_updateIfValueIs, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAUpdateIfRequest, global::DIDAVersion>(serviceImpl.updateIfValueIs));
     serviceBinder.AddMethod(__Method_Status, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::StorageStatusReply>(serviceImpl.Status));
+    serviceBinder.AddMethod(__Method_ListServer, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::ListServerStorageReply>(serviceImpl.ListServer));
   }
 
 }
