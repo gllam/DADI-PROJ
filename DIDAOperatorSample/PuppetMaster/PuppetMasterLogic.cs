@@ -123,6 +123,10 @@ namespace PuppetMaster
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
 
+        override
+        public string ToString(){
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
+        }
         public Boolean SendAppData(string[] data)
         {
             SendAppDataRequest request = new SendAppDataRequest
@@ -188,6 +192,12 @@ namespace PuppetMaster
             client = new DIDAStorageService.DIDAStorageServiceClient(channel);
         }
 
+        override
+        public string ToString()
+        {
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
+        }
+
         public Boolean SendWriteRequest(string key, string value)
         {
             DIDAWriteRequest request = new DIDAWriteRequest
@@ -250,6 +260,12 @@ namespace PuppetMaster
             client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
         }
 
+        override
+        public string ToString()
+        {
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
+        }
+
         public bool SendStatusRequest()
         {
             WorkerStatusEmpty request = new WorkerStatusEmpty { };
@@ -284,6 +300,7 @@ namespace PuppetMaster
     public delegate void DelAddMsg(string line);
     class PuppetMasterLogic
     {
+        private bool debugMode = false;
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
         private List<StorageAsServer> storagesAsServers = new List<StorageAsServer>();
@@ -296,6 +313,24 @@ namespace PuppetMaster
         public PuppetMasterLogic(Form1 guiWindow) {
             this.guiWindow = guiWindow;
             pcs = new ProcessCreatorAsServer(guiWindow);
+        }
+
+        internal void SetDebugMode(bool debugMode)
+        {
+            this.debugMode = debugMode;
+        }
+
+        override
+        public string ToString()
+        {
+            return "Puppet Master:\r\n" + 
+                   "\r\nSchedulerAsServer: " + string.Join("\r\n", scheduler) +
+                   "\r\nWorkersAsServer: " + string.Join("\r\n", workersAsServers) +
+                   "\r\nStoragesAsServer: " + string.Join("\r\n", storagesAsServers) +
+                   "\r\nSchedulerMap: " + string.Join(",", schedulerMap) +
+                   "\r\nWorkerMap: " + string.Join(",", workerMap) +
+                   "\r\nStorageMap: " + string.Join(",", storageMap) +
+                   "\r\nPuppet Master END\r\n";
         }
         public void CreateChannelWithServer(string serverId, string url, string type)
         {
@@ -337,16 +372,40 @@ namespace PuppetMaster
                     t = new Thread(new ThreadStart(() => this.StartListServerOperation(buffer[1])));
                     t.Start();
                     break;
+                case "listGlobal":
+                    t = new Thread(new ThreadStart(() => this.StartListGlobalOperation()));
+                    t.Start();
+                    break;
                 default:
                     break;
-
             }
 
         }
 
+        private void StartListGlobalOperation()
+        {
+            WriteOnDebugTextBox("------------ LISTGLOBAL -----------");
+            //Wirte PM data
+            WriteOnDebugTextBox(this.ToString());
+            //Write Sched data
+            WriteOnDebugTextBox(scheduler.SendListServerRequest());
+            //Write Workers data
+            foreach (WorkerAsServer work in workersAsServers)
+            {
+                WriteOnDebugTextBox(work.SendListServerRequest());
+            }
+            //Write Storages data
+            foreach (StorageAsServer stor in storagesAsServers)
+            {
+                WriteOnDebugTextBox(stor.SendListServerRequest());
+            }
+        }
+
         private void StartListServerOperation(string serverName)
         {
-            if(serverName == scheduler.serverId) {
+            WriteOnDebugTextBox("------------ LISTSERVER ------------");
+
+            if (serverName == scheduler.serverId) {
                 WriteOnDebugTextBox(scheduler.SendListServerRequest());
                 return;
             }
@@ -393,7 +452,7 @@ namespace PuppetMaster
 
             }
             
-            this.WriteOnDebugTextBox("---------------- STATUS ----------------");
+            this.WriteOnDebugTextBox("-------------- STATUS --------------");
             bool schedulerAlive = await schedulerTask;
             if (!schedulerAlive) {/*Write in the DebugTextBox*/
                 this.guiWindow.BeginInvoke(new DelAddMsg(guiWindow.WriteOnDebugTextBox), new object[] {
@@ -465,6 +524,8 @@ namespace PuppetMaster
             //Create Scheduler
             pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
             this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
+
+            //If debugMode == true we need to start connections with worker as client
 
         }
 
