@@ -4,3 +4,6 @@ worker w1 http://localhost:4001 0
 client r1 app1
 populate app1_data
 status
+listServer sched1
+listServer w1
+listServer s1

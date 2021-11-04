@@ -2,6 +2,11 @@
 
 service DIDAWorkerService {
   rpc Status (WorkerStatusEmpty) returns (WorkerStatusReply);
+  rpc ListServer (WorkerStatusEmpty) returns (ListServerWorkerReply);
+}
+
+message ListServerWorkerReply{
+	string sereverDataToSTring = 1;
 }
 
 message WorkerStatusEmpty{}

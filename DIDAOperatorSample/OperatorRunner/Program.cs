@@ -23,6 +23,21 @@ namespace OperatorRunner
             this.name = name;
         }
 
+        override
+        public string ToString()
+        {
+            return "TODO " + this.name;
+        }
+        public override Task<ListServerWorkerReply> ListServer(WorkerStatusEmpty request, ServerCallContext context)
+        {
+            return Task.FromResult(LiServer());
+        }
+
+        private ListServerWorkerReply LiServer()
+        {
+            return new ListServerWorkerReply { SereverDataToSTring = this.ToString() };
+        }
+
         public override Task<SendDIDAReqReply> SendDIDAReq(SendDIDAReqRequest request, ServerCallContext context)
         {
             return Task.FromResult(SendDIDA(request));
