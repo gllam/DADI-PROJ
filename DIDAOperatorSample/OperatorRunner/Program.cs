@@ -69,7 +69,7 @@ namespace OperatorRunner
 
         string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
         {
-
+            Console.WriteLine(this);
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
@@ -113,6 +113,11 @@ namespace OperatorRunner
                 port = Convert.ToInt32(hostport[1])
             };
             storageMap.Add(node);
+        }
+
+        public override string ToString()
+        {
+            return "Worker " + name + " GossipDelay " + gossipDelay + " Storages " + storageMap.ToArray();
         }
     }
 

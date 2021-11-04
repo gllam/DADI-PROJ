@@ -72,6 +72,7 @@ namespace DIDAStorageUI
                     }
                 }
             }
+            Console.WriteLine(this);
             return reply;
         }
 
@@ -128,7 +129,28 @@ namespace DIDAStorageUI
                 if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
                 Console.WriteLine("Write successful -> " + newRecord.id + ":" + newRecord.val);
             }
+            Console.WriteLine(this);
             return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
+        }
+
+        public override string ToString()
+        {
+            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + " Items " + ListData();
+        }
+
+        public string ListData()
+        {
+            string s_data = "";
+            foreach (var d in data)
+            {
+                s_data += d.Key + " ";
+                foreach(var value in d.Value)
+                {
+                    s_data += value.val + ":" + value.version.versionNumber;
+                }
+                s_data += "\n";
+            }
+            return s_data;
         }
     }
 

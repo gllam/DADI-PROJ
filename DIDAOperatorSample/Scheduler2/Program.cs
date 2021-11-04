@@ -79,8 +79,8 @@ namespace SchedulerNamespace
                 Next = 0,
                 ChainSize = chainSize
             }; //request to worker
-            for (int opIndex = lastWorkerIndex + 1 % workerMap.Count; opIndex < chainSize; opIndex = opIndex + 1 % workerMap.Count)
-            {
+            for (int opIndex = lastWorkerIndex + 1 % workerMap.Count; opIndex != (chainSize + lastWorkerIndex + 1) % workerMap.Count; opIndex = opIndex + 1 % workerMap.Count)
+            { //fix
                 OperatorID op = new OperatorID
                 {
                     Classname = request.App[opIndex].Split()[1],
