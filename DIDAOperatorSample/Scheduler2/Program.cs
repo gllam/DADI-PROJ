@@ -65,52 +65,71 @@ namespace SchedulerNamespace
 
         public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
-            Console.WriteLine(request.Input);
-            MetaRecord meta = new MetaRecord
+            try
             {
-                Id = 1
-            }; //metarecord dummy
-            int chainSize = request.App.Count;
-            Console.WriteLine(chainSize);
-            SendDIDAReqRequest req = new SendDIDAReqRequest
+                Console.WriteLine(request.Input);
+                MetaRecord meta = new MetaRecord
+                {
+                    Id = 1
+                }; //metarecord dummy
+                int chainSize = request.App.Count;
+                Console.WriteLine(chainSize);
+                SendDIDAReqRequest req = new SendDIDAReqRequest
+                {
+                    Meta = meta,
+                    Input = request.Input,
+                    Next = 0,
+                    ChainSize = chainSize
+                }; //request to worker
+                for (int opIndex = lastWorkerIndex + 1; opIndex != chainSize + lastWorkerIndex + 1; opIndex = opIndex + 1)
+                { 
+                    var app = request.App[opIndex % workerMap.Count];
+                    Worker worker = workerMap[opIndex % workerMap.Count];
+                    Console.WriteLine(app);
+                    OperatorID op = new OperatorID
+                    {
+                        Classname = app.Split()[1],
+                        Order = Int32.Parse(app.Split()[2])
+                    };
+                    Assignment ass = new Assignment
+                    {
+                        Opid = op,
+                        Host = worker.host,
+                        Port = Int32.Parse(worker.port),
+                        Output = ""
+                    };
+                    req.Asschain.Add(ass);
+                    lastWorkerIndex = opIndex % workerMap.Count;
+                }
+                SendRequestToWorker(req);
+                return new SendAppDataReply
+                {
+                    Ack = true
+                }; //reply to pm
+            } catch (Exception e)
             {
-                Meta = meta,
-                Input = request.Input,
-                Next = 0,
-                ChainSize = chainSize
-            }; //request to worker
-            for (int opIndex = lastWorkerIndex + 1 % workerMap.Count; opIndex != (chainSize + lastWorkerIndex + 1) % workerMap.Count; opIndex = opIndex + 1 % workerMap.Count)
-            { //fix
-                OperatorID op = new OperatorID
+                Console.WriteLine(e);
+                return new SendAppDataReply
                 {
-                    Classname = request.App[opIndex].Split()[1],
-                    Order = Int32.Parse(request.App[opIndex].Split()[2])
+                    Ack = false
                 };
-                Assignment ass = new Assignment
-                {
-                    Opid = op,
-                    Host = workerMap[opIndex].host,
-                    Port = Int32.Parse(workerMap[opIndex].port),
-                    Output = ""
-                };
-                req.Asschain.Add(ass);
-                lastWorkerIndex = opIndex;
             }
-            SendRequestToWorker(req);
-            return new SendAppDataReply
-            {
-                Ack = true
-            }; //reply to pm
         }
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
         {
-            string host = request.Asschain[request.Next].Host;
-            int port = request.Asschain[request.Next].Port;
-            Worker target = workerMap.Find(x => x.host == host && x.port == Convert.ToString(port));
+            try
+            {
+                string host = request.Asschain[request.Next].Host;
+                int port = request.Asschain[request.Next].Port;
+                Worker target = workerMap.Find(x => x.host == host && x.port == Convert.ToString(port));
 
-            SendDIDAReqReply reply = target.GetClient().SendDIDAReq(request);
-            Console.WriteLine("Request to worker " + reply.Ack);
+                SendDIDAReqReply reply = target.GetClient().SendDIDAReq(request);
+                Console.WriteLine("Request to worker " + reply.Ack);
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
 

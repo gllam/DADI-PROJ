@@ -48,26 +48,35 @@ namespace DIDAStorageUI
                 Id = request.Id,
                 Version = request.Version
             };
-            if (request.Version == null) reply.Version.VersionNumber = 0;
             lock (this)
             {
                 if (data.ContainsKey(request.Id))
                 {
-                    foreach (DIDARecord record in data[request.Id])
+                    if (request.Version.VersionNumber == -1)
                     {
-                        if (record.version.versionNumber == reply.Version.VersionNumber && request.Version != null)
+                        var d = data[request.Id][data[request.Id].Count - 1];
+                        reply.Val = d.val;
+                        reply.Version.VersionNumber = d.version.versionNumber;
+                        reply.Version.ReplicaId = d.version.replicaId;
+                    }
+                    else
+                    {
+                        foreach (DIDARecord record in data[request.Id])
                         {
-                            reply.Val = record.val;
-                            break;
-                        }
-                        if (record.version.versionNumber > reply.Version.VersionNumber && request.Version == null)
-                        {
-                            reply.Val = record.val;
-                            reply.Version = new DIDAVersion
+                            if (record.version.versionNumber == reply.Version.VersionNumber && request.Version.VersionNumber != -1)
                             {
-                                VersionNumber = record.version.versionNumber,
-                                ReplicaId = record.version.replicaId
-                            };
+                                reply.Val = record.val;
+                                break;
+                            }
+                            if (record.version.versionNumber > reply.Version.VersionNumber && request.Version.VersionNumber == -1)
+                            {
+                                reply.Val = record.val;
+                                reply.Version = new DIDAVersion
+                                {
+                                    VersionNumber = record.version.versionNumber,
+                                    ReplicaId = record.version.replicaId
+                                };
+                            }
                         }
                     }
                 }
