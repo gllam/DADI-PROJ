@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace PuppetMaster
             client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
         }
 
-        internal Boolean SendCreateSchedulerRequest(int replicaId, string[] scheduler, string[][] workers, List<String> workersMap)
+        internal int SendCreateSchedulerRequest(int replicaId, string[] scheduler, string[][] workers, List<String> workersMap)
         {
             CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
@@ -49,10 +50,10 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateSchedulerInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
 
-        internal Boolean SendCreateWorkerRequest(int replicaId,string[] worker, string[][] storages, List<string> storageMap)
+        internal int SendCreateWorkerRequest(int replicaId,string[] worker, string[][] storages, List<string> storageMap)
         {
             CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
             {
@@ -75,10 +76,10 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateWorkerInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
 
-        internal Boolean SendCreateStorageRequest(int replicaId,string[] storage, string[][] storages)
+        internal int SendCreateStorageRequest(int replicaId,string[] storage, string[][] storages)
         {
             CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
             {
@@ -101,7 +102,7 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
     }
 
@@ -165,7 +166,7 @@ namespace PuppetMaster
             {
                 ListServerSchedReply reply = client.ListServer(request);
 
-                return reply.SereverDataToSTring;
+                return reply.ServerDataToString;
             }
             catch (Exception)
             {
@@ -297,6 +298,24 @@ namespace PuppetMaster
         }
     }
 
+    public class ProcessInfo
+    {
+        public int processId;
+        public string serverName;
+
+        public ProcessInfo(string serverName, int processId)
+        {
+            this.processId = processId;
+            this.serverName = serverName;
+        }
+
+        override
+        public string ToString()
+        {
+            return this.serverName + " -> " + this.processId;
+        }
+    }
+
     public delegate void DelAddMsg(string line);
     class PuppetMasterLogic
     {
@@ -308,6 +327,7 @@ namespace PuppetMaster
         private List<string> schedulerMap = new List<string>();
         private List<string> workerMap = new List<string>();
         private List<string> storageMap = new List<string>();
+        private List<ProcessInfo> processesInfo = new List<ProcessInfo>();
         Form1 guiWindow;
 
         public PuppetMasterLogic(Form1 guiWindow) {
@@ -330,6 +350,7 @@ namespace PuppetMaster
                    "\r\nSchedulerMap: " + string.Join(",", schedulerMap) +
                    "\r\nWorkerMap: " + string.Join(",", workerMap) +
                    "\r\nStorageMap: " + string.Join(",", storageMap) +
+                   "\r\nProcessesInfo:\r\n" + string.Join("\r\n", processesInfo) +
                    "\r\nPuppet Master END\r\n";
         }
         public void CreateChannelWithServer(string serverId, string url, string type)
@@ -376,10 +397,27 @@ namespace PuppetMaster
                     t = new Thread(new ThreadStart(() => this.StartListGlobalOperation()));
                     t.Start();
                     break;
+                case "crash":
+                    t = new Thread(new ThreadStart(() => this.StartCrashOperation(buffer[1])));
+                    t.Start();
+                    break;
                 default:
                     break;
             }
 
+        }
+
+        private void StartCrashOperation(string serverName)
+        {
+           foreach(ProcessInfo p in processesInfo)
+           {
+              if(p.serverName == serverName)
+              {
+                    Process chosen = Process.GetProcessById(p.processId);
+                    chosen.Kill(false);
+                    return;
+              }
+           }
         }
 
         private void StartListGlobalOperation()
@@ -509,7 +547,8 @@ namespace PuppetMaster
             foreach (string[] storage in storages)
             {
                 int replicaId = storageMap.BinarySearch(storage[1]);
-                pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                int processId = pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                processesInfo.Add(new ProcessInfo(storage[1],processId));
                 this.CreateChannelWithServer(storage[1], storage[2], "storage");
             }
 
@@ -517,12 +556,14 @@ namespace PuppetMaster
             foreach (string[] worker in workers)
             {
                 int replicaId = workerMap.BinarySearch(worker[1]);
-                pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
+                int processId = pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
+                processesInfo.Add(new ProcessInfo(worker[1], processId));
                 this.CreateChannelWithServer(worker[1], worker[2], "worker");
             }
 
             //Create Scheduler
-            pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
+            int pId = pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
+            processesInfo.Add(new ProcessInfo(scheduler[1], pId));
             this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
 
             //If debugMode == true we need to start connections with worker as client

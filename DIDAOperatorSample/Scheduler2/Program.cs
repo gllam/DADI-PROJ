@@ -51,7 +51,6 @@ namespace SchedulerNamespace
         {
             return "TODO " + this.name;
         }
-
         public override Task<ListServerSchedReply> ListServer(Empty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
@@ -69,7 +68,7 @@ namespace SchedulerNamespace
 
         private ListServerSchedReply LiServer()
         {
-            return new ListServerSchedReply { SereverDataToSTring = this.ToString() };
+            return new ListServerSchedReply { ServerDataToString = this.ToString() };
         }
 
         private StatusReply StatusOperation()

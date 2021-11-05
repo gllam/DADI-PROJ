@@ -93,15 +93,21 @@ namespace PuppetMaster
             }
         }
 
-        private void ButtonNextStep_Click(object sender, EventArgs e)
+        private async void ButtonNextStep_Click(object sender, EventArgs e)
         {
-            if (currentCommandLineIndex + 1 > scriptLines.Length) { return; }
+            if (!buttonNextStep.Enabled){return;}
+
+            buttonNextStep.Enabled = false;
+            if (currentCommandLineIndex + 1 > scriptLines.Length) {
+                buttonNextStep.Enabled = true;
+                return; 
+            }
             //Console.WriteLine(scriptLines[0], currentCommandLineIndex);
             int index = currentCommandLineIndex;
             if (scriptLines[index].Split(' ')[0] == "wait")
             {
-                buttonNextStep.Enabled = false;
-                System.Threading.Thread.Sleep(Convert.ToInt32(scriptLines[index].Split(' ')[1]));
+                await Task.Delay(Convert.ToInt32(scriptLines[index].Split(' ')[1]));
+                //System.Threading.Thread.Sleep(Convert.ToInt32(scriptLines[index].Split(' ')[1]));
                 buttonNextStep.Enabled = true;
             }
             else
@@ -119,6 +125,7 @@ namespace PuppetMaster
                 textBoxScript.SelectionLength = scriptLines[currentCommandLineIndex].Length;
             else { textBoxScript.SelectionLength = 3; }
             textBoxScript.SelectionBackColor = Color.Yellow;
+            buttonNextStep.Enabled = true;
         }
 
         public void WriteOnDebugTextBox(string line)

@@ -28,7 +28,7 @@ message CreateStorageInstanceRequest {
 	repeated ProccessData dependenciesData = 4; //serverName|url 
 }
 message CreateProccessInstanceReply {
-	bool ack = 1;
+	int32 id = 1;
 }
 
 

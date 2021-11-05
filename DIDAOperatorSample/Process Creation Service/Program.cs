@@ -47,10 +47,10 @@ namespace Process_Creation_Service
                     psi.Arguments = psi.Arguments + " " + data.ServerName + "|" + data.Url;
                 }
 
-                Process.Start(psi);
+                Process p = Process.Start(psi);
                 return new CreateProccessInstanceReply
                 {
-                    Ack = true
+                    Id = p.Id
                 };
             }
 
@@ -83,10 +83,10 @@ namespace Process_Creation_Service
                     psi.Arguments = psi.Arguments + " " + data.ServerName + "|"+ data.Url;
                 }
 
-                Process.Start(psi);
+                Process p = Process.Start(psi);
                 return new CreateProccessInstanceReply
                 {
-                    Ack = true
+                    Id = p.Id
                 };
             }
 
@@ -118,10 +118,10 @@ namespace Process_Creation_Service
                 {
                     psi.Arguments = psi.Arguments + " " + data.ServerName + "|" + data.Url;
                 }
-                Process.Start(psi);
+                Process p = Process.Start(psi);
                 return new CreateProccessInstanceReply
                 {
-                    Ack = true
+                    Id = p.Id
                 };
             }
 

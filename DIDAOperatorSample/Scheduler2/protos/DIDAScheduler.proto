@@ -8,7 +8,7 @@ service DIDASchedulerService {
 }
 
 message ListServerSchedReply{
-	string sereverDataToSTring = 1;
+	string serverDataToString = 1;
 }
 message StatusReply{
 	bool success = 1;

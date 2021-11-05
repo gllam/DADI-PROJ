@@ -4,8 +4,9 @@ worker w1 http://localhost:4001 0
 client r1 app1
 populate app1_data
 status
-wait 10000
+wait 300
 listServer sched1
 listServer w1
 listServer s1
 listGlobal
+crash w1
