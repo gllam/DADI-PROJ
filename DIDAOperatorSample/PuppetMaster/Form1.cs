@@ -17,7 +17,6 @@ namespace PuppetMaster
         string[] scriptLines;
         int currentCommandLineIndex = 0;
         int allProccessesRead = 0;
-        bool onSleep = false;
         List<string[]> workers = new List<string[]>();
         List<string[]> storages = new List<string[]>();
         string[] scheduler = null;

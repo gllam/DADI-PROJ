@@ -135,7 +135,7 @@ namespace PuppetMaster
                 Input = data[1],
             };
             //need to check where we put the input files
-            foreach (string line in System.IO.File.ReadLines(Path.GetFullPath(data[2])))
+            foreach (string line in System.IO.File.ReadLines("..//..//..//..//DebugFiles//" + data[2]))
             {
                 request.App.Add(line);
             }
@@ -296,6 +296,12 @@ namespace PuppetMaster
                 return this.serverId + " is not alive!";
             }
         }
+
+        internal void SetDebugRequest()
+        {
+            client.SetDebugTrue(new WorkerStatusEmpty { });
+            return;
+        }
     }
 
     public class ProcessInfo
@@ -335,17 +341,25 @@ namespace PuppetMaster
             this.guiWindow = guiWindow;
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
+
         //PuppetMasterAsServer
+        public override Task<WorkerEmptyReply> SendOutputToPM(WorkerOutputToPMRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(WorkerOutputHandler(request));
+        }
 
-
-
+        private WorkerEmptyReply WorkerOutputHandler(WorkerOutputToPMRequest request)
+        {
+            WriteOnDebugTextBox(request.ServerId + "_output -> " + request.Output);
+            return new WorkerEmptyReply { };
+        }
 
         //End PuppetMasterAsServer
 
         internal void SetDebugMode(bool debugMode)
         {
             this.debugMode = debugMode;
-            if(debugMode == true)
+            if (debugMode == true)
             {
                 ServerPort serverPort = new ServerPort("localhost", 10001, ServerCredentials.Insecure);
 
@@ -373,7 +387,7 @@ namespace PuppetMaster
                    "\r\nProcessesInfo:\r\n" + string.Join("\r\n", processesInfo) +
                    "\r\nPuppet Master END\r\n";
         }
-        public void CreateChannelWithServer(string serverId, string url, string type)
+        public void CreateChannelWithServerType(string serverId, string url, string type)
         {
             string urlRefined = url.Split("http://")[1];
             string port = urlRefined.Split(':')[1];
@@ -551,6 +565,7 @@ namespace PuppetMaster
         //Sync function
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
+            Thread t;
             //Save nodes data
             schedulerMap.Add(scheduler[1]);
             foreach (string[] worker in workers)
@@ -567,7 +582,8 @@ namespace PuppetMaster
                 int replicaId = storageMap.BinarySearch(storage[1]);
                 int processId = pcs.SendCreateStorageRequest(replicaId, storage, storages);
                 processesInfo.Add(new ProcessInfo(storage[1],processId));
-                this.CreateChannelWithServer(storage[1], storage[2], "storage");
+                t = new Thread(new ThreadStart(() => this.CreateChannelWithServerType(storage[1], storage[2], "storage")));
+                t.Start();
             }
 
             //Create Workers
@@ -576,22 +592,27 @@ namespace PuppetMaster
                 int replicaId = workerMap.BinarySearch(worker[1]);
                 int processId = pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
                 processesInfo.Add(new ProcessInfo(worker[1], processId));
-                this.CreateChannelWithServer(worker[1], worker[2], "worker");
+                t = new Thread(new ThreadStart(() => this.CreateChannelWithServerType(worker[1], worker[2], "worker")));
+                t.Start();
+                //If debugMode == true we need to inform the worker that the debug is true
+                if(debugMode == true)
+                {
+                    WorkerAsServer target = workersAsServers[workersAsServers.Count - 1];
+                    t = new Thread(new ThreadStart(() => target.SetDebugRequest()));
+                    t.Start();
+                }
             }
 
             //Create Scheduler
             int pId = pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
             processesInfo.Add(new ProcessInfo(scheduler[1], pId));
-            this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
-
-            //If debugMode == true we need to start connections with worker as client
-
-
+            t = new Thread(new ThreadStart(() => this.CreateChannelWithServerType(scheduler[1], scheduler[2], "scheduler")));
+            t.Start();
         }
 
         internal void StartPopulateStoragesOperation(string storageDataFileName)
         {
-            foreach (string line in System.IO.File.ReadLines(storageDataFileName))
+            foreach (string line in System.IO.File.ReadLines("..//..//..//..//DebugFiles//" + storageDataFileName))
             {
                 string[] data = line.Split(',');
                 this.SendDataToStorage(data[0],data[1]);
