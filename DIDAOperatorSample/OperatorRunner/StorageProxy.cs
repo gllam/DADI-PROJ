@@ -40,8 +40,6 @@ namespace Worker
             _meta = metaRecord;
         }
 
-        //do hash function and key is hash
-
         // THE FOLLOWING 3 METHODS ARE THE ESSENCE OF A STORAGE PROXY
         // IN THIS EXAMPLE THEY ARE JUST CALLING THE STORAGE 
         // IN THE COMLPETE IMPLEMENTATION THEY NEED TO:

@@ -23,11 +23,6 @@ namespace DIDAStorageUI
             this.replicaid = replicaid;
             this.name = name;
         }
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
 
         public override Task<ListServerStorageReply> ListServer(StorageStatusEmpty request, ServerCallContext context)
         {
@@ -151,7 +146,7 @@ namespace DIDAStorageUI
 
         public override string ToString()
         {
-            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + "\nItems:\n" + ListData();
+            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + "\r\nItems:\r\n" + ListData();
         }
 
         public string ListData()
@@ -164,7 +159,7 @@ namespace DIDAStorageUI
                 {
                     s_data += value.val + ":" + value.version.versionNumber + " ";
                 }
-                s_data += "\n";
+                s_data += "\r\n";
             }
             return s_data;
         }

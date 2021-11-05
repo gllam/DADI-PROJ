@@ -23,11 +23,6 @@ namespace OperatorRunner
             this.name = name;
         }
 
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
         public override Task<ListServerWorkerReply> ListServer(WorkerStatusEmpty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
@@ -74,6 +69,7 @@ namespace OperatorRunner
                     previousoutput = request.Asschain[request.Next - 1].Output;
                 }
                 request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
+                Console.WriteLine(metarecord);
                 request.Next += 1;
                 if (request.Next < request.Asschain.Count)
                 {
@@ -100,8 +96,6 @@ namespace OperatorRunner
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
-            //string path = Path.Combine(", );
-            //Console.WriteLine(path);
             Assembly _dll = Assembly.LoadFrom("..//..//..//..//DebugFiles//LibOperators.dll"); //maybe name not static
             Type[] types = _dll.GetTypes();
             Type t = null;
@@ -113,8 +107,9 @@ namespace OperatorRunner
                 }
             }
             Console.WriteLine(t);
+            StorageProxy sp = new StorageProxy(storageMap.ToArray(), meta);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
-            _opLoadedByReflection.ConfigureStorage(new StorageProxy(storageMap.ToArray(), meta));
+            _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
             return output;
         }

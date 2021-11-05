@@ -43,14 +43,8 @@ namespace SchedulerNamespace
         int lastWorkerIndex = 0;
         string name;
 
-
         public SchedulerService(string name) { this.name = name; }
 
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
         public override Task<ListServerSchedReply> ListServer(Empty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
