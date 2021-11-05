@@ -4,8 +4,12 @@ service DIDASchedulerService {
   rpc SendAppData (SendAppDataRequest) returns (SendAppDataReply);
   rpc SendWorkers (SendWorkersRequest) returns (SendWorkersReply);
   rpc Status (Empty) returns (StatusReply);
+  rpc ListServer (Empty) returns (ListServerSchedReply);
 }
 
+message ListServerSchedReply{
+	string serverDataToString = 1;
+}
 message StatusReply{
 	bool success = 1;
 }

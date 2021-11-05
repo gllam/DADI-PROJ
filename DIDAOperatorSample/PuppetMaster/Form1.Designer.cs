@@ -31,10 +31,6 @@ namespace PuppetMaster
         {
             this.buttonBrowseConfigScript = new System.Windows.Forms.Button();
             this.textFileScript = new System.Windows.Forms.TextBox();
-            this.textAppDataFile = new System.Windows.Forms.TextBox();
-            this.buttonBrowseAppData = new System.Windows.Forms.Button();
-            this.textAppInput = new System.Windows.Forms.TextBox();
-            this.buttonSendAppData = new System.Windows.Forms.Button();
             this.textBoxScript = new System.Windows.Forms.RichTextBox();
             this.buttonNextStep = new System.Windows.Forms.Button();
             this.textBoxDebug = new System.Windows.Forms.TextBox();
@@ -57,42 +53,6 @@ namespace PuppetMaster
             this.textFileScript.Name = "textFileScript";
             this.textFileScript.Size = new System.Drawing.Size(110, 23);
             this.textFileScript.TabIndex = 1;
-            // 
-            // textAppDataFile
-            // 
-            this.textAppDataFile.Location = new System.Drawing.Point(31, 139);
-            this.textAppDataFile.Name = "textAppDataFile";
-            this.textAppDataFile.Size = new System.Drawing.Size(110, 23);
-            this.textAppDataFile.TabIndex = 2;
-            // 
-            // buttonBrowseAppData
-            // 
-            this.buttonBrowseAppData.Location = new System.Drawing.Point(31, 168);
-            this.buttonBrowseAppData.Name = "buttonBrowseAppData";
-            this.buttonBrowseAppData.Size = new System.Drawing.Size(111, 25);
-            this.buttonBrowseAppData.TabIndex = 3;
-            this.buttonBrowseAppData.Text = "Browse App Data";
-            this.buttonBrowseAppData.UseVisualStyleBackColor = true;
-            this.buttonBrowseAppData.Click += new System.EventHandler(this.ButtonBrowseAppData_Click);
-            // 
-            // textAppInput
-            // 
-            this.textAppInput.Location = new System.Drawing.Point(31, 208);
-            this.textAppInput.Name = "textAppInput";
-            this.textAppInput.Size = new System.Drawing.Size(110, 23);
-            this.textAppInput.TabIndex = 4;
-            this.textAppInput.Text = "Please Insert Input";
-            this.textAppInput.Click += new System.EventHandler(this.TextAppInput_Click);
-            // 
-            // buttonSendAppData
-            // 
-            this.buttonSendAppData.Location = new System.Drawing.Point(31, 237);
-            this.buttonSendAppData.Name = "buttonSendAppData";
-            this.buttonSendAppData.Size = new System.Drawing.Size(111, 25);
-            this.buttonSendAppData.TabIndex = 5;
-            this.buttonSendAppData.Text = "Send App Data";
-            this.buttonSendAppData.UseVisualStyleBackColor = true;
-            this.buttonSendAppData.Click += new System.EventHandler(this.ButtonSendAppData_Click);
             // 
             // textBoxScript
             // 
@@ -117,6 +77,7 @@ namespace PuppetMaster
             this.textBoxDebug.Location = new System.Drawing.Point(228, 41);
             this.textBoxDebug.Multiline = true;
             this.textBoxDebug.Name = "textBoxDebug";
+            this.textBoxDebug.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxDebug.Size = new System.Drawing.Size(218, 369);
             this.textBoxDebug.TabIndex = 8;
             // 
@@ -138,10 +99,6 @@ namespace PuppetMaster
             this.Controls.Add(this.textBoxDebug);
             this.Controls.Add(this.buttonNextStep);
             this.Controls.Add(this.textBoxScript);
-            this.Controls.Add(this.buttonSendAppData);
-            this.Controls.Add(this.textAppInput);
-            this.Controls.Add(this.buttonBrowseAppData);
-            this.Controls.Add(this.textAppDataFile);
             this.Controls.Add(this.textFileScript);
             this.Controls.Add(this.buttonBrowseConfigScript);
             this.Name = "Form1";
@@ -155,10 +112,6 @@ namespace PuppetMaster
 
         private System.Windows.Forms.Button buttonBrowseConfigScript;
         private System.Windows.Forms.TextBox textFileScript;
-        private System.Windows.Forms.TextBox textAppDataFile;
-        private System.Windows.Forms.Button buttonBrowseAppData;
-        private System.Windows.Forms.TextBox textAppInput;
-        private System.Windows.Forms.Button buttonSendAppData;
         private System.Windows.Forms.RichTextBox textBoxScript;
         private System.Windows.Forms.Button buttonNextStep;
         private System.Windows.Forms.TextBox textBoxDebug;

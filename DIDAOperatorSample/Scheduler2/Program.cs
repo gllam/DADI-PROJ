@@ -46,6 +46,16 @@ namespace SchedulerNamespace
 
         public SchedulerService(string name) { this.name = name; }
 
+        override
+        public string ToString()
+        {
+            return "TODO " + this.name;
+        }
+        public override Task<ListServerSchedReply> ListServer(Empty request, ServerCallContext context)
+        {
+            return Task.FromResult(LiServer());
+        }
+
         public override Task<SendAppDataReply> SendAppData(SendAppDataRequest request, ServerCallContext context)
         {
             return Task.FromResult(RequestApp(request));
@@ -54,6 +64,11 @@ namespace SchedulerNamespace
         public override Task<StatusReply> Status(Empty request, ServerCallContext context)
         {
             return Task.FromResult(StatusOperation());
+        }
+
+        private ListServerSchedReply LiServer()
+        {
+            return new ListServerSchedReply { ServerDataToString = this.ToString() };
         }
 
         private StatusReply StatusOperation()

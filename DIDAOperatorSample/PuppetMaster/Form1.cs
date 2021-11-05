@@ -17,7 +17,7 @@ namespace PuppetMaster
         string[] scriptLines;
         int currentCommandLineIndex = 0;
         int allProccessesRead = 0;
-        bool debugMode = false;
+        bool onSleep = false;
         List<string[]> workers = new List<string[]>();
         List<string[]> storages = new List<string[]>();
         string[] scheduler = null;
@@ -51,14 +51,15 @@ namespace PuppetMaster
                     switch (buffer[0])
                     {
                         case "debug":
-                            debugMode = true;
+                            puppetMaster.SetDebugMode(true);
+                            highlightStartPoint += line.Length + 1; //need to count the /n char
                             currentCommandLineIndex++;
                             break;
                         case "scheduler":
                             if (scheduler != null)//Only allowed 1 scheduler per script
                                 break;
-                            currentCommandLineIndex++;
                             highlightStartPoint += line.Length + 1; //need to count the /n char
+                            currentCommandLineIndex++;
                             scheduler = buffer;
                             break;
                         case "worker":
@@ -93,54 +94,29 @@ namespace PuppetMaster
             }
         }
 
-        private void ButtonBrowseAppData_Click(object sender, EventArgs e)
+        private async void ButtonNextStep_Click(object sender, EventArgs e)
         {
-            /*OpenFileDialog fdlg = new OpenFileDialog
-            {
-                Title = "C# Corner Open File Dialog",
-                InitialDirectory = @"c:\",
-                Filter = "All files (*.*)|*.*|All files (*.*)|*.*",
-                FilterIndex = 2,
-                RestoreDirectory = true
-            };
-            if (fdlg.ShowDialog() == DialogResult.OK)
-            {
-                textAppDataFile.Text = fdlg.FileName;
-            }*/
+            if (!buttonNextStep.Enabled){return;}
 
-        }
-
-        private void ButtonSendAppData_Click(object sender, EventArgs e)
-        {
-            /*puppetMaster.SendAppDataToScheduler(
-                textAppDataFile.Text,
-                textAppInput.Text);*/
-        }
-
-        private void TextAppInput_Click(object sender, EventArgs e)
-        {
-            textAppInput.Text = null;
-        }
-
-        private void ButtonCreateConnectionWithScheduler_Click(object sender, EventArgs e)
-        {
-            //puppetMaster.CreateChannelWithScheduler(this, "localhost", 4001, "localhost");
-        }
-
-        private void ButtonDebugCreateScheduler_Click(object sender, EventArgs e)
-        {
-            //puppetMaster.SendCreateProccessInstanceRequest("sched1", "http://localhost:2000");
-        }
-
-        private void ButtonNextStep_Click(object sender, EventArgs e)
-        {
-
-            if (currentCommandLineIndex + 1 > scriptLines.Length) { return; }
+            buttonNextStep.Enabled = false;
+            if (currentCommandLineIndex + 1 > scriptLines.Length) {
+                buttonNextStep.Enabled = true;
+                return; 
+            }
             //Console.WriteLine(scriptLines[0], currentCommandLineIndex);
             int index = currentCommandLineIndex;
-            Thread t = new Thread(new ThreadStart(() =>
-                                   puppetMaster.ExecuteCommand(scriptLines[index])));
-            t.Start();
+            if (scriptLines[index].Split(' ')[0] == "wait")
+            {
+                await Task.Delay(Convert.ToInt32(scriptLines[index].Split(' ')[1]));
+                //System.Threading.Thread.Sleep(Convert.ToInt32(scriptLines[index].Split(' ')[1]));
+                buttonNextStep.Enabled = true;
+            }
+            else
+            {
+                Thread t = new Thread(new ThreadStart(() =>
+                        puppetMaster.ExecuteCommand(scriptLines[index])));
+                t.Start();
+            }
 
             currentCommandLineIndex += 1;
             textBoxScript.SelectionBackColor = Color.White;
@@ -150,7 +126,7 @@ namespace PuppetMaster
                 textBoxScript.SelectionLength = scriptLines[currentCommandLineIndex].Length;
             else { textBoxScript.SelectionLength = 3; }
             textBoxScript.SelectionBackColor = Color.Yellow;
-
+            buttonNextStep.Enabled = true;
         }
 
         public void WriteOnDebugTextBox(string line)

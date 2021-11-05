@@ -23,7 +23,7 @@
     <Protobuf Include="protos\DIDAProccessCreator.proto" GrpcServices="Client" />
 	  <Protobuf Include="protos\DIDAScheduler.proto" GrpcServices="Client" />
 	  <Protobuf Include="protos\DIDAStorage.proto" GrpcServices="Client" />
-	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Client" />
+	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Both" />
   </ItemGroup>
 
 

@@ -23,6 +23,21 @@ namespace DIDAStorageUI
             this.replicaid = replicaid;
             this.name = name;
         }
+        override
+        public string ToString()
+        {
+            return "TODO " + this.name;
+        }
+
+        public override Task<ListServerStorageReply> ListServer(StorageStatusEmpty request, ServerCallContext context)
+        {
+            return Task.FromResult(LiServer());
+        }
+
+        private ListServerStorageReply LiServer()
+        {
+            return new ListServerStorageReply { SereverDataToSTring = this.ToString() };
+        }
 
         public override Task<StorageStatusReply> Status(StorageStatusEmpty request, ServerCallContext context)
         {

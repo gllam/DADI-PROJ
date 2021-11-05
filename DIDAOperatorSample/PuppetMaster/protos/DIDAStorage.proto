@@ -4,8 +4,12 @@
 service DIDAStorageService {
   rpc write(DIDAWriteRequest) returns (DIDAVersion);
   rpc Status(StorageStatusEmpty) returns (StorageStatusReply);
+  rpc ListServer (StorageStatusEmpty) returns (ListServerStorageReply);
 }
 
+message ListServerStorageReply{
+	string sereverDataToSTring = 1;
+}
 message StorageStatusEmpty{}
 
 message StorageStatusReply{

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace PuppetMaster
             client = new DIDAProccessCreatorService.DIDAProccessCreatorServiceClient(channel);
         }
 
-        internal Boolean SendCreateSchedulerRequest(int replicaId, string[] scheduler, string[][] workers, List<String> workersMap)
+        internal int SendCreateSchedulerRequest(int replicaId, string[] scheduler, string[][] workers, List<String> workersMap)
         {
             CreateSchedulerInstanceRequest request = new CreateSchedulerInstanceRequest
             {
@@ -49,10 +50,10 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateSchedulerInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
 
-        internal Boolean SendCreateWorkerRequest(int replicaId,string[] worker, string[][] storages, List<string> storageMap)
+        internal int SendCreateWorkerRequest(int replicaId,string[] worker, string[][] storages, List<string> storageMap)
         {
             CreateWorkerInstanceRequest request = new CreateWorkerInstanceRequest
             {
@@ -75,10 +76,10 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateWorkerInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
 
-        internal Boolean SendCreateStorageRequest(int replicaId,string[] storage, string[][] storages)
+        internal int SendCreateStorageRequest(int replicaId,string[] storage, string[][] storages)
         {
             CreateStorageInstanceRequest request = new CreateStorageInstanceRequest
             {
@@ -101,7 +102,7 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
-            return reply.Ack;
+            return reply.Id;
         }
     }
 
@@ -109,7 +110,7 @@ namespace PuppetMaster
     {
         private readonly GrpcChannel channel;
         private readonly DIDASchedulerService.DIDASchedulerServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public SchedulerAsServer(string serverId, string hostname, string port)
         {
@@ -123,6 +124,10 @@ namespace PuppetMaster
             client = new DIDASchedulerService.DIDASchedulerServiceClient(channel);
         }
 
+        override
+        public string ToString(){
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
+        }
         public Boolean SendAppData(string[] data)
         {
             SendAppDataRequest request = new SendAppDataRequest
@@ -153,13 +158,28 @@ namespace PuppetMaster
                 return false;
             }
         }
+
+        internal string SendListServerRequest()
+        {
+            Empty request = new Empty { };
+            try
+            {
+                ListServerSchedReply reply = client.ListServer(request);
+
+                return reply.ServerDataToString;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
+            }
+        }
     }
     //Only used to populate and status
     public class StorageAsServer
     {
         private readonly GrpcChannel channel;
         private readonly DIDAStorageService.DIDAStorageServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public StorageAsServer(string serverId, string hostname, string port)
         {
@@ -171,6 +191,12 @@ namespace PuppetMaster
             channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
 
             client = new DIDAStorageService.DIDAStorageServiceClient(channel);
+        }
+
+        override
+        public string ToString()
+        {
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
         }
 
         public Boolean SendWriteRequest(string key, string value)
@@ -200,13 +226,28 @@ namespace PuppetMaster
                 return false;
             }
         }
+
+        internal string SendListServerRequest()
+        {
+            StorageStatusEmpty request = new StorageStatusEmpty { };
+            try
+            {
+                ListServerStorageReply reply = client.ListServer(request);
+
+                return reply.SereverDataToSTring;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
+            }
+        }
     }
 
     public class WorkerAsServer
     {
         private readonly GrpcChannel channel;
         private readonly DIDAWorkerService.DIDAWorkerServiceClient client;
-        private readonly string serverId;
+        public readonly string serverId;
 
         public WorkerAsServer(string serverId, string hostname, string port)
         {
@@ -218,6 +259,12 @@ namespace PuppetMaster
             channel = GrpcChannel.ForAddress("http://" + hostname + ":" + port);
 
             client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+        }
+
+        override
+        public string ToString()
+        {
+            return "\r\n" + this.serverId + " -> client: " + this.client.ToString() + "\r\n";
         }
 
         public bool SendStatusRequest()
@@ -234,11 +281,46 @@ namespace PuppetMaster
                 return false;
             }
         }
+
+        internal string SendListServerRequest()
+        {
+            WorkerStatusEmpty request = new WorkerStatusEmpty { };
+            try
+            {
+                ListServerWorkerReply reply = client.ListServer(request);
+
+                return reply.SereverDataToSTring;
+            }
+            catch (Exception)
+            {
+                return this.serverId + " is not alive!";
+            }
+        }
+    }
+
+    public class ProcessInfo
+    {
+        public int processId;
+        public string serverName;
+
+        public ProcessInfo(string serverName, int processId)
+        {
+            this.processId = processId;
+            this.serverName = serverName;
+        }
+
+        override
+        public string ToString()
+        {
+            return this.serverName + " -> " + this.processId;
+        }
     }
 
     public delegate void DelAddMsg(string line);
-    class PuppetMasterLogic
+
+    class PuppetMasterLogic : DIDAWorkerService.DIDAWorkerServiceBase
     {
+        private bool debugMode = false;
         private SchedulerAsServer scheduler;
         private ProcessCreatorAsServer pcs;
         private List<StorageAsServer> storagesAsServers = new List<StorageAsServer>();
@@ -246,11 +328,50 @@ namespace PuppetMaster
         private List<string> schedulerMap = new List<string>();
         private List<string> workerMap = new List<string>();
         private List<string> storageMap = new List<string>();
+        private List<ProcessInfo> processesInfo = new List<ProcessInfo>();
         Form1 guiWindow;
 
         public PuppetMasterLogic(Form1 guiWindow) {
             this.guiWindow = guiWindow;
             pcs = new ProcessCreatorAsServer(guiWindow);
+        }
+        //PuppetMasterAsServer
+
+
+
+
+        //End PuppetMasterAsServer
+
+        internal void SetDebugMode(bool debugMode)
+        {
+            this.debugMode = debugMode;
+            if(debugMode == true)
+            {
+                ServerPort serverPort = new ServerPort("localhost", 10001, ServerCredentials.Insecure);
+
+                Server server = new Server
+                {
+                    Services = { DIDAWorkerService.BindService(this) },
+                    Ports = { serverPort }
+                };
+
+                server.Start();
+            }
+        }
+
+        override
+        public string ToString()
+        {
+            return "Puppet Master:\r\n" +
+                   "\r\nDebugMode: " + debugMode +
+                   "\r\nSchedulerAsServer: " + string.Join("\r\n", scheduler) +
+                   "\r\nWorkersAsServer: " + string.Join("\r\n", workersAsServers) +
+                   "\r\nStoragesAsServer: " + string.Join("\r\n", storagesAsServers) +
+                   "\r\nSchedulerMap: " + string.Join(",", schedulerMap) +
+                   "\r\nWorkerMap: " + string.Join(",", workerMap) +
+                   "\r\nStorageMap: " + string.Join(",", storageMap) +
+                   "\r\nProcessesInfo:\r\n" + string.Join("\r\n", processesInfo) +
+                   "\r\nPuppet Master END\r\n";
         }
         public void CreateChannelWithServer(string serverId, string url, string type)
         {
@@ -288,12 +409,82 @@ namespace PuppetMaster
                     t = new Thread(new ThreadStart(() => this.StartStatusOperation()));
                     t.Start();
                     break;
-
+                case "listServer":
+                    t = new Thread(new ThreadStart(() => this.StartListServerOperation(buffer[1])));
+                    t.Start();
+                    break;
+                case "listGlobal":
+                    t = new Thread(new ThreadStart(() => this.StartListGlobalOperation()));
+                    t.Start();
+                    break;
+                case "crash":
+                    t = new Thread(new ThreadStart(() => this.StartCrashOperation(buffer[1])));
+                    t.Start();
+                    break;
                 default:
                     break;
-
             }
 
+        }
+
+        private void StartCrashOperation(string serverName)
+        {
+           foreach(ProcessInfo p in processesInfo)
+           {
+              if(p.serverName == serverName)
+              {
+                    Process chosen = Process.GetProcessById(p.processId);
+                    chosen.Kill(false);
+                    return;
+              }
+           }
+        }
+
+        private void StartListGlobalOperation()
+        {
+            WriteOnDebugTextBox("------------ LISTGLOBAL -----------");
+            //Wirte PM data
+            WriteOnDebugTextBox(this.ToString());
+            //Write Sched data
+            WriteOnDebugTextBox(scheduler.SendListServerRequest());
+            //Write Workers data
+            foreach (WorkerAsServer work in workersAsServers)
+            {
+                WriteOnDebugTextBox(work.SendListServerRequest());
+            }
+            //Write Storages data
+            foreach (StorageAsServer stor in storagesAsServers)
+            {
+                WriteOnDebugTextBox(stor.SendListServerRequest());
+            }
+        }
+
+        private void StartListServerOperation(string serverName)
+        {
+            WriteOnDebugTextBox("------------ LISTSERVER ------------");
+
+            if (serverName == scheduler.serverId) {
+                WriteOnDebugTextBox(scheduler.SendListServerRequest());
+                return;
+            }
+
+            foreach(WorkerAsServer work in workersAsServers)
+            {
+                if(serverName == work.serverId) {
+                    WriteOnDebugTextBox(work.SendListServerRequest());
+                    return;
+                }
+            }
+            foreach (StorageAsServer stor in storagesAsServers)
+            {
+                if (serverName == stor.serverId)
+                {
+                    WriteOnDebugTextBox(stor.SendListServerRequest());
+                    return;
+                }
+            }
+
+            WriteOnDebugTextBox(serverName + " not found!");
         }
 
         private void WriteOnDebugTextBox(string line)
@@ -318,16 +509,11 @@ namespace PuppetMaster
                 storagesTask.Add(storageTask);
 
             }
-
-            //TODO
-            //Checking if the tasks return or if the proccesses are dead
             
-            this.WriteOnDebugTextBox("---------------- STATUS ----------------");
+            WriteOnDebugTextBox("-------------- STATUS --------------");
             bool schedulerAlive = await schedulerTask;
             if (!schedulerAlive) {/*Write in the DebugTextBox*/
-                this.guiWindow.BeginInvoke(new DelAddMsg(guiWindow.WriteOnDebugTextBox), new object[] {
-                                                                        "Scheduler: " + schedulerMap[0] + " is probably dead!"});
-                //guiWindow.WriteOnDebugTextBox("Scheduler: " + schedulerMap[0] + " is probably dead!");
+                WriteOnDebugTextBox("Scheduler: " + schedulerMap[0] + " is probably dead!");
             }
 
             int index = 0;
@@ -335,7 +521,7 @@ namespace PuppetMaster
             {
                 bool workerAlive = await workerTask;
                 if (!workerAlive) {/*Write in the DebugTextBox*/
-                    this.WriteOnDebugTextBox("Worker: " + workerMap[index] + " is probably dead!");
+                    WriteOnDebugTextBox("Worker: " + workerMap[index] + " is probably dead!");
                 }
                 index++;
             }
@@ -345,7 +531,7 @@ namespace PuppetMaster
             {
                 bool storageAlive = await storageTask;
                 if (!storageAlive) {/*Write in the DebugTextBox*/
-                    guiWindow.WriteOnDebugTextBox("Storage: " + storageMap[index] + " is probably dead!");
+                    WriteOnDebugTextBox("Storage: " + storageMap[index] + " is probably dead!");
                 }
                 index++;
             }
@@ -362,6 +548,7 @@ namespace PuppetMaster
 
         }
 
+        //Sync function
         internal void CreateAllConfigEvents(string[] scheduler, string[][] workers, string[][] storages)
         {
             //Save nodes data
@@ -378,7 +565,8 @@ namespace PuppetMaster
             foreach (string[] storage in storages)
             {
                 int replicaId = storageMap.BinarySearch(storage[1]);
-                pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                int processId = pcs.SendCreateStorageRequest(replicaId, storage, storages);
+                processesInfo.Add(new ProcessInfo(storage[1],processId));
                 this.CreateChannelWithServer(storage[1], storage[2], "storage");
             }
 
@@ -386,13 +574,18 @@ namespace PuppetMaster
             foreach (string[] worker in workers)
             {
                 int replicaId = workerMap.BinarySearch(worker[1]);
-                pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
+                int processId = pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
+                processesInfo.Add(new ProcessInfo(worker[1], processId));
                 this.CreateChannelWithServer(worker[1], worker[2], "worker");
             }
 
             //Create Scheduler
-            pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
+            int pId = pcs.SendCreateSchedulerRequest(schedulerMap.BinarySearch(scheduler[1]), scheduler, workers, workerMap);
+            processesInfo.Add(new ProcessInfo(scheduler[1], pId));
             this.CreateChannelWithServer(scheduler[1], scheduler[2], "scheduler");
+
+            //If debugMode == true we need to start connections with worker as client
+
 
         }
 
@@ -411,10 +604,5 @@ namespace PuppetMaster
             storagesAsServers[0].SendWriteRequest(key, value);
 
         }
-
-        /*public void SendCreateProccessInstanceRequest(string serverId, string url)
-        {
-            pcs.SendCreateProccessInstanceRequest(serverId, url);
-        }*/
     }
 }
