@@ -10,4 +10,5 @@ listServer sched1
 listServer w1
 listServer s1
 listGlobal
+wait 50000
 crash w1
