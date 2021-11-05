@@ -13,8 +13,6 @@ namespace Process_Creation_Service
     {
         public class ServerService : DIDAProccessCreatorService.DIDAProccessCreatorServiceBase
         {
-            private GrpcChannel channel;
-
             public ServerService()
             {
             }

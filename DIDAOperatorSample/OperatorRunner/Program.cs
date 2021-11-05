@@ -6,27 +6,69 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Worker;
 
 namespace OperatorRunner
 {
+    public class WorkerClientService
+    {
+        private readonly GrpcChannel channel;
+        private readonly DIDAWorkerService.DIDAWorkerServiceClient client;
+        private readonly string name;
+        public WorkerClientService(string name)
+        {
+            this.name = name;
+            AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            channel = GrpcChannel.ForAddress("http://localhost:10001");
 
+            client = new DIDAWorkerService.DIDAWorkerServiceClient(channel);
+        }
+
+        internal void SendOutputToPMRequest(string output)
+        {
+            WorkerOutputToPMRequest request = new WorkerOutputToPMRequest {
+                ServerId = this.name,
+                Output = output           
+            };
+            client.SendOutputToPM(request);
+            return;
+        }
+    }
     public class WorkerService : DIDAWorkerService.DIDAWorkerServiceBase
     {
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
         int gossipDelay;
         string name;
+        bool debugMode = false;
+        WorkerClientService workerAsClient;
 
         public WorkerService(int gossipDelay, string name) {
             this.gossipDelay = gossipDelay;
             this.name = name;
+        }
+        public override Task<WorkerEmptyReply> SetDebugTrue(WorkerStatusEmpty request, ServerCallContext context)
+        {
+            return Task.FromResult(SetDebug());
+        }
+
+        private WorkerEmptyReply SetDebug()
+        {
+            this.debugMode = true;
+            if(workerAsClient == null)
+            {
+                workerAsClient = new WorkerClientService(this.name);
+            }
+            return new WorkerEmptyReply { };
         }
 
         public override Task<ListServerWorkerReply> ListServer(WorkerStatusEmpty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
         }
+
 
         private ListServerWorkerReply LiServer()
         {
@@ -111,6 +153,11 @@ namespace OperatorRunner
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
+            if(debugMode == true)
+            {
+                Thread thre = new Thread(new ThreadStart(() => workerAsClient.SendOutputToPMRequest(output)));
+                thre.Start();
+            }
             return output;
         }
 
