@@ -80,6 +80,7 @@ namespace OperatorRunner
 
         string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
         {
+            Console.WriteLine("input string was: " + input);
             Console.WriteLine(this);
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
@@ -168,7 +169,7 @@ namespace OperatorRunner
             };
 
             server.Start();
-            while (true) ;
+            Console.ReadKey();
         }
     }
 }
