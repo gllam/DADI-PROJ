@@ -147,7 +147,7 @@ namespace DIDAStorageUI
                 s_data += d.Key + " ";
                 foreach(var value in d.Value)
                 {
-                    s_data += value.val + ":" + value.version.versionNumber;
+                    s_data += value.val + ":" + value.version.versionNumber + " ";
                 }
                 s_data += "\n";
             }
