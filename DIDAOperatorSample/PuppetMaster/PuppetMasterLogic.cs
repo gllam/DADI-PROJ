@@ -317,7 +317,8 @@ namespace PuppetMaster
     }
 
     public delegate void DelAddMsg(string line);
-    class PuppetMasterLogic
+
+    class PuppetMasterLogic : DIDAWorkerService.DIDAWorkerServiceBase
     {
         private bool debugMode = false;
         private SchedulerAsServer scheduler;
@@ -334,16 +335,35 @@ namespace PuppetMaster
             this.guiWindow = guiWindow;
             pcs = new ProcessCreatorAsServer(guiWindow);
         }
+        //PuppetMasterAsServer
+
+
+
+
+        //End PuppetMasterAsServer
 
         internal void SetDebugMode(bool debugMode)
         {
             this.debugMode = debugMode;
+            if(debugMode == true)
+            {
+                ServerPort serverPort = new ServerPort("localhost", 10001, ServerCredentials.Insecure);
+
+                Server server = new Server
+                {
+                    Services = { DIDAWorkerService.BindService(this) },
+                    Ports = { serverPort }
+                };
+
+                server.Start();
+            }
         }
 
         override
         public string ToString()
         {
-            return "Puppet Master:\r\n" + 
+            return "Puppet Master:\r\n" +
+                   "\r\nDebugMode: " + debugMode +
                    "\r\nSchedulerAsServer: " + string.Join("\r\n", scheduler) +
                    "\r\nWorkersAsServer: " + string.Join("\r\n", workersAsServers) +
                    "\r\nStoragesAsServer: " + string.Join("\r\n", storagesAsServers) +
@@ -490,12 +510,10 @@ namespace PuppetMaster
 
             }
             
-            this.WriteOnDebugTextBox("-------------- STATUS --------------");
+            WriteOnDebugTextBox("-------------- STATUS --------------");
             bool schedulerAlive = await schedulerTask;
             if (!schedulerAlive) {/*Write in the DebugTextBox*/
-                this.guiWindow.BeginInvoke(new DelAddMsg(guiWindow.WriteOnDebugTextBox), new object[] {
-                                                                        "Scheduler: " + schedulerMap[0] + " is probably dead!"});
-                //guiWindow.WriteOnDebugTextBox("Scheduler: " + schedulerMap[0] + " is probably dead!");
+                WriteOnDebugTextBox("Scheduler: " + schedulerMap[0] + " is probably dead!");
             }
 
             int index = 0;
@@ -503,7 +521,7 @@ namespace PuppetMaster
             {
                 bool workerAlive = await workerTask;
                 if (!workerAlive) {/*Write in the DebugTextBox*/
-                    this.WriteOnDebugTextBox("Worker: " + workerMap[index] + " is probably dead!");
+                    WriteOnDebugTextBox("Worker: " + workerMap[index] + " is probably dead!");
                 }
                 index++;
             }
@@ -513,7 +531,7 @@ namespace PuppetMaster
             {
                 bool storageAlive = await storageTask;
                 if (!storageAlive) {/*Write in the DebugTextBox*/
-                    guiWindow.WriteOnDebugTextBox("Storage: " + storageMap[index] + " is probably dead!");
+                    WriteOnDebugTextBox("Storage: " + storageMap[index] + " is probably dead!");
                 }
                 index++;
             }
@@ -568,6 +586,7 @@ namespace PuppetMaster
 
             //If debugMode == true we need to start connections with worker as client
 
+
         }
 
         internal void StartPopulateStoragesOperation(string storageDataFileName)
@@ -585,10 +604,5 @@ namespace PuppetMaster
             storagesAsServers[0].SendWriteRequest(key, value);
 
         }
-
-        /*public void SendCreateProccessInstanceRequest(string serverId, string url)
-        {
-            pcs.SendCreateProccessInstanceRequest(serverId, url);
-        }*/
     }
 }

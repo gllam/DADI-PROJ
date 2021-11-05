@@ -52,13 +52,14 @@ namespace PuppetMaster
                     {
                         case "debug":
                             puppetMaster.SetDebugMode(true);
+                            highlightStartPoint += line.Length + 1; //need to count the /n char
                             currentCommandLineIndex++;
                             break;
                         case "scheduler":
                             if (scheduler != null)//Only allowed 1 scheduler per script
                                 break;
-                            currentCommandLineIndex++;
                             highlightStartPoint += line.Length + 1; //need to count the /n char
+                            currentCommandLineIndex++;
                             scheduler = buffer;
                             break;
                         case "worker":
