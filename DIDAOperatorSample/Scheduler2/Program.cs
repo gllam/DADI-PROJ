@@ -13,7 +13,7 @@ namespace SchedulerNamespace
     {
         public string host;
         public string port;
-        private string name;
+        public string name;
         private DIDAWorkerService.DIDAWorkerServiceClient client;
 
         public Worker(string name,string host, string port)
@@ -43,14 +43,8 @@ namespace SchedulerNamespace
         int lastWorkerIndex = 0;
         string name;
 
-
         public SchedulerService(string name) { this.name = name; }
 
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
         public override Task<ListServerSchedReply> ListServer(Empty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
@@ -80,73 +74,73 @@ namespace SchedulerNamespace
 
         public SendAppDataReply RequestApp(SendAppDataRequest request)
         {
-            Console.WriteLine(request.Input);
-            MetaRecord meta = new MetaRecord
+            Console.WriteLine(this);
+            try
             {
-                Id = 1
-            }; //metarecord dummy
-            int chainSize = request.App.Count;
-            Console.WriteLine(chainSize);
-            SendDIDAReqRequest req = new SendDIDAReqRequest
-            {
-                Meta = meta,
-                Input = request.Input,
-                Next = 0,
-                ChainSize = chainSize
-            }; //request to worker
-            for (int opIndex = lastWorkerIndex + 1 % workerMap.Count; opIndex < chainSize; opIndex = opIndex + 1 % workerMap.Count)
-            {
-                OperatorID op = new OperatorID
+                Console.WriteLine(request.Input);
+                MetaRecord meta = new MetaRecord
                 {
-                    Classname = request.App[opIndex].Split()[1],
-                    Order = Int32.Parse(request.App[opIndex].Split()[2])
-                };
-                Assignment ass = new Assignment
+                    Id = 1
+                }; //metarecord dummy
+                int chainSize = request.App.Count;
+                Console.WriteLine(chainSize);
+                SendDIDAReqRequest req = new SendDIDAReqRequest
                 {
-                    Opid = op,
-                    Host = workerMap[opIndex].host,
-                    Port = Int32.Parse(workerMap[opIndex].port),
-                    Output = ""
+                    Meta = meta,
+                    Input = request.Input,
+                    Next = 0,
+                    ChainSize = chainSize
+                }; //request to worker
+                for (int opIndex = lastWorkerIndex + 1; opIndex != chainSize + lastWorkerIndex + 1; opIndex += 1)
+                { 
+                    var app = request.App[opIndex % workerMap.Count];
+                    Worker worker = workerMap[opIndex % workerMap.Count];
+                    Console.WriteLine(app);
+                    OperatorID op = new OperatorID
+                    {
+                        Classname = app.Split()[1],
+                        Order = Int32.Parse(app.Split()[2])
+                    };
+                    Assignment ass = new Assignment
+                    {
+                        Opid = op,
+                        Host = worker.host,
+                        Port = Int32.Parse(worker.port),
+                        Output = ""
+                    };
+                    req.Asschain.Add(ass);
+                    lastWorkerIndex = opIndex % workerMap.Count;
+                }
+                SendRequestToWorker(req);
+                return new SendAppDataReply
+                {
+                    Ack = true
+                }; //reply to pm
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new SendAppDataReply
+                {
+                    Ack = false
                 };
-                req.Asschain.Add(ass);
-                lastWorkerIndex = opIndex;
             }
-            SendRequestToWorker(req);
-            return new SendAppDataReply
-            {
-                Ack = true
-            }; //reply to pm
         }
 
         public void SendRequestToWorker(SendDIDAReqRequest request)
         {
-            string host = request.Asschain[request.Next].Host;
-            int port = request.Asschain[request.Next].Port;
-            Worker target = workerMap.Find(x => x.host == host && x.port == Convert.ToString(port));
-
-            SendDIDAReqReply reply = target.GetClient().SendDIDAReq(request);
-            Console.WriteLine("Request to worker " + reply.Ack);
-        }
-
-
-        /*public override Task<SendWorkersReply> SendWorkers(SendWorkersRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(setWorkers(request));
-        }*/
-
-
-        /*public SendWorkersReply setWorkers(SendWorkersRequest request)
-        {
-            foreach (string url in request.Url)
+            try
             {
-                string[] hostport = url.Split("//")[1].Split(":");
-                workerMap.Add((hostport[0], hostport[1]));
+                string host = request.Asschain[request.Next].Host;
+                int port = request.Asschain[request.Next].Port;
+                Worker target = workerMap.Find(x => x.host == host && x.port == Convert.ToString(port));
+
+                SendDIDAReqReply reply = target.GetClient().SendDIDAReq(request);
+                Console.WriteLine("Request to worker " + reply.Ack);
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
-            return new SendWorkersReply
-            {
-                Ack = true
-            };
-        }*/
+        }
 
         internal void AddWorker(string input)
         {
@@ -154,6 +148,21 @@ namespace SchedulerNamespace
             string[] hostport = data[1].Split("//")[1].Split(":");
             workerMap.Add(new Worker(data[0], hostport[0], hostport[1]));
             Console.WriteLine(hostport[0], hostport[1]);
+        }
+
+        public override string ToString()
+        {
+            return "Scheduler " + name + " Workers: " + ListWorkers();
+        }
+
+        public string ListWorkers()
+        {
+            string s_data = "";
+            foreach (var worker in workerMap)
+            {
+                s_data += worker.name + "-" + worker.host + ":" + worker.port + " ";
+            }
+            return s_data;
         }
     }
 

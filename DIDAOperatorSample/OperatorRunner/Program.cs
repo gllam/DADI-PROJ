@@ -23,11 +23,6 @@ namespace OperatorRunner
             this.name = name;
         }
 
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
         public override Task<ListServerWorkerReply> ListServer(WorkerStatusEmpty request, ServerCallContext context)
         {
             return Task.FromResult(LiServer());
@@ -57,51 +52,64 @@ namespace OperatorRunner
 
         public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //out of range
         {
-            Console.WriteLine(request);
-            string classname = request.Asschain[request.Next].Opid.Classname;
-            Console.WriteLine(classname);
-            DIDAMetaRecord metarecord = new DIDAMetaRecord
+            try
             {
-                Id = request.Meta.Id
-            }; //dummy meta record
-            string input = request.Input;
-            string previousoutput = null;
-            if (request.Next != 0)
+                Console.WriteLine(this);
+                Console.WriteLine(request);
+                string classname = request.Asschain[request.Next].Opid.Classname;
+                Console.WriteLine(classname);
+                DIDAMetaRecord metarecord = new DIDAMetaRecord
+                {
+                    Id = request.Meta.Id
+                }; //dummy meta record
+                string input = request.Input;
+                string previousoutput = null;
+                if (request.Next != 0)
+                {
+                    previousoutput = request.Asschain[request.Next - 1].Output;
+                }
+                request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
+                Console.WriteLine(metarecord);
+                request.Next += 1;
+                if (request.Next < request.Asschain.Count)
+                {
+                    SendRequestToWorker(request);
+                }
+                return new SendDIDAReqReply
+                {
+                    Ack = true
+                };
+            } catch (Exception e)
             {
-                previousoutput = request.Asschain[request.Next - 1].Output;
+                Console.WriteLine(e);
+                return new SendDIDAReqReply
+                {
+                    Ack = false
+                };
             }
-            request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
-            request.Next += 1;
-            if (request.Next < request.Asschain.Count)
-            {
-                SendRequestToWorker(request);
-            }
-            return new SendDIDAReqReply
-            {
-                Ack = true
-            };
         }
 
         string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
         {
-
+            Console.WriteLine("input string was: " + input);
+            Console.WriteLine(this);
             Console.WriteLine(classname);
             string _currWorkingDir = Directory.GetCurrentDirectory();
             IDIDAOperator _opLoadedByReflection;
-            string filename = "LibOperators.dll";
-            Assembly _dll = Assembly.LoadFrom(filename);
+            Assembly _dll = Assembly.LoadFrom("..//..//..//..//DebugFiles//LibOperators.dll"); //maybe name not static
             Type[] types = _dll.GetTypes();
             Type t = null;
             foreach (Type type in types)
             {
-                if (type.Name == classname)
+                if (type.Name.Contains(classname))
                 {
                     t = type;
                 }
             }
             Console.WriteLine(t);
+            StorageProxy sp = new StorageProxy(storageMap.ToArray(), meta);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
-            _opLoadedByReflection.ConfigureStorage(new StorageProxy(storageMap.ToArray(), meta));
+            _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
             return output;
         }
@@ -128,6 +136,21 @@ namespace OperatorRunner
                 port = Convert.ToInt32(hostport[1])
             };
             storageMap.Add(node);
+        }
+
+        public override string ToString()
+        {
+            return "Worker " + name + " GossipDelay " + gossipDelay + " Storages: " + ListStorages();
+        }
+
+        public string ListStorages()
+        {
+            string s_data = "";
+            foreach (var storage in storageMap)
+            {
+                s_data += storage.serverId + "-" + storage.host + ":" + storage.port + " ";
+            }
+            return s_data;
         }
     }
 
@@ -156,7 +179,7 @@ namespace OperatorRunner
             };
 
             server.Start();
-            Console.ReadLine();
+            Console.ReadKey();
         }
     }
 }

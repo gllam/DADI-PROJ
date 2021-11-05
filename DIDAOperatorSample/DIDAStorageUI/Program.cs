@@ -23,11 +23,6 @@ namespace DIDAStorageUI
             this.replicaid = replicaid;
             this.name = name;
         }
-        override
-        public string ToString()
-        {
-            return "TODO " + this.name;
-        }
 
         public override Task<ListServerStorageReply> ListServer(StorageStatusEmpty request, ServerCallContext context)
         {
@@ -63,30 +58,32 @@ namespace DIDAStorageUI
                 Id = request.Id,
                 Version = request.Version
             };
-            if (request.Version == null) reply.Version.VersionNumber = 0;
             lock (this)
             {
                 if (data.ContainsKey(request.Id))
                 {
-                    foreach (DIDARecord record in data[request.Id])
+                    if (request.Version.VersionNumber == -1)
                     {
-                        if (record.version.versionNumber == reply.Version.VersionNumber && request.Version != null)
-                        {
+                        var lastRecord = data[request.Id][data[request.Id].Count - 1];
+                        reply.Val = lastRecord.val;
+                        reply.Version.VersionNumber = lastRecord.version.versionNumber;
+                        reply.Version.ReplicaId = lastRecord.version.replicaId;
+                    }
+                    else
+                    {
+                        DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
+                        if(record.id == request.Id) { //not tested
                             reply.Val = record.val;
-                            break;
-                        }
-                        if (record.version.versionNumber > reply.Version.VersionNumber && request.Version == null)
+                        } else
                         {
-                            reply.Val = record.val;
-                            reply.Version = new DIDAVersion
-                            {
-                                VersionNumber = record.version.versionNumber,
-                                ReplicaId = record.version.replicaId
-                            };
+                            reply.Version.VersionNumber = -1;
+                            reply.Version.ReplicaId = -1;
                         }
+                        
                     }
                 }
             }
+            Console.WriteLine(this);
             return reply;
         }
 
@@ -143,7 +140,28 @@ namespace DIDAStorageUI
                 if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
                 Console.WriteLine("Write successful -> " + newRecord.id + ":" + newRecord.val);
             }
+            Console.WriteLine(this);
             return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
+        }
+
+        public override string ToString()
+        {
+            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + "\r\nItems:\r\n" + ListData();
+        }
+
+        public string ListData()
+        {
+            string s_data = "";
+            foreach (var d in data)
+            {
+                s_data += d.Key + " ";
+                foreach(var value in d.Value)
+                {
+                    s_data += value.val + ":" + value.version.versionNumber + " ";
+                }
+                s_data += "\r\n";
+            }
+            return s_data;
         }
     }
 
