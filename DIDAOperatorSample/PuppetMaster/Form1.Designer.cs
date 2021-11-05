@@ -35,6 +35,7 @@ namespace PuppetMaster
             this.buttonNextStep = new System.Windows.Forms.Button();
             this.textBoxDebug = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.buttonRunAll = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonBrowseConfigScript
@@ -90,11 +91,22 @@ namespace PuppetMaster
             this.label1.TabIndex = 9;
             this.label1.Text = "Debug";
             // 
+            // buttonRunAll
+            // 
+            this.buttonRunAll.Location = new System.Drawing.Point(452, 50);
+            this.buttonRunAll.Name = "buttonRunAll";
+            this.buttonRunAll.Size = new System.Drawing.Size(75, 23);
+            this.buttonRunAll.TabIndex = 10;
+            this.buttonRunAll.Text = "Run All";
+            this.buttonRunAll.UseVisualStyleBackColor = true;
+            this.buttonRunAll.Click += new System.EventHandler(this.ButtonRunAll_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonRunAll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxDebug);
             this.Controls.Add(this.buttonNextStep);
@@ -116,6 +128,7 @@ namespace PuppetMaster
         private System.Windows.Forms.Button buttonNextStep;
         private System.Windows.Forms.TextBox textBoxDebug;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonRunAll;
     }
 }
 

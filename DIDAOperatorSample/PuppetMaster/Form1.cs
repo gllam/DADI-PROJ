@@ -132,5 +132,35 @@ namespace PuppetMaster
         {
             textBoxDebug.Text += line + "\r\n";
         }
+
+        private void ButtonRunAll_Click(object sender, EventArgs e)
+        {
+            if (!buttonRunAll.Enabled)
+                return;
+            buttonRunAll.Enabled = false;
+            buttonNextStep.Enabled = false;
+            string[] data = new string[scriptLines.Length - currentCommandLineIndex];
+            Array.Copy(scriptLines, currentCommandLineIndex, data, 0, scriptLines.Length - currentCommandLineIndex);
+
+            //Console.WriteLine(data);
+            //Console.WriteLine(Convert.ToString(currentCommandLineIndex), scriptLines);
+            foreach(string line in data)
+            {
+                //Console.WriteLine(index);
+                if (line.Split(' ')[0] == "wait")
+                {
+                    System.Threading.Thread.Sleep(Convert.ToInt32(line.Split(' ')[1]));
+                }
+                else
+                {
+                    //Console.WriteLine(Convert.ToString(currentCommandLineIndex), scriptLines, Convert.ToString(index));
+                    Thread t = new Thread(new ThreadStart(() =>
+                            puppetMaster.ExecuteCommand(line)));
+                    t.Start();
+                }
+            }
+
+            textBoxScript.Text = "END!";
+        }
     }
 }

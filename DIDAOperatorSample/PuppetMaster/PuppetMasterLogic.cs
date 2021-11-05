@@ -592,11 +592,12 @@ namespace PuppetMaster
                 int replicaId = workerMap.BinarySearch(worker[1]);
                 int processId = pcs.SendCreateWorkerRequest(replicaId, worker, storages, storageMap);
                 processesInfo.Add(new ProcessInfo(worker[1], processId));
-                t = new Thread(new ThreadStart(() => this.CreateChannelWithServerType(worker[1], worker[2], "worker")));
-                t.Start();
+                Thread thre = new Thread(new ThreadStart(() => this.CreateChannelWithServerType(worker[1], worker[2], "worker")));
+                thre.Start();
                 //If debugMode == true we need to inform the worker that the debug is true
                 if(debugMode == true)
                 {
+                    thre.Join();
                     WorkerAsServer target = workersAsServers[workersAsServers.Count - 1];
                     t = new Thread(new ThreadStart(() => target.SetDebugRequest()));
                     t.Start();
