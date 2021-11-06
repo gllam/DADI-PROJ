@@ -36,6 +36,8 @@ namespace PuppetMaster
             this.textBoxDebug = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonRunAll = new System.Windows.Forms.Button();
+            this.textBoxRunCommand = new System.Windows.Forms.TextBox();
+            this.buttonRunCommand = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonBrowseConfigScript
@@ -101,11 +103,30 @@ namespace PuppetMaster
             this.buttonRunAll.UseVisualStyleBackColor = true;
             this.buttonRunAll.Click += new System.EventHandler(this.ButtonRunAll_Click);
             // 
+            // textBoxRunCommand
+            // 
+            this.textBoxRunCommand.Location = new System.Drawing.Point(31, 117);
+            this.textBoxRunCommand.Name = "textBoxRunCommand";
+            this.textBoxRunCommand.Size = new System.Drawing.Size(100, 23);
+            this.textBoxRunCommand.TabIndex = 11;
+            // 
+            // buttonRunCommand
+            // 
+            this.buttonRunCommand.Location = new System.Drawing.Point(30, 147);
+            this.buttonRunCommand.Name = "buttonRunCommand";
+            this.buttonRunCommand.Size = new System.Drawing.Size(101, 23);
+            this.buttonRunCommand.TabIndex = 12;
+            this.buttonRunCommand.Text = "Run Command";
+            this.buttonRunCommand.UseVisualStyleBackColor = true;
+            this.buttonRunCommand.Click += new System.EventHandler(this.ButtonRunCommand_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonRunCommand);
+            this.Controls.Add(this.textBoxRunCommand);
             this.Controls.Add(this.buttonRunAll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxDebug);
@@ -129,6 +150,8 @@ namespace PuppetMaster
         private System.Windows.Forms.TextBox textBoxDebug;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonRunAll;
+        private System.Windows.Forms.TextBox textBoxRunCommand;
+        private System.Windows.Forms.Button buttonRunCommand;
     }
 }
 
