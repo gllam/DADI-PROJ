@@ -162,5 +162,31 @@ namespace PuppetMaster
 
             textBoxScript.Text = "END!";
         }
+
+        private async void ButtonRunCommand_Click(object sender, EventArgs e)
+        {
+            if (!buttonRunCommand.Enabled)
+                return;
+            buttonRunCommand.Enabled = false;
+            if (textBoxRunCommand.Text.Split(' ')[0] == "wait")
+            {
+                buttonRunAll.Enabled = false;
+                buttonNextStep.Enabled = false;
+                await Task.Delay(Convert.ToInt32(textBoxRunCommand.Text.Split(' ')[1]));
+                buttonRunAll.Enabled = true;
+                buttonNextStep.Enabled = true;
+            }
+            else
+            {
+                Console.WriteLine(textBoxRunCommand.Text);
+                string line = textBoxRunCommand.Text;
+                Thread t = new Thread(new ThreadStart(() =>
+                        puppetMaster.ExecuteCommand(line)));
+                t.Start();
+            }
+            buttonRunCommand.Enabled = true;
+            textBoxRunCommand.Text = "";
+
+        }
     }
 }
