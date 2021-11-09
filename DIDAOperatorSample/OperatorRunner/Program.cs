@@ -153,6 +153,7 @@ namespace OperatorRunner
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
+            //TODO get alive storage nodes and metadata !!!
             if(debugMode == true)
             {
                 Thread thre = new Thread(new ThreadStart(() => workerAsClient.SendOutputToPMRequest(output)));

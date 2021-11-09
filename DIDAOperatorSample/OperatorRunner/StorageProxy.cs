@@ -48,7 +48,7 @@ namespace Worker
         // 3) CHECK IN THE METARECORD WHICH ARE THE PREVIOUSLY READ VERSIONS OF DATA ???
         // 4) RECORD ACCESSED DATA INTO THE METARECORD ???
 
-        private DIDAStorageService.DIDAStorageServiceClient LocateStorage(string id)
+        private int LocateStorage(string id)
         { // (2)!! 
             int hash = id.GetHashCode();
             int closer = 0;
@@ -59,12 +59,21 @@ namespace Worker
                     closer = i;
                 }
             }
-            return _clients[closer].client;
+            return closer;
         }
 
         public virtual DIDAWorker.DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
         {
-            var res = LocateStorage(r.Id).read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
+            Client storage = _clients[LocateStorage(r.Id)];
+            DIDARecordReply res = new DIDARecordReply();
+            try
+            {
+                res = storage.client.read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
+            }catch (Exception)
+            {
+                Console.WriteLine("Storage with ID " + storage.id + " disconnected");
+                //TODO Delete from storages !!!
+            }
             return new DIDAWorker.DIDARecordReply { Id = res.Id, Val = res.Val, Version = { VersionNumber = res.Version.VersionNumber, ReplicaId = res.Version.ReplicaId } };
         }
 
