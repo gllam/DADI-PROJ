@@ -9,33 +9,24 @@ namespace Worker
 
     public struct Client
     {
-        public string id;
+        public DIDAStorageNode storageNode;
         public DIDAStorageService.DIDAStorageServiceClient client;
     }
 
     public class StorageProxy : IDIDAStorage
     {
-        // dictionary with storage gRPC client objects for all storage nodes DIDAStorageService.DIDAStorageServiceClient
-        //Dictionary<string, DIDAStorageService.DIDAStorageServiceClient> _clients = new Dictionary<string, DIDAStorageService.DIDAStorageServiceClient>();
-
         Dictionary<int, Client> _clients = new Dictionary<int, Client>();
 
-        // dictionary with storage gRPC channel objects for all storage nodes
-        //Dictionary<string, GrpcChannel> _channels = new Dictionary<string, GrpcChannel>();
-
-        // metarecord for the request that this storage proxy is handling
         DIDAMetaRecord _meta;
 
 
         public StorageProxy(DIDAStorageNode[] storageNodes, DIDAMetaRecord metaRecord)
-        { //hash all server id's?
+        {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             foreach (DIDAStorageNode n in storageNodes)
             {
-                //_channels[n.serverId] = GrpcChannel.ForAddress("http://" + n.host + ":" + n.port);
-                //_clients[n.serverId] = new DIDAStorageService.DIDAStorageServiceClient(channel);
                 GrpcChannel channel = GrpcChannel.ForAddress("http://" + n.host + ":" + n.port);
-                _clients[n.serverId.GetHashCode()] = new Client { id = n.serverId, client = new DIDAStorageService.DIDAStorageServiceClient(channel) };
+                _clients[n.serverId.GetHashCode()] = new Client { storageNode = n, client = new DIDAStorageService.DIDAStorageServiceClient(channel) };
             }
             _meta = metaRecord;
         }
@@ -48,8 +39,8 @@ namespace Worker
         // 3) CHECK IN THE METARECORD WHICH ARE THE PREVIOUSLY READ VERSIONS OF DATA ???
         // 4) RECORD ACCESSED DATA INTO THE METARECORD ???
 
-        private DIDAStorageService.DIDAStorageServiceClient LocateStorage(string id)
-        { // (2)!! 
+        private int LocateStorage(string id)
+        {
             int hash = id.GetHashCode();
             int closer = 0;
             foreach(int i in _clients.Keys)
@@ -59,25 +50,65 @@ namespace Worker
                     closer = i;
                 }
             }
-            return _clients[closer].client;
+            return closer;
         }
 
         public virtual DIDAWorker.DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
         {
-            var res = LocateStorage(r.Id).read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
-            return new DIDAWorker.DIDARecordReply { Id = res.Id, Val = res.Val, Version = { VersionNumber = res.Version.VersionNumber, ReplicaId = res.Version.ReplicaId } };
+            int storage = LocateStorage(r.Id);
+            try
+            {
+                DIDARecordReply res = _clients[storage].client.read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
+                return new DIDAWorker.DIDARecordReply { Id = res.Id, Val = res.Val, Version = { VersionNumber = res.Version.VersionNumber, ReplicaId = res.Version.ReplicaId } };
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
+                _clients.Remove(storage);
+                return read(r);
+            }
         }
 
         public virtual DIDAWorker.DIDAVersion write(DIDAWorker.DIDAWriteRequest r)
         {
-            var res = LocateStorage(r.Id).write(new DIDAWriteRequest { Id = r.Id, Val = r.Val });
-            return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+            int storage = LocateStorage(r.Id);
+            try
+            {
+                DIDAVersion res = _clients[storage].client.write(new DIDAWriteRequest { Id = r.Id, Val = r.Val });
+                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
+                _clients.Remove(storage);
+                return write(r);
+            }
         }
 
         public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
         {
-            var res = LocateStorage(r.Id).updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
-            return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+            int storage = LocateStorage(r.Id);
+            try
+            {
+                DIDAVersion res = _clients[storage].client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
+                _clients.Remove(storage);
+                return updateIfValueIs(r);
+            }
+        }
+
+        public List<DIDAStorageNode> GetAliveStorages()
+        {
+            List <DIDAStorageNode> list = new List<DIDAStorageNode>();
+            foreach (var c in _clients.Values)
+            {
+                list.Add(c.storageNode);
+            }
+            return list;
         }
     }
     
