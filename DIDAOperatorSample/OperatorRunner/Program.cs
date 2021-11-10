@@ -92,7 +92,7 @@ namespace OperatorRunner
             return reply;
         }
 
-        public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //out of range
+        public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //try catch?
         {
             try
             {
@@ -103,14 +103,15 @@ namespace OperatorRunner
                 DIDAMetaRecord metarecord = new DIDAMetaRecord
                 {
                     Id = request.Meta.Id
-                }; //dummy meta record
+                };
                 string input = request.Input;
                 string previousoutput = null;
                 if (request.Next != 0)
                 {
                     previousoutput = request.Asschain[request.Next - 1].Output;
                 }
-                request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput); //metarecord?
+                request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput);
+                request.Meta.Id = metarecord.Id;
                 Console.WriteLine(metarecord);
                 request.Next += 1;
                 if (request.Next < request.Asschain.Count)
@@ -153,7 +154,8 @@ namespace OperatorRunner
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
-            //TODO get alive storage nodes and metadata !!!
+            //TODO update metarecord !!!
+            storageMap = sp.GetAliveStorages();
             if(debugMode == true)
             {
                 Thread thre = new Thread(new ThreadStart(() => workerAsClient.SendOutputToPMRequest(output)));
