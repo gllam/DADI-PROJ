@@ -6,7 +6,28 @@ service DIDAStorageService {
   rpc write(DIDAWriteRequest) returns (DIDAVersion);
   rpc updateIfValueIs(DIDAUpdateIfRequest) returns (DIDAVersion);
   rpc Status(StorageStatusEmpty) returns (StorageStatusReply);
-    rpc ListServer (StorageStatusEmpty) returns (ListServerStorageReply);
+  rpc ListServer (StorageStatusEmpty) returns (ListServerStorageReply);
+  //new functions
+  rpc sendUpdateRequest(sendUpdateRequestReq) returns (TimeStampValue);
+  rpc sendUpdateValidation(sendUpdateAck) returns (sendUpdateValidationReply); //if the TimeStamp returned is null -> success!
+}
+
+message sendUpdateAck{
+    bool success = 1;
+}
+message sendUpdateRequestReq{
+    string key = 1;
+    string value = 2;
+    repeated int32 numberUpdates = 3;
+}
+
+message sendUpdateValidationReply{
+    TimeStampValue tmv = 1;
+    DIDAVersion version = 2;
+}
+
+message TimeStampValue{
+    repeated int32 numberUpdates = 1;
 }
 
 message ListServerStorageReply{

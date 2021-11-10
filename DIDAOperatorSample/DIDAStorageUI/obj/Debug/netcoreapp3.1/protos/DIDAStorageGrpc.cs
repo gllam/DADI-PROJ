@@ -63,6 +63,14 @@ public static partial class DIDAStorageService
   static readonly grpc::Marshaller<global::StorageStatusReply> __Marshaller_StorageStatusReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::StorageStatusReply.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::ListServerStorageReply> __Marshaller_ListServerStorageReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::ListServerStorageReply.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::sendUpdateRequestReq> __Marshaller_sendUpdateRequestReq = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendUpdateRequestReq.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::TimeStampValue> __Marshaller_TimeStampValue = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::TimeStampValue.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::sendUpdateAck> __Marshaller_sendUpdateAck = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendUpdateAck.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::sendUpdateValidationReply> __Marshaller_sendUpdateValidationReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendUpdateValidationReply.Parser));
 
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Method<global::DIDAReadRequest, global::DIDARecordReply> __Method_read = new grpc::Method<global::DIDAReadRequest, global::DIDARecordReply>(
@@ -104,6 +112,22 @@ public static partial class DIDAStorageService
       __Marshaller_StorageStatusEmpty,
       __Marshaller_ListServerStorageReply);
 
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::sendUpdateRequestReq, global::TimeStampValue> __Method_sendUpdateRequest = new grpc::Method<global::sendUpdateRequestReq, global::TimeStampValue>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "sendUpdateRequest",
+      __Marshaller_sendUpdateRequestReq,
+      __Marshaller_TimeStampValue);
+
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::sendUpdateAck, global::sendUpdateValidationReply> __Method_sendUpdateValidation = new grpc::Method<global::sendUpdateAck, global::sendUpdateValidationReply>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "sendUpdateValidation",
+      __Marshaller_sendUpdateAck,
+      __Marshaller_sendUpdateValidationReply);
+
   /// <summary>Service descriptor</summary>
   public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
   {
@@ -144,6 +168,30 @@ public static partial class DIDAStorageService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
+    /// <summary>
+    ///new functions
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::TimeStampValue> sendUpdateRequest(global::sendUpdateRequestReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    /// <summary>
+    ///if the TimeStamp returned is null -> success!
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::sendUpdateValidationReply> sendUpdateValidation(global::sendUpdateAck request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
   }
 
   /// <summary>Creates service definition that can be registered with a server</summary>
@@ -156,7 +204,9 @@ public static partial class DIDAStorageService
         .AddMethod(__Method_write, serviceImpl.write)
         .AddMethod(__Method_updateIfValueIs, serviceImpl.updateIfValueIs)
         .AddMethod(__Method_Status, serviceImpl.Status)
-        .AddMethod(__Method_ListServer, serviceImpl.ListServer).Build();
+        .AddMethod(__Method_ListServer, serviceImpl.ListServer)
+        .AddMethod(__Method_sendUpdateRequest, serviceImpl.sendUpdateRequest)
+        .AddMethod(__Method_sendUpdateValidation, serviceImpl.sendUpdateValidation).Build();
   }
 
   /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
@@ -171,6 +221,8 @@ public static partial class DIDAStorageService
     serviceBinder.AddMethod(__Method_updateIfValueIs, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAUpdateIfRequest, global::DIDAVersion>(serviceImpl.updateIfValueIs));
     serviceBinder.AddMethod(__Method_Status, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::StorageStatusReply>(serviceImpl.Status));
     serviceBinder.AddMethod(__Method_ListServer, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::ListServerStorageReply>(serviceImpl.ListServer));
+    serviceBinder.AddMethod(__Method_sendUpdateRequest, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::sendUpdateRequestReq, global::TimeStampValue>(serviceImpl.sendUpdateRequest));
+    serviceBinder.AddMethod(__Method_sendUpdateValidation, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::sendUpdateAck, global::sendUpdateValidationReply>(serviceImpl.sendUpdateValidation));
   }
 
 }
