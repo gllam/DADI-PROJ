@@ -27,9 +27,9 @@ namespace DIDAStorageUI
 
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
 
-        Dictionary<string, int[]> valueTimeStamp = new Dictionary<string, int[]>();
+        Dictionary<string, int[]> valueTimeStamp = new Dictionary<string, int[]>();//the correct/real one
 
-        Dictionary<string, int[]> replicaTimeStamp = new Dictionary<string, int[]>();
+        Dictionary<string, int[]> replicaTimeStamp = new Dictionary<string, int[]>();//the one that has the data that is in the log
 
         List<UpdateRecord> update_log = new List<UpdateRecord>();
 

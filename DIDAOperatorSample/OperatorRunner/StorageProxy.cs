@@ -2,7 +2,7 @@
 using System;
 using Grpc.Net.Client;
 using System.Collections.Generic;
-
+using Google.Protobuf.Collections;
 
 namespace Worker
 {
@@ -80,20 +80,46 @@ namespace Worker
 
         public virtual DIDAWorker.DIDAVersion write(DIDAWorker.DIDAWriteRequest r)
         {
-            int storage = LocateStorage(r.Id);
+            if (!timestamp.ContainsKey(r.Id))
+                CreateTimeStampKey(r.Id);
+            int storageHash = LocateStorage(r.Id);
+            Client storage = _clients[storageHash];
             try
             {
-                DIDAVersion res = _clients[storage].client.write(new DIDAWriteRequest { Id = r.Id, Val = r.Val });
-                if (!timestamp.ContainsKey(r.Id))
-                    CreateTimeStampKey(r.Id);
-                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+                sendUpdateRequestReq request = new sendUpdateRequestReq { Key = r.Id, Value = r.Val };
+                request = CreateTimeStampValueRepeated(r.Id, request);
+                TimeStampValue reply = storage.client.sendUpdateRequest(request);
+                sendUpdateValidationReply replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, reply.NumberUpdates) });
+                if(replyValidation.Version.VersionNumber == -1) //while nao é necessario porque a mensagem eventualmente vai chegar
+                    replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, replyValidation.Tmv.NumberUpdates) });
+                return new DIDAWorker.DIDAVersion { VersionNumber = replyValidation.Version.VersionNumber, ReplicaId = replyValidation.Version.ReplicaId };
             }
             catch (Exception)
             {
-                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
-                _clients.Remove(storage);
+                Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
+                _clients.Remove(storageHash);
                 return write(r);
             }
+        }
+
+        private bool CompareTimeStamps(RepeatedField<int> timeStampValueSP, RepeatedField<int> timeStampValueStorage)
+        {
+            for(int i = 0; i < timeStampValueSP.Count; i++)
+            {
+                if (timeStampValueSP[i] > timeStampValueStorage[i])
+                    return false;
+            }
+            return true;
+        }
+
+        private sendUpdateRequestReq CreateTimeStampValueRepeated(string key, sendUpdateRequestReq request)
+        {
+            int[] timeStampValue = timestamp[key];
+            foreach (int t in timeStampValue)
+            {
+                request.Tmv.NumberUpdates.Add(t);
+            }
+            return request;
         }
 
         public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
