@@ -2,18 +2,36 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DIDAStorage;
+using DIDAWorker;
 using Grpc.Core;
 
 namespace DIDAStorageUI
 {
+    struct UpdateRecord
+    {
+        int i;
+        Dictionary<string, int[]> timeStamp;
+        Dictionary<string, int[]> prev;
+        string key;
+        string value;
+    }
+
     class StorageService : DIDAStorageService.DIDAStorageServiceBase
     {
 
-        Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
+        Dictionary<string, List<DIDAStorage.DIDARecord>> data = new Dictionary<string, List<DIDAStorage.DIDARecord>>();
         int maxVersions = 5; //dummy
         readonly int replicaid;
         string name;
         int gossipDelay;
+
+        List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
+
+        Dictionary<string, int[]> valueTimeStamp = new Dictionary<string, int[]>();
+
+        Dictionary<string, int[]> replicaTimeStamp = new Dictionary<string, int[]>();
+
+        List<UpdateRecord> update_log = new List<UpdateRecord>();
 
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
@@ -71,8 +89,8 @@ namespace DIDAStorageUI
                     }
                     else
                     {
-                        DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
-                        if(record.id == request.Id) { //not tested
+                        DIDAStorage.DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
+                        if(record.id == request.Id) {
                             reply.Val = record.val;
                         } else
                         {
@@ -118,7 +136,7 @@ namespace DIDAStorageUI
 
         private DIDAVersion WriteData(DIDAWriteRequest request)
         {
-            DIDARecord newRecord = new DIDARecord();
+            DIDAStorage.DIDARecord newRecord = new DIDAStorage.DIDARecord();
             lock (this)
             {
                 newRecord.id = request.Id;
@@ -134,7 +152,7 @@ namespace DIDAStorageUI
                 else
                 {
                     newRecord.version.versionNumber = 1;
-                    data.Add(request.Id, new List<DIDARecord>());
+                    data.Add(request.Id, new List<DIDAStorage.DIDARecord>());
                 }
                 data[request.Id].Add(newRecord);
                 if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
@@ -142,6 +160,24 @@ namespace DIDAStorageUI
             }
             Console.WriteLine(this);
             return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
+        }
+
+        private void CreateTimeStampKey(string key)
+        {
+            valueTimeStamp.Add(key, new int[storageMap.Count]);
+        }
+
+        internal void AddStorage(string storage)
+        {
+            string[] storageUrl = storage.Split("|");
+            string[] hostport = storageUrl[1].Split("//")[1].Split(":");
+            DIDAStorageNode node = new DIDAStorageNode
+            {
+                serverId = storageUrl[0],
+                host = hostport[0],
+                port = Convert.ToInt32(hostport[1])
+            };
+            storageMap.Add(node);
         }
 
         public override string ToString()
@@ -174,11 +210,15 @@ namespace DIDAStorageUI
             string host = args[2];
             int port = Convert.ToInt32(args[3]);
             int gossipDelay = Convert.ToInt32(args[4]);
-
+            StorageService storageService = new StorageService(replicaid, gossipDelay, storageName);
+            for (int i = 5; i < args.Length; i++)
+            {
+                storageService.AddStorage(args[i]);
+            }
             Console.WriteLine("Insecure Storage server '" + storageName + "' | hostname: " + host + " | port " + port);
             Server server = new Server
             {
-                Services = { DIDAStorageService.BindService(new StorageService(replicaid, gossipDelay, storageName)) },
+                Services = { DIDAStorageService.BindService(storageService) },
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) }
             };
             server.Start();

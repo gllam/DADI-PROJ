@@ -44,6 +44,7 @@ namespace OperatorRunner
         string name;
         bool debugMode = false;
         WorkerClientService workerAsClient;
+        StorageProxy sp;
 
         public WorkerService(int gossipDelay, string name) {
             this.gossipDelay = gossipDelay;
@@ -150,12 +151,10 @@ namespace OperatorRunner
                 }
             }
             Console.WriteLine(t);
-            StorageProxy sp = new StorageProxy(storageMap.ToArray(), meta);
+            sp.Update(meta);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
-            //TODO update metarecord !!!
-            storageMap = sp.GetAliveStorages();
             if(debugMode == true)
             {
                 Thread thre = new Thread(new ThreadStart(() => workerAsClient.SendOutputToPMRequest(output)));
@@ -186,6 +185,11 @@ namespace OperatorRunner
                 port = Convert.ToInt32(hostport[1])
             };
             storageMap.Add(node);
+        }
+
+        internal void CreateStorageProxy()
+        {
+            sp = new StorageProxy(storageMap.ToArray(), null);
         }
 
         public override string ToString()
