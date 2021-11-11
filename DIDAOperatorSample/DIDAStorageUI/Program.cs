@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DIDAStorage;
 using DIDAWorker;
 using Grpc.Core;
 
@@ -19,7 +18,7 @@ namespace DIDAStorageUI
     class StorageService : DIDAStorageService.DIDAStorageServiceBase
     {
 
-        Dictionary<string, List<DIDAStorage.DIDARecord>> data = new Dictionary<string, List<DIDAStorage.DIDARecord>>();
+        Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         int maxVersions = 5; //dummy
         readonly int replicaid;
         string name;
@@ -83,15 +82,15 @@ namespace DIDAStorageUI
                     if (request.Version.VersionNumber == -1)
                     {
                         var lastRecord = data[request.Id][data[request.Id].Count - 1];
-                        reply.Val = lastRecord.val;
-                        reply.Version.VersionNumber = lastRecord.version.versionNumber;
-                        reply.Version.ReplicaId = lastRecord.version.replicaId;
+                        reply.Val = lastRecord.Val;
+                        reply.Version.VersionNumber = lastRecord.Version.VersionNumber;
+                        reply.Version.ReplicaId = lastRecord.Version.ReplicaId;
                     }
                     else
                     {
-                        DIDAStorage.DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
-                        if(record.id == request.Id) {
-                            reply.Val = record.val;
+                        DIDARecord record = data[request.Id].Find(x => x.Version.VersionNumber == request.Version.VersionNumber && x.Version.ReplicaId == request.Version.ReplicaId);
+                        if(record.Id == request.Id) {
+                            reply.Val = record.Val;
                         } else
                         {
                             reply.Version.VersionNumber = -1;
@@ -116,7 +115,7 @@ namespace DIDAStorageUI
             {
                 if (data.ContainsKey(request.Id))
                 {
-                    if (data[request.Id][data[request.Id].Count - 1].val == request.Oldvalue)
+                    if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
                     {
                         return WriteData(new DIDAWriteRequest
                         {
@@ -136,30 +135,30 @@ namespace DIDAStorageUI
 
         private DIDAVersion WriteData(DIDAWriteRequest request)
         {
-            DIDAStorage.DIDARecord newRecord = new DIDAStorage.DIDARecord();
+            DIDARecord newRecord = new DIDARecord();
             lock (this)
             {
-                newRecord.id = request.Id;
-                newRecord.val = request.Val;
-                newRecord.version = new DIDAStorage.DIDAVersion
+                newRecord.Id = request.Id;
+                newRecord.Val = request.Val;
+                newRecord.Version = new DIDAWorker.DIDAVersion
                 {
-                    replicaId = replicaid
+                    ReplicaId = replicaid
                 };
                 if (data.ContainsKey(request.Id))
                 {
-                    newRecord.version.versionNumber = data[request.Id][data[request.Id].Count - 1].version.versionNumber + 1;
+                    newRecord.Version.VersionNumber = data[request.Id][data[request.Id].Count - 1].Version.VersionNumber + 1;
                 }
                 else
                 {
-                    newRecord.version.versionNumber = 1;
-                    data.Add(request.Id, new List<DIDAStorage.DIDARecord>());
+                    newRecord.Version.VersionNumber = 1;
+                    data.Add(request.Id, new List<DIDARecord>());
                 }
                 data[request.Id].Add(newRecord);
                 if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
-                Console.WriteLine("Write successful -> " + newRecord.id + ":" + newRecord.val);
+                Console.WriteLine("Write successful -> " + newRecord.Id + ":" + newRecord.Val);
             }
             Console.WriteLine(this);
-            return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
+            return new DIDAVersion { ReplicaId = newRecord.Version.ReplicaId, VersionNumber = newRecord.Version.VersionNumber };
         }
 
         private void CreateTimeStampKey(string key)
@@ -193,7 +192,7 @@ namespace DIDAStorageUI
                 s_data += d.Key + " ";
                 foreach(var value in d.Value)
                 {
-                    s_data += value.val + ":" + value.version.versionNumber + " ";
+                    s_data += value.Val + ":" + value.Version.VersionNumber + " ";
                 }
                 s_data += "\r\n";
             }

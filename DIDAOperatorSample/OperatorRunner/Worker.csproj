@@ -23,9 +23,6 @@
 	  <Protobuf Include="protos\DIDAWorker.proto" GrpcServices="Both" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="LibDIDAStorage">
-      <HintPath>..\..\LibDIDAStorage.dll</HintPath>
-    </Reference>
     <Reference Include="LibDIDAWorker">
       <HintPath>..\..\LibDIDAWorker.dll</HintPath>
     </Reference>
