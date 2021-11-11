@@ -1,5 +1,6 @@
 ﻿using DIDAOperator;
 using DIDAWorker;
+using Google.Protobuf.Collections;
 using Grpc.Core;
 using Grpc.Net.Client;
 using System;
@@ -12,6 +13,119 @@ using Worker;
 
 namespace OperatorRunner
 {
+    public class MetaRecord: DIDAMetaRecord
+    {
+        public Dictionary<string, DIDAWorker.DIDAVersion> lastChanges;//need to be cleaned after each operation run
+        public Dictionary<string, int[]> timeStamp;
+
+
+        public MetaRecord(int id, RepeatedField<KeyTimeStampValue> tmv)
+        {
+            this.Id = id;
+            if (tmv == null)
+                return;
+            SetData(tmv);
+        }
+
+        public MetaRecordProto ToMetaRecordProto()
+        {
+            MetaRecordProto mrp = new MetaRecordProto
+            {
+                Id = this.Id
+            };
+            foreach (string key in lastChanges.Keys)
+            {
+                mrp.Tmv.Add(CreateKeyTimeStampValue(key));
+            }
+
+            return mrp;
+        }
+
+        private KeyTimeStampValue CreateKeyTimeStampValue(string key)
+        {
+            KeyTimeStampValue ktsv = new KeyTimeStampValue
+            {
+                Key = key
+            };
+
+            ktsv.Version = new DIDAVersionWorker { 
+                VersionNumber = lastChanges[key].VersionNumber,
+                ReplicaId = lastChanges[key].ReplicaId
+            };
+
+            int[] buffer = timeStamp[key];
+            foreach(int i in buffer)
+            {
+                ktsv.NumberUpdates.Add(i);
+            }
+
+            return ktsv;
+        }
+
+        private void SetData(RepeatedField<KeyTimeStampValue> tmv)
+        {
+            foreach(KeyTimeStampValue data in tmv)
+            {
+                AddToLastChanges(data);
+                AddToTimeStamp(data);
+            }
+        }
+
+        private void AddToLastChanges(KeyTimeStampValue data)
+        {
+            string key = data.Key;
+            DIDAWorker.DIDAVersion version = new DIDAWorker.DIDAVersion { ReplicaId = data.Version.ReplicaId, VersionNumber = data.Version.VersionNumber };
+
+            lastChanges.Add(key, version);
+        }
+
+        private void AddToTimeStamp(KeyTimeStampValue data)
+        {
+            string key = data.Key;
+            List<int> buffer = new List<int>();
+            foreach(int i in data.NumberUpdates)
+            {
+                buffer.Add(i);
+            }
+            timeStamp.Add(key, buffer.ToArray());
+        }
+
+        private int[] MergeTimeStampValue(string key, int[] workerTimeStampValue)
+        {
+            for(int i = 0; i < workerTimeStampValue.Length; i++)
+            {
+                timeStamp[key][i] = workerTimeStampValue[i] >= timeStamp[key][i] ? workerTimeStampValue[i] : timeStamp[key][i];
+            }
+            return timeStamp[key];
+        }
+
+        public Dictionary<string, int[]> MergeTimeStamps(Dictionary<string, int[]> workerTimeStamp)
+        {
+            if (this.timeStamp == null)
+            {
+                this.timeStamp = workerTimeStamp;
+                return workerTimeStamp;
+            }
+            Dictionary<string, int[]> bufferWorkerTimeStamp = workerTimeStamp;
+
+            HashSet<string> keys = new HashSet<string>();
+            foreach(string key in timeStamp.Keys)
+            {
+                keys.Add(key);
+            }
+            foreach (string key in bufferWorkerTimeStamp.Keys)
+            {
+                keys.Add(key);
+            }
+
+            foreach (string key in keys)
+            {
+                bufferWorkerTimeStamp[key] = MergeTimeStampValue(key, bufferWorkerTimeStamp[key]);
+            }
+
+            return bufferWorkerTimeStamp;
+        }
+    }
     public class WorkerClientService
     {
         private readonly GrpcChannel channel;
@@ -39,17 +153,31 @@ namespace OperatorRunner
     }
     public class WorkerService : DIDAWorkerService.DIDAWorkerServiceBase
     {
+        private readonly object timeStampLock = new object();
+        private readonly object storageMapLock = new object();
         List<DIDAStorageNode> storageMap = new List<DIDAStorageNode>();
+        public Dictionary<string, int[]> timeStamp;
         int gossipDelay;
         string name;
+        int numberStorages;
         bool debugMode = false;
         WorkerClientService workerAsClient;
-        StorageProxy sp;
 
         public WorkerService(int gossipDelay, string name) {
             this.gossipDelay = gossipDelay;
             this.name = name;
         }
+        internal void SetNumberStorages()
+        {
+            numberStorages = storageMap.Count;
+        }
+
+        internal void CreateTimeStamp()//Prevent Null Pointer Exceptions
+        {
+            timeStamp = new Dictionary<string, int[]>();
+            timeStamp.Add("0", new int[storageMap.Count]);
+        }
+
         public override Task<WorkerEmptyReply> SetDebugTrue(WorkerStatusEmpty request, ServerCallContext context)
         {
             return Task.FromResult(SetDebug());
@@ -101,19 +229,25 @@ namespace OperatorRunner
                 Console.WriteLine(request);
                 string classname = request.Asschain[request.Next].Opid.Classname;
                 Console.WriteLine(classname);
-                DIDAMetaRecord metarecord = new DIDAMetaRecord
+                MetaRecord metaRecord;
+                lock (timeStampLock)
                 {
-                    Id = request.Meta.Id
-                };
+                    metaRecord = new MetaRecord(request.Meta.Id, request.Meta.Tmv);
+                    timeStamp = metaRecord.MergeTimeStamps(timeStamp);
+                }
                 string input = request.Input;
                 string previousoutput = null;
                 if (request.Next != 0)
                 {
                     previousoutput = request.Asschain[request.Next - 1].Output;
                 }
-                request.Asschain[request.Next].Output = RunOperator(classname, metarecord, input, previousoutput);
-                request.Meta.Id = metarecord.Id;
-                Console.WriteLine(metarecord);
+                request.Asschain[request.Next].Output = RunOperator(classname,metaRecord,input, previousoutput);
+                lock (timeStampLock)
+                {
+                    timeStamp = metaRecord.MergeTimeStamps(timeStamp);
+                }
+                request.Meta = metaRecord.ToMetaRecordProto();
+                Console.WriteLine(metaRecord);
                 request.Next += 1;
                 if (request.Next < request.Asschain.Count)
                 {
@@ -133,7 +267,7 @@ namespace OperatorRunner
             }
         }
 
-        string RunOperator(string classname, DIDAMetaRecord meta, string input, string previousoutput)
+        string RunOperator(string classname, MetaRecord meta,string input, string previousoutput)
         {
             Console.WriteLine("input string was: " + input);
             Console.WriteLine(this);
@@ -151,16 +285,33 @@ namespace OperatorRunner
                 }
             }
             Console.WriteLine(t);
-            sp.Update(meta);
+
+            StorageProxy sp = new StorageProxy(storageMap.ToArray(), meta, numberStorages);
             _opLoadedByReflection = (IDIDAOperator)Activator.CreateInstance(t);
             _opLoadedByReflection.ConfigureStorage(sp);
             string output = _opLoadedByReflection.ProcessRecord(meta, input, previousoutput);
+            lock (storageMapLock)
+            {
+                UpdateStorageMap(sp);
+            }
+
             if(debugMode == true)
             {
                 Thread thre = new Thread(new ThreadStart(() => workerAsClient.SendOutputToPMRequest(output)));
                 thre.Start();
             }
             return output;
+        }
+
+        private void UpdateStorageMap(StorageProxy sp)
+        {
+            List<DIDAStorageNode> alive = sp.GetAliveClients();
+            foreach(DIDAStorageNode storage in storageMap)
+            {
+                if (!alive.Contains(storage)){
+                    storageMap.Remove(storage);
+                }
+            }
         }
 
         void SendRequestToWorker(SendDIDAReqRequest request)
@@ -187,11 +338,6 @@ namespace OperatorRunner
             storageMap.Add(node);
         }
 
-        internal void CreateStorageProxy()
-        {
-            sp = new StorageProxy(storageMap.ToArray(), null);
-        }
-
         public override string ToString()
         {
             return "Worker " + name + " GossipDelay " + gossipDelay + " Storages: " + ListStorages();
@@ -206,6 +352,7 @@ namespace OperatorRunner
             }
             return s_data;
         }
+
     }
 
     class Program
@@ -222,6 +369,8 @@ namespace OperatorRunner
             {
                 workerService.AddStorage(args[i]);
             }
+            workerService.SetNumberStorages();
+            workerService.CreateTimeStamp();
             ServerPort serverPort = new ServerPort(host, port, ServerCredentials.Insecure);
 
             Console.WriteLine("Insecure Worker server '" + workerName + "' | hostname: " + host + " | port " + port);

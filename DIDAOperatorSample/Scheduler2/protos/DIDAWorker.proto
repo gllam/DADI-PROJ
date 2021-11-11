@@ -5,15 +5,27 @@ service DIDAWorkerService {
 }
 
 message SendDIDAReqRequest {
-	MetaRecord meta = 1;
+	MetaRecordProto meta = 1;
 	string input = 2;
 	int32 next = 3;
 	int32 chainSize = 4;
 	repeated Assignment asschain= 5;
 }
 
-message MetaRecord{
+message MetaRecordProto{
 	int32 id = 1;
+	repeated KeyTimeStampValue tmv = 2;
+}
+
+message KeyTimeStampValue{
+	string key = 1;
+	DIDAVersionWorker version = 2;
+	repeated int32 numberUpdates = 3;
+}
+
+message DIDAVersionWorker{
+	int32 versionNumber = 1;
+	int32 replicaId = 2;
 }
 
 message Assignment {
