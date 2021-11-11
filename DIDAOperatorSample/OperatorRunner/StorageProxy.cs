@@ -3,6 +3,7 @@ using System;
 using Grpc.Net.Client;
 using System.Collections.Generic;
 using Google.Protobuf.Collections;
+using OperatorRunner;
 
 namespace Worker
 {
@@ -18,17 +19,21 @@ namespace Worker
     {
         Dictionary<int, Client> _clients = new Dictionary<int, Client>();
 
-        DIDAMetaRecord _meta;
+        int allClients;
+
+        MetaRecord _meta;
 
         Dictionary<string, int[]> timestamp = new Dictionary<string, int[]>();
 
         //TODO add timestamp list<int>[nº storages]
 
 
-        public StorageProxy(DIDAStorageNode[] storageNodes, DIDAMetaRecord metaRecord)
+        public StorageProxy(DIDAStorageNode[] storageNodes, MetaRecord metaRecord, int allClients)
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             int k = 0;
+            this.allClients = allClients;
+            
             foreach (DIDAStorageNode n in storageNodes)
             {
                 GrpcChannel channel = GrpcChannel.ForAddress("http://" + n.host + ":" + n.port);
@@ -88,11 +93,18 @@ namespace Worker
             {
                 sendUpdateRequestReq request = new sendUpdateRequestReq { Key = r.Id, Value = r.Val };
                 request = CreateTimeStampValueRepeated(r.Id, request);
+
                 TimeStampValue reply = storage.client.sendUpdateRequest(request);
+
                 sendUpdateValidationReply replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, reply.NumberUpdates) });
-                if(replyValidation.Version.VersionNumber == -1) //while nao é necessario porque a mensagem eventualmente vai chegar
+                while (replyValidation.Version.VersionNumber == -1)
+                { 
                     replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, replyValidation.Tmv.NumberUpdates) });
-                return new DIDAWorker.DIDAVersion { VersionNumber = replyValidation.Version.VersionNumber, ReplicaId = replyValidation.Version.ReplicaId };
+                }
+                UpdateMetaTimeStamp(replyValidation.Tmv, r.Id);
+                DIDAWorker.DIDAVersion version = new DIDAWorker.DIDAVersion { VersionNumber = replyValidation.Version.VersionNumber, ReplicaId = replyValidation.Version.ReplicaId };
+                _meta.lastChanges[r.Id] = version;
+                return version;
             }
             catch (Exception)
             {
@@ -100,6 +112,16 @@ namespace Worker
                 _clients.Remove(storageHash);
                 return write(r);
             }
+        }
+
+        private void UpdateMetaTimeStamp(TimeStampValue tmv,string key)
+        {
+            List<int> buffer = new List<int>();
+            foreach(int i in tmv.NumberUpdates)
+            {
+                buffer.Add(i);
+            }
+            _meta.timeStamp[key] = buffer.ToArray();
         }
 
         private bool CompareTimeStamps(RepeatedField<int> timeStampValueSP, RepeatedField<int> timeStampValueStorage)
@@ -142,12 +164,23 @@ namespace Worker
 
         private void CreateTimeStampKey(string key)
         {
-            timestamp.Add(key, new int[_clients.Count]);
+            timestamp.Add(key, new int[allClients]);
         }
 
-        public void Update(DIDAMetaRecord meta)
+        public void Update(MetaRecord meta)
         {
             _meta = meta;
+        }
+
+        internal List<DIDAStorageNode> GetAliveClients()
+        {
+            List<DIDAStorageNode> buffer = new List<DIDAStorageNode>();
+            foreach (Client c in _clients.Values)
+            {
+                buffer.Add(c.storageNode);
+            }
+
+            return buffer;
         }
     }
     

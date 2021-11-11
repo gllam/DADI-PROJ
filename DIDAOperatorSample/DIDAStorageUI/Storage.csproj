@@ -20,9 +20,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="LibDIDAStorage">
-      <HintPath>..\DIDALibraries\LibDIDAStorage.dll</HintPath>
-    </Reference>
     <Reference Include="LibDIDAWorker">
       <HintPath>..\..\LibDIDAWorker.dll</HintPath>
     </Reference>

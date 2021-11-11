@@ -78,10 +78,10 @@ namespace SchedulerNamespace
             try
             {
                 Console.WriteLine(request.Input);
-                MetaRecord meta = new MetaRecord
+                MetaRecordProto meta = new MetaRecordProto
                 {
-                    Id = 1
-                }; //metarecord dummy
+                    Id = 1,
+                }; //metarecord 
                 int chainSize = request.App.Count;
                 Console.WriteLine(chainSize);
                 SendDIDAReqRequest req = new SendDIDAReqRequest

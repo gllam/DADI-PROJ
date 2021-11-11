@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DIDAStorage;
 using DIDAWorker;
 using Grpc.Core;
 
@@ -19,9 +18,9 @@ namespace DIDAStorageUI
     class StorageService : DIDAStorageService.DIDAStorageServiceBase
     {
 
-        Dictionary<string, List<DIDAStorage.DIDARecord>> data = new Dictionary<string, List<DIDAStorage.DIDARecord>>();
+        Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         int maxVersions = 5; //dummy
-        readonly int replicaid;
+        readonly int replicaId;
         string name;
         int gossipDelay;
 
@@ -31,14 +30,14 @@ namespace DIDAStorageUI
 
         Dictionary<string, int[]> replicaTimeStamp = new Dictionary<string, int[]>();//the one that has the data that is in the log
 
-        List<UpdateRecord> update_log = new List<UpdateRecord>();
+        List<UpdateRecord> updateLog = new List<UpdateRecord>();
 
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
         public StorageService(int replicaid, int gossipDelay, string name)
         {
             this.gossipDelay = gossipDelay;
-            this.replicaid = replicaid;
+            this.replicaId = replicaid;
             this.name = name;
         }
 
@@ -64,6 +63,39 @@ namespace DIDAStorageUI
             return reply;
         }
 
+        public override Task<DIDAVersion> write(DIDAWriteRequest request, ServerCallContext context)
+        {
+            return Task.FromResult<DIDAVersion>(WriteData(request));
+        }
+
+        private DIDAVersion WriteData(DIDAWriteRequest request)
+        {
+            DIDARecord newRecord = new DIDARecord();
+            lock (this)
+            {
+                newRecord.Id = request.Id;
+                newRecord.Val = request.Val;
+                newRecord.Version = new DIDAWorker.DIDAVersion
+                {
+                    ReplicaId = replicaId
+                };
+                if (data.ContainsKey(request.Id))
+                {
+                    newRecord.Version.VersionNumber = data[request.Id][data[request.Id].Count - 1].Version.VersionNumber + 1;
+                }
+                else
+                {
+                    newRecord.Version.VersionNumber = 1;
+                    data.Add(request.Id, new List<DIDARecord>());
+                }
+                data[request.Id].Add(newRecord);
+                if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
+                Console.WriteLine("Write successful -> " + newRecord.Id + ":" + newRecord.Val);
+            }
+            Console.WriteLine(this);
+            return new DIDAVersion { ReplicaId = newRecord.Version.ReplicaId, VersionNumber = newRecord.Version.VersionNumber };
+        }
+
         public override Task<DIDARecordReply> read(DIDAReadRequest request, ServerCallContext context)
         {
             return Task.FromResult<DIDARecordReply>(ReadData(request));
@@ -83,15 +115,15 @@ namespace DIDAStorageUI
                     if (request.Version.VersionNumber == -1)
                     {
                         var lastRecord = data[request.Id][data[request.Id].Count - 1];
-                        reply.Val = lastRecord.val;
-                        reply.Version.VersionNumber = lastRecord.version.versionNumber;
-                        reply.Version.ReplicaId = lastRecord.version.replicaId;
+                        reply.Val = lastRecord.Val;
+                        reply.Version.VersionNumber = lastRecord.Version.VersionNumber;
+                        reply.Version.ReplicaId = lastRecord.Version.ReplicaId;
                     }
                     else
                     {
-                        DIDAStorage.DIDARecord record = data[request.Id].Find(x => x.version.versionNumber == request.Version.VersionNumber && x.version.replicaId == request.Version.ReplicaId);
-                        if(record.id == request.Id) {
-                            reply.Val = record.val;
+                        DIDARecord record = data[request.Id].Find(x => x.Version.VersionNumber == request.Version.VersionNumber && x.Version.ReplicaId == request.Version.ReplicaId);
+                        if(record.Id == request.Id) {
+                            reply.Val = record.Val;
                         } else
                         {
                             reply.Version.VersionNumber = -1;
@@ -116,7 +148,7 @@ namespace DIDAStorageUI
             {
                 if (data.ContainsKey(request.Id))
                 {
-                    if (data[request.Id][data[request.Id].Count - 1].val == request.Oldvalue)
+                    if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
                     {
                         return WriteData(new DIDAWriteRequest
                         {
@@ -127,39 +159,6 @@ namespace DIDAStorageUI
                 }
                 return new DIDAVersion { ReplicaId = -1, VersionNumber = -1 }; //null version
             }
-        }
-
-        public override Task<DIDAVersion> write(DIDAWriteRequest request, ServerCallContext context)
-        {
-            return Task.FromResult<DIDAVersion>(WriteData(request));
-        }
-
-        private DIDAVersion WriteData(DIDAWriteRequest request)
-        {
-            DIDAStorage.DIDARecord newRecord = new DIDAStorage.DIDARecord();
-            lock (this)
-            {
-                newRecord.id = request.Id;
-                newRecord.val = request.Val;
-                newRecord.version = new DIDAStorage.DIDAVersion
-                {
-                    replicaId = replicaid
-                };
-                if (data.ContainsKey(request.Id))
-                {
-                    newRecord.version.versionNumber = data[request.Id][data[request.Id].Count - 1].version.versionNumber + 1;
-                }
-                else
-                {
-                    newRecord.version.versionNumber = 1;
-                    data.Add(request.Id, new List<DIDAStorage.DIDARecord>());
-                }
-                data[request.Id].Add(newRecord);
-                if (data[request.Id].Count > maxVersions) data[request.Id].RemoveAt(0);
-                Console.WriteLine("Write successful -> " + newRecord.id + ":" + newRecord.val);
-            }
-            Console.WriteLine(this);
-            return new DIDAVersion { ReplicaId = newRecord.version.replicaId, VersionNumber = newRecord.version.versionNumber };
         }
 
         private void CreateTimeStampKey(string key)
@@ -182,7 +181,7 @@ namespace DIDAStorageUI
 
         public override string ToString()
         {
-            return "Storage " + name + " ReplicaId " + replicaid + " GossipDelay " + gossipDelay + "\r\nItems:\r\n" + ListData();
+            return "Storage " + name + " ReplicaId " + replicaId + " GossipDelay " + gossipDelay + "\r\nItems:\r\n" + ListData();
         }
 
         public string ListData()
@@ -193,7 +192,7 @@ namespace DIDAStorageUI
                 s_data += d.Key + " ";
                 foreach(var value in d.Value)
                 {
-                    s_data += value.val + ":" + value.version.versionNumber + " ";
+                    s_data += value.Val + ":" + value.Version.VersionNumber + " ";
                 }
                 s_data += "\r\n";
             }
