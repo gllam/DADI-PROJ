@@ -1,15 +1,6 @@
-# DADI-PROJ
-Fazer tudo menos vários storages (isso faz-se depois)
+Hello!
+To use this service, please add the files to the folder named(DIDAOperatorSample/Debug Files)
+The files that can be added are all the files needed to execute(.ddl, app, app_data) there is no need to add the script.
 
-Cenas para fazer:
-  - Puppet Master -> David Miranda
-  - PCS(Process creation service) (no final?) -> Todos / quem acabar primeiro
-  - Storage (no final) -> TODOS
-  - Worker -> Leitão
-  - Scheduler -> Bernardo PORT=4001
 
-Fazer GRPC's entre todos
-Definir o protobuff
-Work work work
-
-NÃO ESQUECER DE COMUNICAR COM O RESTO DO PESSOAL DO GRUPO, PODEMOS AJUDAR-NOS UNS AOS OUTROS!
+Thank you!

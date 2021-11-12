@@ -23,10 +23,6 @@ namespace Worker
 
         MetaRecord _meta;
 
-        //Dictionary<string, int[]> timestamp = new Dictionary<string, int[]>();
-
-        //TODO add timestamp list<int>[nº storages]
-
 
         public StorageProxy(DIDAStorageNode[] storageNodes, MetaRecord metaRecord, int allClients)
         {
@@ -38,8 +34,6 @@ namespace Worker
             {
                 GrpcChannel channel = GrpcChannel.ForAddress("http://" + n.host + ":" + n.port);
                 _clients[n.serverId.GetHashCode()] = new Client { id = k, storageNode = n, client = new DIDAStorageService.DIDAStorageServiceClient(channel) };
-                Console.WriteLine(_clients[n.serverId.GetHashCode()]);
-                Console.WriteLine(n.serverId.GetHashCode());
                 k++;
             }
             _meta = metaRecord;
@@ -59,7 +53,6 @@ namespace Worker
             int closer = 0;
             foreach(int i in _clients.Keys)
             {
-                //Console.WriteLine(i);
                 if (Math.Abs(hash - i) < Math.Abs(hash - closer) || closer == 0)
                 {
                     closer = i;
@@ -113,7 +106,6 @@ namespace Worker
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
                 _clients.Remove(storageHash);
                 return read(r);
@@ -159,14 +151,17 @@ namespace Worker
             Client storage = _clients[storageHash];
             try
             {
-                //same structure
-                sendReadRequestReq reply = storage.client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+                if(r.Newvalue == null|| r.Oldvalue == null)
+                    return new DIDAWorker.DIDAVersion {VersionNumber = -1, ReplicaId = -1};
+
+                sendUpdateValidationReply reply = storage.client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
                 UpdateMetaTimeStamp(reply.Tmv, r.Id);
                 DIDAWorker.DIDAVersion version = new DIDAWorker.DIDAVersion { VersionNumber = reply.Version.VersionNumber, ReplicaId = reply.Version.ReplicaId };
-                _meta.lastChanges[r.Id] = version;
+                if(version.VersionNumber != -1)
+                    _meta.lastChanges[r.Id] = version;
                 return version;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
                 _clients.Remove(storageHash);

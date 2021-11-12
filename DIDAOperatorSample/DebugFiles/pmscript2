@@ -1,0 +1,20 @@
+debug
+storage s1 http://localhost:3001 0
+storage s2 http://localhost:3002 0
+worker w1 http://localhost:4001 0
+worker w2 http://localhost:4002 0
+scheduler sc1 http://localhost:2000
+wait 2000
+status
+listServer s1
+listGlobal
+populate app2_data
+wait 1000
+client 23 app2
+wait 2000
+client 13 app2
+client 13 app2
+wait 2000
+status
+listServer s1
+listGlobal

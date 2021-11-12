@@ -32,10 +32,8 @@ namespace DIDAOperator {
                     Console.WriteLine(storedString);
                     requestCounter = Int32.Parse(storedString);
                 }
-                //Console.WriteLine("sss");
                 requestCounter++;
                 storageServer = _locationFunction(meta.id.ToString(), OperationType.WriteOp).serverId;
-                //Console.WriteLine("sssyyyy");
                 _storageServers[storageServer].write(new DIDAWriteRequest { Id = meta.id.ToString(), Val = requestCounter.ToString() });
                 Console.WriteLine("writing data record: " + meta.id + "with new value: " + requestCounter.ToString());
                 return requestCounter.ToString();
