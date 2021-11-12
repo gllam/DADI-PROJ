@@ -102,6 +102,8 @@ namespace PuppetMaster
             }
 
             CreateProccessInstanceReply reply = client.CreateStorageInstance(request);
+            //client.CreateStorageInstanceAsync(request);
+
             return reply.Id;
         }
     }
