@@ -6,11 +6,25 @@ service DIDAStorageService {
   rpc write(DIDAWriteRequest) returns (DIDAVersion);
   rpc updateIfValueIs(DIDAUpdateIfRequest) returns (DIDAVersion);
   //new functions
-  rpc sendUpdateRequest(sendUpdateRequestReq) returns (TimeStampValue);
+  rpc sendUpdateRequest(sendUpdateRequestReq) returns (sendUpdateRequestReply);
   rpc sendUpdateValidation(sendUpdateAck) returns (sendUpdateValidationReply); //if the TimeStamp returned is null -> success!
+  rpc sendReadRequest(sendReadRequestReq) returns (sendReadRequestReply);
 }
+message sendReadRequestReq{
+    string key = 1;  // the id of the object being read
+    DIDAVersion version = 2;
+    TimeStampValue tmv = 3;
+}
+message sendReadRequestReply{
+    string key = 1;  // the id of the object being read
+    string value = 2;
+    DIDAVersion version = 3;
+    TimeStampValue tmv = 4;
+}
+
 message sendUpdateAck{
-    bool success = 1;
+    int32 id = 1;
+    bool success = 2;
 }
 message sendUpdateRequestReq{
     string key = 1;
@@ -22,9 +36,13 @@ message sendUpdateValidationReply{
     TimeStampValue tmv = 1;
     DIDAVersion version = 2;
 }
+message sendUpdateRequestReply{
+	int32 id = 1;
+	TimeStampValue tmv = 2;
+}
 
 message TimeStampValue{
-    repeated int32 numberUpdates = 1;
+    repeated int32 numberUpdates = 2;
 }
 
 message DIDAReadRequest {

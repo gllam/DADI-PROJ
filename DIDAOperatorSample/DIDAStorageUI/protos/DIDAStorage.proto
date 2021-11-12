@@ -8,26 +8,63 @@ service DIDAStorageService {
   rpc Status(StorageStatusEmpty) returns (StorageStatusReply);
   rpc ListServer (StorageStatusEmpty) returns (ListServerStorageReply);
   //new functions
-  rpc sendUpdateRequest(sendUpdateRequestReq) returns (TimeStampValue);
+  rpc sendUpdateRequest(sendUpdateRequestReq) returns (sendUpdateRequestReply);
   rpc sendUpdateValidation(sendUpdateAck) returns (sendUpdateValidationReply); //if the TimeStamp returned is null -> success!
+  rpc sendReadRequest(sendReadRequestReq) returns (sendReadRequestReply);
+  rpc gossip(gossipMessage) returns (EmptyAnswer);
+}
+message EmptyAnswer{}
+
+message gossipMessage{
+    DIDARecordReply record = 1;
+    TimeStampValue tmv = 2;
+}
+
+message DIDARecordReply {
+	string id = 1;
+	DIDAVersion version = 2;
+	string val = 3;
+}
+
+message sendReadRequestReq{
+    string key = 1;  // the id of the object being read
+    DIDAVersion version = 2;
+    TimeStampValue tmv = 3;
+}
+
+message DIDAVersion {
+	int32 versionNumber = 1;
+	int32 replicaId = 2;
+}
+
+message sendReadRequestReply{
+    string key = 1;  // the id of the object being read
+    string value = 2;
+    DIDAVersion version = 3;
+    TimeStampValue tmv = 4;
 }
 
 message sendUpdateAck{
-    bool success = 1;
+    int32 id = 1;
+    bool success = 2;
 }
 message sendUpdateRequestReq{
     string key = 1;
     string value = 2;
-    repeated int32 numberUpdates = 3;
+    TimeStampValue tmv = 3;
 }
 
 message sendUpdateValidationReply{
     TimeStampValue tmv = 1;
     DIDAVersion version = 2;
 }
+message sendUpdateRequestReply{
+	int32 id = 1;
+	TimeStampValue tmv = 2;
+}
 
 message TimeStampValue{
-    repeated int32 numberUpdates = 1;
+    repeated int32 numberUpdates = 2;
 }
 
 message ListServerStorageReply{
@@ -42,17 +79,6 @@ message StorageStatusReply{
 message DIDAReadRequest {
 	string id = 1;  // the id of the object being read
 	DIDAVersion version = 2;
-}
-
-message DIDARecordReply {
-	string id = 1;
-	DIDAVersion version = 2;
-	string val = 3;
-}
-
-message DIDAVersion {
-	int32 versionNumber = 1;
-	int32 replicaId = 2;
 }
 
 message DIDAWriteRequest {

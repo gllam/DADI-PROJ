@@ -67,18 +67,38 @@ namespace Worker
 
         public virtual DIDAWorker.DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
         {
-            int storage = LocateStorage(r.Id);
+            if (!timestamp.ContainsKey(r.Id))
+                CreateTimeStampKey(r.Id);
+
+            int storageHash = LocateStorage(r.Id);
+            Client storage = _clients[storageHash];
             try
             {
-                DIDARecordReply res = _clients[storage].client.read(new DIDAReadRequest { Id = r.Id, Version = new DIDAVersion { VersionNumber = r.Version.VersionNumber, ReplicaId = r.Version.ReplicaId } });
-                if (!timestamp.ContainsKey(r.Id))
-                    CreateTimeStampKey(r.Id);
-                return new DIDAWorker.DIDARecordReply { Id = res.Id, Val = res.Val, Version = { VersionNumber = res.Version.VersionNumber, ReplicaId = res.Version.ReplicaId } };
+                int versionNumber;
+                int replicaIdToSend;
+                if (_meta.lastChanges.ContainsKey(r.Id))
+                {
+                    versionNumber = _meta.lastChanges[r.Id].VersionNumber;
+                    replicaIdToSend = _meta.lastChanges[r.Id].ReplicaId;
+                }
+                else { versionNumber = -1; replicaIdToSend = -1; }
+
+                sendReadRequestReply reply = storage.client.sendReadRequest(new sendReadRequestReq {
+                    Key = r.Id,
+                    Version = new DIDAVersion {
+                        VersionNumber = r.Version.VersionNumber == -1 ? versionNumber : r.Version.VersionNumber,
+                        ReplicaId = r.Version.ReplicaId == -1 ? replicaIdToSend : r.Version.ReplicaId
+                    } 
+                });
+
+                UpdateMetaTimeStamp(reply.Tmv, r.Id);
+                _meta.lastChanges[r.Id] = new DIDAWorker.DIDAVersion { ReplicaId = reply.Version.ReplicaId, VersionNumber = reply.Version.VersionNumber};
+                return new DIDAWorker.DIDARecordReply { Id = reply.Key, Val = reply.Value, Version = { VersionNumber = reply.Version.VersionNumber, ReplicaId = reply.Version.ReplicaId } };
             }
             catch (Exception)
             {
-                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
-                _clients.Remove(storage);
+                Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
+                _clients.Remove(storageHash);
                 return read(r);
             }
         }
@@ -94,12 +114,12 @@ namespace Worker
                 sendUpdateRequestReq request = new sendUpdateRequestReq { Key = r.Id, Value = r.Val };
                 request = CreateTimeStampValueRepeated(r.Id, request);
 
-                TimeStampValue reply = storage.client.sendUpdateRequest(request);
+                sendUpdateRequestReply reply = storage.client.sendUpdateRequest(request);
 
-                sendUpdateValidationReply replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, reply.NumberUpdates) });
+                sendUpdateValidationReply replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Id = reply.Id, Success = CompareTimeStamps(request.Tmv.NumberUpdates, reply.Tmv.NumberUpdates) });
                 while (replyValidation.Version.VersionNumber == -1)
                 { 
-                    replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck { Success = CompareTimeStamps(request.Tmv.NumberUpdates, replyValidation.Tmv.NumberUpdates) });
+                    replyValidation = storage.client.sendUpdateValidation(new sendUpdateAck {Id = reply.Id, Success = CompareTimeStamps(request.Tmv.NumberUpdates, replyValidation.Tmv.NumberUpdates) });
                 }
                 UpdateMetaTimeStamp(replyValidation.Tmv, r.Id);
                 DIDAWorker.DIDAVersion version = new DIDAWorker.DIDAVersion { VersionNumber = replyValidation.Version.VersionNumber, ReplicaId = replyValidation.Version.ReplicaId };
@@ -111,6 +131,27 @@ namespace Worker
                 Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
                 _clients.Remove(storageHash);
                 return write(r);
+            }
+        }
+
+        public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
+        {
+            if (!timestamp.ContainsKey(r.Id))
+                CreateTimeStampKey(r.Id);
+            int storageHash = LocateStorage(r.Id);
+            Client storage = _clients[storageHash];
+            try
+            {
+                DIDAVersion res = storage.client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+                if (!timestamp.ContainsKey(r.Id))
+                    CreateTimeStampKey(r.Id);
+                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
+                _clients.Remove(storageHash);
+                return updateIfValueIs(r);
             }
         }
 
@@ -142,24 +183,6 @@ namespace Worker
                 request.Tmv.NumberUpdates.Add(t);
             }
             return request;
-        }
-
-        public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
-        {
-            int storage = LocateStorage(r.Id);
-            try
-            {
-                DIDAVersion res = _clients[storage].client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
-                if (!timestamp.ContainsKey(r.Id))
-                    CreateTimeStampKey(r.Id);
-                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Storage with ID " + _clients[storage].storageNode.serverId + " disconnected");
-                _clients.Remove(storage);
-                return updateIfValueIs(r);
-            }
         }
 
         private void CreateTimeStampKey(string key)

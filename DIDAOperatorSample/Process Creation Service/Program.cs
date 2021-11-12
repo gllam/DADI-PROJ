@@ -98,6 +98,7 @@ namespace Process_Creation_Service
 
             private CreateProccessInstanceReply CreateStorInstance(CreateStorageInstanceRequest request)
             {
+                //System.Threading.Thread.Sleep(1000);
                 int port;
                 string hostname;
                 string urlRefined;
