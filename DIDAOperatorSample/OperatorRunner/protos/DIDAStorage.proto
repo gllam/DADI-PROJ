@@ -7,8 +7,9 @@ service DIDAStorageService {
   //new functions
   rpc sendUpdateRequest(sendUpdateRequestReq) returns (sendUpdateRequestReply);
   rpc sendUpdateValidation(sendUpdateAck) returns (sendUpdateValidationReply);
+  rpc updateIfValueIs(DIDAUpdateIfRequest) returns (sendUpdateValidationReply);
   rpc sendReadRequest(sendReadRequestReq) returns (sendReadRequestReply);
-  rpc updateIfValueIs(DIDAUpdateIfRequest) returns (sendReadRequestReq);
+
 }
 
 message DIDAUpdateIfRequest {

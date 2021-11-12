@@ -22,7 +22,7 @@ namespace DIDAStorageUI
 
         Dictionary<string, List<DIDARecord>> data = new Dictionary<string, List<DIDARecord>>();
         private readonly object dataLock = new object();
-        int maxVersions = 5; //dummy
+        int maxVersions = 5; 
         readonly int replicaId;
         int maxStorages;
         string name;
@@ -45,8 +45,6 @@ namespace DIDAStorageUI
         private readonly object updateLogLock = new object();
 
         private readonly object updateIfValueIsLock = new object();
-
-        //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
         public StorageService(int replicaid, int gossipDelay, string name)
         {
@@ -87,6 +85,12 @@ namespace DIDAStorageUI
             int[] timeStampValue = GetValueTimeStampValue(request.Id);
             timeStampValue[replicaId] += 1;
             DIDAVersion version = UpdateData(request.Id, request.Val);
+            lock (replicaTimeStampLock)
+            {
+                replicaTimeStamp[request.Id] = new int[maxStorages];
+            }
+
+            MergeTSIntoReplicaTimeStamp(timeStampValue, request.Id);
             MergeTSIntoValueTimeStamp(timeStampValue, request.Id);
 
             SendGossipToAllStorages(timeStampValue, request.Id, request.Val, version);//When this function ends all the gossipMessages are in the channels
@@ -124,6 +128,7 @@ namespace DIDAStorageUI
                         timeStamp.Add(n);
                     }
                     timeStamp[replicaId] = replicaTimeStamp[request.Key][replicaId];
+
                     UpdateRecord record = new UpdateRecord
                     {
                         i = replicaId,
@@ -134,13 +139,13 @@ namespace DIDAStorageUI
                     record.prev = buffer.ToArray();
 
                     updateLog.Add(id, record);
-                    List<int> tmvNumberUpdatedBuffer = new List<int>();
+                    /*List<int> tmvNumberUpdatedBuffer = new List<int>();
                     foreach (int update in record.timeStamp)
                     {
                         tmvNumberUpdatedBuffer.Add(update);
-                    }
-                    request.Tmv = new TimeStampValue();
-                    request.Tmv.NumberUpdates.Add(tmvNumberUpdatedBuffer);
+                    }*/
+                    reply.Tmv = new TimeStampValue();
+                    reply.Tmv.NumberUpdates.Add(timeStamp);
                     reply.Id = id;
                 }
             }
@@ -172,7 +177,9 @@ namespace DIDAStorageUI
 
                 SendGossipToAllStorages(timeStampValue, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
                 RemoveFromUpdateLog(request.Id);
-                Monitor.Pulse(updateIfValueIsLock);
+                lock(updateIfValueIsLock)
+                    Monitor.Pulse(updateIfValueIsLock);
+                
                 return reply;
             }
 
@@ -196,10 +203,6 @@ namespace DIDAStorageUI
                 }
                 reply.Tmv = new TimeStampValue();
                 reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
-
-                SendGossipToAllStorages(buffer, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
-                RemoveFromUpdateLog(request.Id);
-                Monitor.Pulse(updateIfValueIsLock);
             }
             return reply;
         }
@@ -211,16 +214,16 @@ namespace DIDAStorageUI
 
         private sendUpdateValidationReply UpdateIfValueIs(DIDAUpdateIfRequest request)
         {
-            //Garantir sucesso -> Mandar random messages to all channels so we can get all gossips(FIFO channels)
-            sendUpdateValidationReply reply; //= new sendUpdateValidationReply { };
+            //Grant Success -> Send ping to all channels so we can get all gossips(FIFO channels)
+            sendUpdateValidationReply reply;
 
             lock (replicaTimeStampLock)//Preventing start of new write operations
             {
-                foreach (var s in storageMap)
+                foreach (DIDAStorageService.DIDAStorageServiceClient s in storageMap.Values)
                 {
                     try
                     {
-                        s.Value.ping(new EmptyAnswer { });
+                        s.ping(new EmptyAnswer { });
                     }
                     catch (Exception) { }
                 } //When this finishes this storage has received all updates regarding this key
@@ -233,7 +236,22 @@ namespace DIDAStorageUI
                     }
                     lock (dataLock)
                     {
-                        if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
+                        Console.WriteLine(data[request.Id]);
+                        if(data[request.Id].Count == 0)
+                        {
+                            DIDAVersion version = new DIDAVersion { ReplicaId = -1, VersionNumber = -1 };
+                            int[] timeStampValue = GetValueTimeStampValue(request.Id);
+                            reply = new sendUpdateValidationReply { Version = version };
+
+                            List<int> tmvNumberUpdatesBuffer = new List<int>();
+                            foreach (int n in timeStampValue)
+                            {
+                                tmvNumberUpdatesBuffer.Add(n);
+                            }
+                            reply.Tmv = new TimeStampValue();
+                            reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
+                        }
+                        else if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
                         {
                             DIDAVersion version = UpdateData(request.Id, request.Newvalue);
                             reply = new sendUpdateValidationReply { Version = version };
@@ -302,10 +320,10 @@ namespace DIDAStorageUI
 
             request.Tmv.NumberUpdates.Add(buffer);
             System.Threading.Thread.Sleep(gossipDelay);
-            foreach (var s in storageMap)
+            foreach (DIDAStorageService.DIDAStorageServiceClient s in storageMap.Values)
             {
                 try { 
-                    s.Value.gossipAsync(request);
+                    s.gossipAsync(request);
                 }
                 catch (Exception) { }
 
@@ -317,7 +335,6 @@ namespace DIDAStorageUI
             return Task.FromResult<EmptyAnswer>(Gossip(request));
         }
 
-        //testar gossip com dead storages
         private EmptyAnswer Gossip(gossipMessage request)
         {
             List<int> timeStampValueGossip = new List<int>();
@@ -325,12 +342,13 @@ namespace DIDAStorageUI
             {
                 timeStampValueGossip.Add(i);
             }
-            if(IsTSBigger(timeStampValueGossip.ToArray() , GetValueTimeStampValue(request.Record.Id)))
+            if (IsTSBigger(timeStampValueGossip.ToArray() , GetValueTimeStampValue(request.Record.Id)))
             {
                 UpdateData(request.Record.Id, request.Record.Val);
                 MergeTSIntoValueTimeStamp(timeStampValueGossip.ToArray(), request.Record.Id);
                 MergeTSIntoReplicaTimeStamp(timeStampValueGossip.ToArray(), request.Record.Id);
-                Monitor.PulseAll(gossipMessageLock);
+                lock(gossipMessageLock)
+                    Monitor.PulseAll(gossipMessageLock);
             }
             return new EmptyAnswer { };
         }
@@ -506,8 +524,10 @@ namespace DIDAStorageUI
             lock (dataLock)
             {
                 if (data.ContainsKey(key)) {
-
-                    record.Version.VersionNumber = data[key][data[key].Count - 1].Version.VersionNumber + 1;
+                    if (data[key].Count == 0)
+                        record.Version.VersionNumber = 1;
+                    else 
+                        record.Version.VersionNumber = data[key][data[key].Count - 1].Version.VersionNumber + 1;
                 }
                 else
                 {
@@ -557,47 +577,6 @@ namespace DIDAStorageUI
             return updateLog[id];
         }
 
-        public override Task<DIDARecordReply> read(DIDAReadRequest request, ServerCallContext context)
-        {
-            return Task.FromResult<DIDARecordReply>(ReadData(request));
-        }
-
-        private DIDARecordReply ReadData(DIDAReadRequest request)
-        {
-            DIDARecordReply reply = new DIDARecordReply
-            {
-                Id = request.Id,
-                Version = request.Version
-            };
-            lock (this)
-            {
-                if (data.ContainsKey(request.Id))
-                {
-                    if (request.Version.VersionNumber == -1)
-                    {
-                        var lastRecord = data[request.Id][data[request.Id].Count - 1];
-                        reply.Val = lastRecord.Val;
-                        reply.Version.VersionNumber = lastRecord.Version.VersionNumber;
-                        reply.Version.ReplicaId = lastRecord.Version.ReplicaId;
-                    }
-                    else
-                    {
-                        DIDARecord record = data[request.Id].Find(x => x.Version.VersionNumber == request.Version.VersionNumber && x.Version.ReplicaId == request.Version.ReplicaId);
-                        if(record.Id == request.Id) {
-                            reply.Val = record.Val;
-                        } else
-                        {
-                            reply.Version.VersionNumber = -1;
-                            reply.Version.ReplicaId = -1;
-                        }
-                        
-                    }
-                }
-            }
-            Console.WriteLine(this);
-            return reply;
-        }
-
         internal void AddStorage(string storage)
         {
             string[] storageUrl = storage.Split("|");
@@ -610,7 +589,10 @@ namespace DIDAStorageUI
                     host = hostport[0],
                     port = Convert.ToInt32(hostport[1])
                 };
-                GrpcChannel channel = GrpcChannel.ForAddress("http://" + node.host + ":" + node.port);
+
+                AppContext.SetSwitch(
+                "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+                GrpcChannel channel = GrpcChannel.ForAddress("http://" + hostport[0] + ":" + Convert.ToInt32(hostport[1]));
                 storageMap.Add(node, new DIDAStorageService.DIDAStorageServiceClient(channel));
             }
         }

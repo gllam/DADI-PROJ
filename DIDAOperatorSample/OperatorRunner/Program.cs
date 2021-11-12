@@ -15,12 +15,14 @@ namespace OperatorRunner
 {
     public class MetaRecord: DIDAMetaRecord
     {
-        public Dictionary<string, DIDAWorker.DIDAVersion> lastChanges;//need to be cleaned after each operation run
+        public Dictionary<string, DIDAWorker.DIDAVersion> lastChanges;
         public Dictionary<string, int[]> timeStamp;
+        private readonly object updateLocalTimeStampLock = new object();
+        int maxStorages;
 
-
-        public MetaRecord(int id, RepeatedField<KeyTimeStampValue> tmv)
+        public MetaRecord(int id, RepeatedField<KeyTimeStampValue> tmv, int maxStorages)
         {
+            this.maxStorages = maxStorages;
             lastChanges = new Dictionary<string, DIDAWorker.DIDAVersion>();
             timeStamp = new Dictionary<string, int[]>();
             this.Id = id;
@@ -115,24 +117,31 @@ namespace OperatorRunner
                 this.timeStamp = workerTimeStamp;
                 return workerTimeStamp;
             }*/
-            Dictionary<string, int[]> bufferWorkerTimeStamp = workerTimeStamp;
-
-            HashSet<string> keys = new HashSet<string>();
-            foreach(string key in timeStamp.Keys)
+            Dictionary<string, int[]> bufferWorkerTimeStamp;
+            lock (updateLocalTimeStampLock)
             {
-                keys.Add(key);
-            }
-            foreach (string key in bufferWorkerTimeStamp.Keys)
-            {
-                keys.Add(key);
-            }
+                bufferWorkerTimeStamp = workerTimeStamp;
 
-            foreach (string key in keys)
-            {
-                bufferWorkerTimeStamp[key] = MergeTimeStampValue(key, bufferWorkerTimeStamp[key]);
-            }
+                HashSet<string> keys = new HashSet<string>();
+                foreach (string key in timeStamp.Keys)
+                {
+                    keys.Add(key);
+                }
+                foreach (string key in bufferWorkerTimeStamp.Keys)
+                {
+                    keys.Add(key);
+                }
 
+                foreach (string key in keys)
+                {
+                    if (!bufferWorkerTimeStamp.ContainsKey(key))
+                        bufferWorkerTimeStamp[key] = new int[maxStorages];
+
+                    bufferWorkerTimeStamp[key] = MergeTimeStampValue(key, bufferWorkerTimeStamp[key]);
+                }
+            }
             return bufferWorkerTimeStamp;
+
         }
     }
     public class WorkerClientService
@@ -230,7 +239,7 @@ namespace OperatorRunner
             return reply;
         }
 
-        public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request) //try catch?
+        public SendDIDAReqReply SendDIDA(SendDIDAReqRequest request)
         {
             try
             {
@@ -241,8 +250,8 @@ namespace OperatorRunner
                 MetaRecord metaRecord;
                 lock (timeStampLock)
                 {
-                    metaRecord = new MetaRecord(request.Meta.Id, request.Meta.Tmv);
-                    timeStamp = metaRecord.MergeTimeStamps(timeStamp);
+                    metaRecord = new MetaRecord(request.Meta.Id, request.Meta.Tmv, numberStorages);
+                    timeStamp = metaRecord.MergeTimeStamps(timeStamp);//Just to initialize the timeStamp
                 }
                 string input = request.Input;
                 string previousoutput = null;
@@ -256,7 +265,22 @@ namespace OperatorRunner
                     timeStamp = metaRecord.MergeTimeStamps(timeStamp);
                 }
                 request.Meta = metaRecord.ToMetaRecordProto();
-                Console.WriteLine(metaRecord);
+                //Uncomment to see the timestamps printed
+                /*foreach (KeyValuePair<string, int[]> kvp in metaRecord.timeStamp)
+                {
+                    Console.Write("Key = {0}", kvp.Key);
+                    Console.Write("[");
+                    foreach (int i in kvp.Value)
+                    {
+                        Console.Write(i + ",");
+                    }
+                    Console.WriteLine("]");
+                }
+                foreach (KeyValuePair<string, DIDAWorker.DIDAVersion> kvp in metaRecord.lastChanges)
+                {
+                    Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                }*/
+                
                 request.Next += 1;
                 if (request.Next < request.Asschain.Count)
                 {
