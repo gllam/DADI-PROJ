@@ -21,6 +21,8 @@ namespace OperatorRunner
 
         public MetaRecord(int id, RepeatedField<KeyTimeStampValue> tmv)
         {
+            lastChanges = new Dictionary<string, DIDAWorker.DIDAVersion>();
+            timeStamp = new Dictionary<string, int[]>();
             this.Id = id;
             if (tmv == null)
                 return;
@@ -92,20 +94,27 @@ namespace OperatorRunner
 
         private int[] MergeTimeStampValue(string key, int[] workerTimeStampValue)
         {
-            for(int i = 0; i < workerTimeStampValue.Length; i++)
-            {
-                timeStamp[key][i] = workerTimeStampValue[i] >= timeStamp[key][i] ? workerTimeStampValue[i] : timeStamp[key][i];
+            int[] buffer = new int[workerTimeStampValue.Length];
+            if (!timeStamp.ContainsKey(key)) {
+                workerTimeStampValue.CopyTo(buffer, 0);
+                return buffer;
             }
-            return timeStamp[key];
+            timeStamp[key].CopyTo(buffer, 0);
+            for (int i = 0; i < workerTimeStampValue.Length; i++)
+            {
+                buffer[i] = workerTimeStampValue[i] >= buffer[i] ? workerTimeStampValue[i] : buffer[i];
+            }
+            return buffer;
         }
 
         public Dictionary<string, int[]> MergeTimeStamps(Dictionary<string, int[]> workerTimeStamp)
         {
+            /*
             if (this.timeStamp == null)
             {
                 this.timeStamp = workerTimeStamp;
                 return workerTimeStamp;
-            }
+            }*/
             Dictionary<string, int[]> bufferWorkerTimeStamp = workerTimeStamp;
 
             HashSet<string> keys = new HashSet<string>();
