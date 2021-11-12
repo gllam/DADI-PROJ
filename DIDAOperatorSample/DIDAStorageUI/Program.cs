@@ -103,6 +103,9 @@ namespace DIDAStorageUI
             sendUpdateRequestReply reply = new sendUpdateRequestReply { };
             lock (replicaTimeStampLock)
             {
+                if (!replicaTimeStamp.ContainsKey(request.Key))
+                    replicaTimeStamp[request.Key] = new int[maxStorages];
+                
                 replicaTimeStamp[request.Key][replicaId] += 1;
 
                 lock (updateLogLock)
@@ -595,23 +598,21 @@ namespace DIDAStorageUI
             return reply;
         }
 
-        private void CreateTimeStampKey(string key)
-        {
-            valueTimeStamp.Add(key, new int[storageMap.Count]);
-        }
-
         internal void AddStorage(string storage)
         {
             string[] storageUrl = storage.Split("|");
-            string[] hostport = storageUrl[1].Split("//")[1].Split(":");
-            DIDAStorageNode node = new DIDAStorageNode
+            if (storageUrl[0] != name)
             {
-                serverId = storageUrl[0],
-                host = hostport[0],
-                port = Convert.ToInt32(hostport[1])
-            };
-            GrpcChannel channel = GrpcChannel.ForAddress("http://" + node.host + ":" + node.port );
-            storageMap.Add(node, new DIDAStorageService.DIDAStorageServiceClient(channel));
+                string[] hostport = storageUrl[1].Split("//")[1].Split(":");
+                DIDAStorageNode node = new DIDAStorageNode
+                {
+                    serverId = storageUrl[0],
+                    host = hostport[0],
+                    port = Convert.ToInt32(hostport[1])
+                };
+                GrpcChannel channel = GrpcChannel.ForAddress("http://" + node.host + ":" + node.port);
+                storageMap.Add(node, new DIDAStorageService.DIDAStorageServiceClient(channel));
+            }
         }
 
         public override string ToString()
@@ -636,7 +637,7 @@ namespace DIDAStorageUI
 
         internal void SetMaxStorages()
         {
-            this.maxStorages = storageMap.Count;
+            this.maxStorages = storageMap.Count + 1;
         }
     }
 
