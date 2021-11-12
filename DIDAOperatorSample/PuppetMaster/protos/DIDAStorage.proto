@@ -2,7 +2,7 @@
 
 /* this service specifies how to access the storage */
 service DIDAStorageService {
-  rpc write(DIDAWriteRequest) returns (DIDAVersion);
+  rpc populate(DIDAWriteRequest) returns (DIDAVersion);
   rpc Status(StorageStatusEmpty) returns (StorageStatusReply);
   rpc ListServer (StorageStatusEmpty) returns (ListServerStorageReply);
 }

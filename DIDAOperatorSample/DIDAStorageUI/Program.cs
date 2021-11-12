@@ -44,6 +44,8 @@ namespace DIDAStorageUI
         Dictionary<int,UpdateRecord> updateLog = new Dictionary<int, UpdateRecord>();
         private readonly object updateLogLock = new object();
 
+        private readonly object updateIfValueIsLock = new object();
+
         //TODO updateif ; S2S.proto(pm cliente) ; data consistency ; fault tolerance ; gossip
 
         public StorageService(int replicaid, int gossipDelay, string name)
@@ -73,6 +75,22 @@ namespace DIDAStorageUI
             Console.WriteLine("Storage: " + this.name + " -> I am alive!");
             StorageStatusReply reply = new StorageStatusReply { Success = true };
             return reply;
+        }
+
+        public override Task<DIDAVersion> populate(DIDAWriteRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(Populate(request));
+        }
+
+        private DIDAVersion Populate(DIDAWriteRequest request)
+        {
+            int[] timeStampValue = GetValueTimeStampValue(request.Id);
+            timeStampValue[replicaId] += 1;
+            DIDAVersion version = UpdateData(request.Id, request.Val);
+            MergeTSIntoValueTimeStamp(timeStampValue, request.Id);
+
+            SendGossipToAllStorages(timeStampValue, request.Id, request.Val, version);//When this function ends all the gossipMessages are in the channels
+            return version;
         }
 
         public override Task<sendUpdateRequestReply> sendUpdateRequest(sendUpdateRequestReq request, ServerCallContext context)
@@ -144,6 +162,7 @@ namespace DIDAStorageUI
                 
                 SendGossipToAllStorages(timeStampValue, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
                 RemoveFromUpdateLog(request.Id);
+                Monitor.Pulse(updateIfValueIsLock);
                 return reply;
             }
 
@@ -165,8 +184,85 @@ namespace DIDAStorageUI
                 }
                 SendGossipToAllStorages(buffer, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
                 RemoveFromUpdateLog(request.Id);
+                Monitor.Pulse(updateIfValueIsLock);
             }
             return reply;
+        }
+
+        public override Task<sendUpdateValidationReply> updateIfValueIs(DIDAUpdateIfRequest request, ServerCallContext context)
+        {
+            return Task.FromResult<sendUpdateValidationReply>(UpdateIfValueIs(request));
+        }
+
+        private sendUpdateValidationReply UpdateIfValueIs(DIDAUpdateIfRequest request)
+        {
+            //Garantir sucesso -> Mandar random messages to all channels so we can get all gossips(FIFO channels)
+            sendUpdateValidationReply reply; //= new sendUpdateValidationReply { };
+
+            lock (replicaTimeStampLock)//Preventing start of new write operations
+            {
+                foreach (var s in storageMap)
+                {
+                    try
+                    {
+                        s.Value.ping(new EmptyAnswer { });
+                    }
+                    catch (Exception) { }
+                } //When this finishes this storage has received all updates regarding this key
+
+                lock (updateIfValueIsLock) //This lock is only to prevent running the while over and over again
+                {
+                    while(GetUpdateLogSizeKey(request.Id) != 0)
+                    {
+                        Monitor.Wait(updateIfValueIsLock);
+                    }
+                    lock (dataLock)
+                    {
+                        if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
+                        {
+                            DIDAVersion version = UpdateData(request.Id, request.Newvalue);
+                            reply = new sendUpdateValidationReply { Version = version };
+                            int[] timeStampValue = GetValueTimeStampValue(request.Id);
+                            timeStampValue[replicaId] = timeStampValue[replicaId] + 1;
+
+                            MergeTSIntoValueTimeStamp(timeStampValue, request.Id);
+                            MergeTSIntoReplicaTimeStamp(timeStampValue, request.Id);
+
+                            foreach (int n in timeStampValue)
+                            {
+                                reply.Tmv.NumberUpdates.Add(n);
+                            }
+
+                            SendGossipToAllStorages(timeStampValue, request.Id, request.Newvalue, version);//When this function ends all the gossipMessages are in the channels
+                        }
+                        else
+                        {
+                            DIDAVersion version = new DIDAVersion { ReplicaId = -1, VersionNumber = -1 };
+                            int[] timeStampValue = GetValueTimeStampValue(request.Id);
+                            reply = new sendUpdateValidationReply { Version = version };
+                            foreach (int n in timeStampValue)
+                            {
+                                reply.Tmv.NumberUpdates.Add(n);
+                            }
+                        }
+                    }
+                }
+            }
+            return reply;
+        }
+
+        private int GetUpdateLogSizeKey(string key)
+        {
+            int size = 0;
+            lock (updateLogLock)
+            {
+                foreach(UpdateRecord record in updateLog.Values)
+                {
+                    if (record.key == key)
+                        size += 1;
+                }
+            }
+            return size;
         }
 
         private void SendGossipToAllStorages(int[] timeStampValue, string key, string value, DIDAVersion version)
@@ -178,10 +274,15 @@ namespace DIDAStorageUI
             {
                 request.Tmv.NumberUpdates.Add(i);
             }
+
             System.Threading.Thread.Sleep(gossipDelay);
             foreach (var s in storageMap)
             {
-                s.Value.gossipAsync(request);
+                try { 
+                    s.Value.gossipAsync(request);
+                }
+                catch (Exception) { }
+
             }
         }
 
@@ -190,6 +291,7 @@ namespace DIDAStorageUI
             return Task.FromResult<EmptyAnswer>(Gossip(request));
         }
 
+        //testar gossip com dead storages
         private EmptyAnswer Gossip(gossipMessage request)
         {
             List<int> timeStampValueGossip = new List<int>();
@@ -319,6 +421,9 @@ namespace DIDAStorageUI
             lock (valueTimeStampLock)
             {
                 valueTimeStampValue = new int[maxStorages];
+                if (!valueTimeStamp.ContainsKey(key))
+                    valueTimeStamp[key] = new int[maxStorages];
+
                 valueTimeStamp[key].CopyTo(valueTimeStampValue, 0);
             }
             return valueTimeStampValue;
@@ -447,30 +552,6 @@ namespace DIDAStorageUI
             Console.WriteLine(this);
             return reply;
         }
-
-        /*public override Task<DIDAVersion> updateIfValueIs(DIDAUpdateIfRequest request, ServerCallContext context)
-        {
-            return Task.FromResult<DIDAVersion>(UpdateData(request));
-        }*/
-
-        /*private DIDAVersion UpdateData(DIDAUpdateIfRequest request)
-        {
-            lock (this)
-            {
-                if (data.ContainsKey(request.Id))
-                {
-                    if (data[request.Id][data[request.Id].Count - 1].Val == request.Oldvalue)
-                    {
-                        return WriteData(new DIDAWriteRequest
-                        {
-                            Id = request.Id,
-                            Val = request.Newvalue
-                        });
-                    }
-                }
-                return new DIDAVersion { ReplicaId = -1, VersionNumber = -1 }; //null version
-            }
-        }*/
 
         private void CreateTimeStampKey(string key)
         {

@@ -208,9 +208,12 @@ namespace PuppetMaster
                 Id = key,
                 Val = value
             };
-            DIDAVersion data = client.write(request);
-            if (data == null)
-                return false;
+            try
+            {
+                DIDAVersion data = client.populate(request);
+            }
+            catch (Exception) { return false; }
+
             return true;
         }
 
@@ -624,9 +627,12 @@ namespace PuppetMaster
 
         private void SendDataToStorage(string key, string value)
         {
-            //Calculate which storage needs to receive the Data TODO
-            storagesAsServers[0].SendWriteRequest(key, value);
-
+            for(int i = 0; i < storagesAsServers.Count; i++)
+            {
+                bool success = storagesAsServers[i].SendWriteRequest(key, value);
+                if (success)
+                    return;
+            }
         }
     }
 }
