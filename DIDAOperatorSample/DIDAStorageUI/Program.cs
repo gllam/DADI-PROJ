@@ -131,10 +131,13 @@ namespace DIDAStorageUI
                     record.prev = buffer.ToArray();
 
                     updateLog.Add(id, record);
+                    List<int> tmvNumberUpdatedBuffer = new List<int>();
                     foreach (int update in record.timeStamp)
                     {
-                        reply.Tmv.NumberUpdates.Add(update);
+                        tmvNumberUpdatedBuffer.Add(update);
                     }
+                    request.Tmv = new TimeStampValue();
+                    request.Tmv.NumberUpdates.Add(tmvNumberUpdatedBuffer);
                     reply.Id = id;
                 }
             }
@@ -155,11 +158,15 @@ namespace DIDAStorageUI
                 int[] timeStampValue = MergeTSIntoValueTimeStamp(record.timeStamp, record.key);
                 DIDAVersion version = UpdateData(record.key, record.value);
                 reply = new sendUpdateValidationReply { Version = version };
+
+                List<int> tmvNumberUpdatedBuffer = new List<int>();
                 foreach(int n in timeStampValue)
                 {
-                    reply.Tmv.NumberUpdates.Add(n);
+                    tmvNumberUpdatedBuffer.Add(n);
                 }
-                
+                reply.Tmv = new TimeStampValue();
+                reply.Tmv.NumberUpdates.Add(tmvNumberUpdatedBuffer);
+
                 SendGossipToAllStorages(timeStampValue, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
                 RemoveFromUpdateLog(request.Id);
                 Monitor.Pulse(updateIfValueIsLock);
@@ -178,10 +185,15 @@ namespace DIDAStorageUI
                 }
                 DIDAVersion version = new DIDAVersion { ReplicaId = replicaId, VersionNumber = -1 };
                 reply = new sendUpdateValidationReply { Version = version };
+
+                List<int> tmvNumberUpdatesBuffer = new List<int>();
                 foreach (int n in buffer)
                 {
-                    reply.Tmv.NumberUpdates.Add(n);
+                    tmvNumberUpdatesBuffer.Add(n);
                 }
+                reply.Tmv = new TimeStampValue();
+                reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
+
                 SendGossipToAllStorages(buffer, record.key, record.value, version);//When this function ends all the gossipMessages are in the channels
                 RemoveFromUpdateLog(request.Id);
                 Monitor.Pulse(updateIfValueIsLock);
@@ -228,10 +240,13 @@ namespace DIDAStorageUI
                             MergeTSIntoValueTimeStamp(timeStampValue, request.Id);
                             MergeTSIntoReplicaTimeStamp(timeStampValue, request.Id);
 
+                            List<int> tmvNumberUpdatesBuffer = new List<int>();
                             foreach (int n in timeStampValue)
                             {
-                                reply.Tmv.NumberUpdates.Add(n);
+                                tmvNumberUpdatesBuffer.Add(n);
                             }
+                            reply.Tmv = new TimeStampValue();
+                            reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
 
                             SendGossipToAllStorages(timeStampValue, request.Id, request.Newvalue, version);//When this function ends all the gossipMessages are in the channels
                         }
@@ -240,10 +255,14 @@ namespace DIDAStorageUI
                             DIDAVersion version = new DIDAVersion { ReplicaId = -1, VersionNumber = -1 };
                             int[] timeStampValue = GetValueTimeStampValue(request.Id);
                             reply = new sendUpdateValidationReply { Version = version };
+
+                            List<int> tmvNumberUpdatesBuffer = new List<int>();
                             foreach (int n in timeStampValue)
                             {
-                                reply.Tmv.NumberUpdates.Add(n);
+                                tmvNumberUpdatesBuffer.Add(n);
                             }
+                            reply.Tmv = new TimeStampValue();
+                            reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
                         }
                     }
                 }
@@ -275,7 +294,6 @@ namespace DIDAStorageUI
             foreach(int i in timeStampValue)
             {
                 buffer.Add(i);
-                //request.Tmv.NumberUpdates.Add(i);
             }
             request.Tmv = new TimeStampValue();
 
@@ -333,6 +351,9 @@ namespace DIDAStorageUI
             lock (valueTimeStampLock)
             {
                 valueTimeStampValue = new int[maxStorages];
+                if (!valueTimeStamp.ContainsKey(request.Key))
+                    valueTimeStamp[request.Key] = new int[maxStorages];
+
                 valueTimeStamp[request.Key].CopyTo(valueTimeStampValue, 0);
             }
             if (IsTSBigger(valueTimeStampValue,timeStampReceived.ToArray()))
@@ -343,10 +364,14 @@ namespace DIDAStorageUI
                     Value = record.Val,
                     Version = new DIDAVersion { ReplicaId = record.Version.ReplicaId, VersionNumber = record.Version.VersionNumber}
                 };
+
+                List<int> tmvNumberUpdatesBuffer = new List<int>();
                 foreach(int n in valueTimeStampValue)
                 {
-                    reply.Tmv.NumberUpdates.Add(n);
+                    tmvNumberUpdatesBuffer.Add(n);
                 }
+                reply.Tmv = new TimeStampValue();
+                reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
                 return reply;
             }
             lock (gossipMessageLock)
@@ -366,21 +391,33 @@ namespace DIDAStorageUI
                     Value = record.Val,
                     Version = new DIDAVersion { ReplicaId = record.Version.ReplicaId, VersionNumber = record.Version.VersionNumber }
                 };
+
+                List<int> tmvNumberUpdatesBuffer = new List<int>();
                 foreach (int n in valueTimeStampValue)
                 {
-                    reply.Tmv.NumberUpdates.Add(n);
+                    tmvNumberUpdatesBuffer.Add(n);
                 }
+                reply.Tmv = new TimeStampValue();
+                reply.Tmv.NumberUpdates.Add(tmvNumberUpdatesBuffer);
+
             }
             return reply;
         }
 
         private DIDARecord SearchRecord(string key, DIDAVersion version)
         {
-            DIDARecord reply = new DIDARecord { Id = key, Val = null, Version = new DIDAWorker.DIDAVersion { ReplicaId = version.ReplicaId, VersionNumber = version.VersionNumber } }; ;
+            DIDARecord reply = new DIDARecord { Id = key, Val = "", Version = new DIDAWorker.DIDAVersion { ReplicaId = version.ReplicaId, VersionNumber = version.VersionNumber } }; ;
             lock (dataLock)
             {
                 if(version.VersionNumber == -1) {
-                    reply = data[key][data[key].Count - 1];
+                    if (!data.ContainsKey(key))
+                        data[key] = new List<DIDARecord>();
+                    if(data[key].Count == 0)
+                    {
+                        reply.Version = new DIDAWorker.DIDAVersion { ReplicaId = -1, VersionNumber = -1 };
+                    }
+                    else
+                        reply = data[key][data[key].Count - 1];
                 }
                 else
                 {
