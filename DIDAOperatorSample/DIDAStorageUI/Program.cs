@@ -270,11 +270,16 @@ namespace DIDAStorageUI
             gossipMessage request = new gossipMessage {
                 Record = new DIDARecordReply { Id = key, Val = value, Version = version}
             };
+            List<int> buffer = new List<int>();
+
             foreach(int i in timeStampValue)
             {
-                request.Tmv.NumberUpdates.Add(i);
+                buffer.Add(i);
+                //request.Tmv.NumberUpdates.Add(i);
             }
+            request.Tmv = new TimeStampValue();
 
+            request.Tmv.NumberUpdates.Add(buffer);
             System.Threading.Thread.Sleep(gossipDelay);
             foreach (var s in storageMap)
             {

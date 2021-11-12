@@ -38,6 +38,8 @@ namespace Worker
             {
                 GrpcChannel channel = GrpcChannel.ForAddress("http://" + n.host + ":" + n.port);
                 _clients[n.serverId.GetHashCode()] = new Client { id = k, storageNode = n, client = new DIDAStorageService.DIDAStorageServiceClient(channel) };
+                Console.WriteLine(_clients[n.serverId.GetHashCode()]);
+                Console.WriteLine(n.serverId.GetHashCode());
                 k++;
             }
             _meta = metaRecord;
@@ -57,6 +59,7 @@ namespace Worker
             int closer = 0;
             foreach(int i in _clients.Keys)
             {
+                //Console.WriteLine(i);
                 if (Math.Abs(hash - i) < Math.Abs(hash - closer) || closer == 0)
                 {
                     closer = i;
@@ -95,8 +98,9 @@ namespace Worker
                 _meta.lastChanges[r.Id] = new DIDAWorker.DIDAVersion { ReplicaId = reply.Version.ReplicaId, VersionNumber = reply.Version.VersionNumber};
                 return new DIDAWorker.DIDARecordReply { Id = reply.Key, Val = reply.Value, Version = { VersionNumber = reply.Version.VersionNumber, ReplicaId = reply.Version.ReplicaId } };
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 Console.WriteLine("Storage with ID " + storage.storageNode.serverId + " disconnected");
                 _clients.Remove(storageHash);
                 return read(r);
