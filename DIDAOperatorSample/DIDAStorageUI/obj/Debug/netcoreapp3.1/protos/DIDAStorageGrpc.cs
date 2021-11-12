@@ -56,8 +56,6 @@ public static partial class DIDAStorageService
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::DIDAVersion> __Marshaller_DIDAVersion = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::DIDAVersion.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-  static readonly grpc::Marshaller<global::DIDAUpdateIfRequest> __Marshaller_DIDAUpdateIfRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::DIDAUpdateIfRequest.Parser));
-  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::StorageStatusEmpty> __Marshaller_StorageStatusEmpty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::StorageStatusEmpty.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::StorageStatusReply> __Marshaller_StorageStatusReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::StorageStatusReply.Parser));
@@ -71,6 +69,8 @@ public static partial class DIDAStorageService
   static readonly grpc::Marshaller<global::sendUpdateAck> __Marshaller_sendUpdateAck = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendUpdateAck.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::sendUpdateValidationReply> __Marshaller_sendUpdateValidationReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendUpdateValidationReply.Parser));
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Marshaller<global::DIDAUpdateIfRequest> __Marshaller_DIDAUpdateIfRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::DIDAUpdateIfRequest.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Marshaller<global::sendReadRequestReq> __Marshaller_sendReadRequestReq = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::sendReadRequestReq.Parser));
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
@@ -97,14 +97,6 @@ public static partial class DIDAStorageService
       __Marshaller_DIDAVersion);
 
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-  static readonly grpc::Method<global::DIDAUpdateIfRequest, global::DIDAVersion> __Method_updateIfValueIs = new grpc::Method<global::DIDAUpdateIfRequest, global::DIDAVersion>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "updateIfValueIs",
-      __Marshaller_DIDAUpdateIfRequest,
-      __Marshaller_DIDAVersion);
-
-  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Method<global::StorageStatusEmpty, global::StorageStatusReply> __Method_Status = new grpc::Method<global::StorageStatusEmpty, global::StorageStatusReply>(
       grpc::MethodType.Unary,
       __ServiceName,
@@ -119,6 +111,14 @@ public static partial class DIDAStorageService
       "ListServer",
       __Marshaller_StorageStatusEmpty,
       __Marshaller_ListServerStorageReply);
+
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::DIDAWriteRequest, global::DIDAVersion> __Method_populate = new grpc::Method<global::DIDAWriteRequest, global::DIDAVersion>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "populate",
+      __Marshaller_DIDAWriteRequest,
+      __Marshaller_DIDAVersion);
 
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Method<global::sendUpdateRequestReq, global::sendUpdateRequestReply> __Method_sendUpdateRequest = new grpc::Method<global::sendUpdateRequestReq, global::sendUpdateRequestReply>(
@@ -137,6 +137,14 @@ public static partial class DIDAStorageService
       __Marshaller_sendUpdateValidationReply);
 
   [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::DIDAUpdateIfRequest, global::sendUpdateValidationReply> __Method_updateIfValueIs = new grpc::Method<global::DIDAUpdateIfRequest, global::sendUpdateValidationReply>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "updateIfValueIs",
+      __Marshaller_DIDAUpdateIfRequest,
+      __Marshaller_sendUpdateValidationReply);
+
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
   static readonly grpc::Method<global::sendReadRequestReq, global::sendReadRequestReply> __Method_sendReadRequest = new grpc::Method<global::sendReadRequestReq, global::sendReadRequestReply>(
       grpc::MethodType.Unary,
       __ServiceName,
@@ -150,6 +158,14 @@ public static partial class DIDAStorageService
       __ServiceName,
       "gossip",
       __Marshaller_gossipMessage,
+      __Marshaller_EmptyAnswer);
+
+  [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+  static readonly grpc::Method<global::EmptyAnswer, global::EmptyAnswer> __Method_ping = new grpc::Method<global::EmptyAnswer, global::EmptyAnswer>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "ping",
+      __Marshaller_EmptyAnswer,
       __Marshaller_EmptyAnswer);
 
   /// <summary>Service descriptor</summary>
@@ -175,12 +191,6 @@ public static partial class DIDAStorageService
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    public virtual global::System.Threading.Tasks.Task<global::DIDAVersion> updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::ServerCallContext context)
-    {
-      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::System.Threading.Tasks.Task<global::StorageStatusReply> Status(global::StorageStatusEmpty request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
@@ -188,6 +198,12 @@ public static partial class DIDAStorageService
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::System.Threading.Tasks.Task<global::ListServerStorageReply> ListServer(global::StorageStatusEmpty request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::DIDAVersion> populate(global::DIDAWriteRequest request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -204,14 +220,14 @@ public static partial class DIDAStorageService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    /// <summary>
-    ///if the TimeStamp returned is null -> success!
-    /// </summary>
-    /// <param name="request">The request received from the client.</param>
-    /// <param name="context">The context of the server-side call handler being invoked.</param>
-    /// <returns>The response to send back to the client (wrapped by a task).</returns>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::System.Threading.Tasks.Task<global::sendUpdateValidationReply> sendUpdateValidation(global::sendUpdateAck request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::sendUpdateValidationReply> updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -224,6 +240,12 @@ public static partial class DIDAStorageService
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::System.Threading.Tasks.Task<global::EmptyAnswer> gossip(global::gossipMessage request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::System.Threading.Tasks.Task<global::EmptyAnswer> ping(global::EmptyAnswer request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -298,26 +320,6 @@ public static partial class DIDAStorageService
       return CallInvoker.AsyncUnaryCall(__Method_write, null, options, request);
     }
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    public virtual global::DIDAVersion updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return updateIfValueIs(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    public virtual global::DIDAVersion updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_updateIfValueIs, null, options, request);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    public virtual grpc::AsyncUnaryCall<global::DIDAVersion> updateIfValueIsAsync(global::DIDAUpdateIfRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return updateIfValueIsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    public virtual grpc::AsyncUnaryCall<global::DIDAVersion> updateIfValueIsAsync(global::DIDAUpdateIfRequest request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_updateIfValueIs, null, options, request);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::StorageStatusReply Status(global::StorageStatusEmpty request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return Status(request, new grpc::CallOptions(headers, deadline, cancellationToken));
@@ -356,6 +358,26 @@ public static partial class DIDAStorageService
     public virtual grpc::AsyncUnaryCall<global::ListServerStorageReply> ListServerAsync(global::StorageStatusEmpty request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ListServer, null, options, request);
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::DIDAVersion populate(global::DIDAWriteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return populate(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::DIDAVersion populate(global::DIDAWriteRequest request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_populate, null, options, request);
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::DIDAVersion> populateAsync(global::DIDAWriteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return populateAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::DIDAVersion> populateAsync(global::DIDAWriteRequest request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_populate, null, options, request);
     }
     /// <summary>
     ///new functions
@@ -405,53 +427,45 @@ public static partial class DIDAStorageService
     {
       return CallInvoker.AsyncUnaryCall(__Method_sendUpdateRequest, null, options, request);
     }
-    /// <summary>
-    ///if the TimeStamp returned is null -> success!
-    /// </summary>
-    /// <param name="request">The request to send to the server.</param>
-    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
-    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
-    /// <param name="cancellationToken">An optional token for canceling the call.</param>
-    /// <returns>The response received from the server.</returns>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::sendUpdateValidationReply sendUpdateValidation(global::sendUpdateAck request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return sendUpdateValidation(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    /// <summary>
-    ///if the TimeStamp returned is null -> success!
-    /// </summary>
-    /// <param name="request">The request to send to the server.</param>
-    /// <param name="options">The options for the call.</param>
-    /// <returns>The response received from the server.</returns>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::sendUpdateValidationReply sendUpdateValidation(global::sendUpdateAck request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_sendUpdateValidation, null, options, request);
     }
-    /// <summary>
-    ///if the TimeStamp returned is null -> success!
-    /// </summary>
-    /// <param name="request">The request to send to the server.</param>
-    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
-    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
-    /// <param name="cancellationToken">An optional token for canceling the call.</param>
-    /// <returns>The call object.</returns>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual grpc::AsyncUnaryCall<global::sendUpdateValidationReply> sendUpdateValidationAsync(global::sendUpdateAck request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return sendUpdateValidationAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    /// <summary>
-    ///if the TimeStamp returned is null -> success!
-    /// </summary>
-    /// <param name="request">The request to send to the server.</param>
-    /// <param name="options">The options for the call.</param>
-    /// <returns>The call object.</returns>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual grpc::AsyncUnaryCall<global::sendUpdateValidationReply> sendUpdateValidationAsync(global::sendUpdateAck request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_sendUpdateValidation, null, options, request);
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::sendUpdateValidationReply updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return updateIfValueIs(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::sendUpdateValidationReply updateIfValueIs(global::DIDAUpdateIfRequest request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_updateIfValueIs, null, options, request);
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::sendUpdateValidationReply> updateIfValueIsAsync(global::DIDAUpdateIfRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return updateIfValueIsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::sendUpdateValidationReply> updateIfValueIsAsync(global::DIDAUpdateIfRequest request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_updateIfValueIs, null, options, request);
     }
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public virtual global::sendReadRequestReply sendReadRequest(global::sendReadRequestReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
@@ -493,6 +507,26 @@ public static partial class DIDAStorageService
     {
       return CallInvoker.AsyncUnaryCall(__Method_gossip, null, options, request);
     }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::EmptyAnswer ping(global::EmptyAnswer request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return ping(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual global::EmptyAnswer ping(global::EmptyAnswer request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_ping, null, options, request);
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::EmptyAnswer> pingAsync(global::EmptyAnswer request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return pingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    public virtual grpc::AsyncUnaryCall<global::EmptyAnswer> pingAsync(global::EmptyAnswer request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_ping, null, options, request);
+    }
     /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     protected override DIDAStorageServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -509,13 +543,15 @@ public static partial class DIDAStorageService
     return grpc::ServerServiceDefinition.CreateBuilder()
         .AddMethod(__Method_read, serviceImpl.read)
         .AddMethod(__Method_write, serviceImpl.write)
-        .AddMethod(__Method_updateIfValueIs, serviceImpl.updateIfValueIs)
         .AddMethod(__Method_Status, serviceImpl.Status)
         .AddMethod(__Method_ListServer, serviceImpl.ListServer)
+        .AddMethod(__Method_populate, serviceImpl.populate)
         .AddMethod(__Method_sendUpdateRequest, serviceImpl.sendUpdateRequest)
         .AddMethod(__Method_sendUpdateValidation, serviceImpl.sendUpdateValidation)
+        .AddMethod(__Method_updateIfValueIs, serviceImpl.updateIfValueIs)
         .AddMethod(__Method_sendReadRequest, serviceImpl.sendReadRequest)
-        .AddMethod(__Method_gossip, serviceImpl.gossip).Build();
+        .AddMethod(__Method_gossip, serviceImpl.gossip)
+        .AddMethod(__Method_ping, serviceImpl.ping).Build();
   }
 
   /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
@@ -527,13 +563,15 @@ public static partial class DIDAStorageService
   {
     serviceBinder.AddMethod(__Method_read, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAReadRequest, global::DIDARecordReply>(serviceImpl.read));
     serviceBinder.AddMethod(__Method_write, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAWriteRequest, global::DIDAVersion>(serviceImpl.write));
-    serviceBinder.AddMethod(__Method_updateIfValueIs, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAUpdateIfRequest, global::DIDAVersion>(serviceImpl.updateIfValueIs));
     serviceBinder.AddMethod(__Method_Status, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::StorageStatusReply>(serviceImpl.Status));
     serviceBinder.AddMethod(__Method_ListServer, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::StorageStatusEmpty, global::ListServerStorageReply>(serviceImpl.ListServer));
+    serviceBinder.AddMethod(__Method_populate, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAWriteRequest, global::DIDAVersion>(serviceImpl.populate));
     serviceBinder.AddMethod(__Method_sendUpdateRequest, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::sendUpdateRequestReq, global::sendUpdateRequestReply>(serviceImpl.sendUpdateRequest));
     serviceBinder.AddMethod(__Method_sendUpdateValidation, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::sendUpdateAck, global::sendUpdateValidationReply>(serviceImpl.sendUpdateValidation));
+    serviceBinder.AddMethod(__Method_updateIfValueIs, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DIDAUpdateIfRequest, global::sendUpdateValidationReply>(serviceImpl.updateIfValueIs));
     serviceBinder.AddMethod(__Method_sendReadRequest, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::sendReadRequestReq, global::sendReadRequestReply>(serviceImpl.sendReadRequest));
     serviceBinder.AddMethod(__Method_gossip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::gossipMessage, global::EmptyAnswer>(serviceImpl.gossip));
+    serviceBinder.AddMethod(__Method_ping, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::EmptyAnswer, global::EmptyAnswer>(serviceImpl.ping));
   }
 
 }

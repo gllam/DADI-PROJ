@@ -142,10 +142,12 @@ namespace Worker
             Client storage = _clients[storageHash];
             try
             {
-                DIDAVersion res = storage.client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
-                if (!timestamp.ContainsKey(r.Id))
-                    CreateTimeStampKey(r.Id);
-                return new DIDAWorker.DIDAVersion { VersionNumber = res.VersionNumber, ReplicaId = res.ReplicaId };
+                //same structure
+                sendReadRequestReq reply = storage.client.updateIfValueIs(new DIDAUpdateIfRequest { Id = r.Id, Newvalue = r.Newvalue, Oldvalue = r.Oldvalue });
+                UpdateMetaTimeStamp(reply.Tmv, r.Id);
+                DIDAWorker.DIDAVersion version = new DIDAWorker.DIDAVersion { VersionNumber = reply.Version.VersionNumber, ReplicaId = reply.Version.ReplicaId };
+                _meta.lastChanges[r.Id] = version;
+                return version;
             }
             catch (Exception)
             {
