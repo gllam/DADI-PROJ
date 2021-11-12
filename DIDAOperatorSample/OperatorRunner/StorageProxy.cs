@@ -23,7 +23,7 @@ namespace Worker
 
         MetaRecord _meta;
 
-        Dictionary<string, int[]> timestamp = new Dictionary<string, int[]>();
+        //Dictionary<string, int[]> timestamp = new Dictionary<string, int[]>();
 
         //TODO add timestamp list<int>[nº storages]
 
@@ -70,7 +70,7 @@ namespace Worker
 
         public virtual DIDAWorker.DIDARecordReply read(DIDAWorker.DIDAReadRequest r)
         {
-            if (!timestamp.ContainsKey(r.Id))
+            if (!_meta.timeStamp.ContainsKey(r.Id))
                 CreateTimeStampKey(r.Id);
 
             int storageHash = LocateStorage(r.Id);
@@ -86,13 +86,26 @@ namespace Worker
                 }
                 else { versionNumber = -1; replicaIdToSend = -1; }
 
-                sendReadRequestReply reply = storage.client.sendReadRequest(new sendReadRequestReq {
+                List<int> buffer = new List<int>();
+                foreach(int n in _meta.timeStamp[r.Id])
+                {
+                    buffer.Add(n);
+                }
+
+                sendReadRequestReq request = new sendReadRequestReq
+                {
                     Key = r.Id,
-                    Version = new DIDAVersion {
+                    Version = new DIDAVersion
+                    {
                         VersionNumber = r.Version.VersionNumber == -1 ? versionNumber : r.Version.VersionNumber,
                         ReplicaId = r.Version.ReplicaId == -1 ? replicaIdToSend : r.Version.ReplicaId
-                    } 
-                });
+                    },
+                };
+                request.Tmv = new TimeStampValue { };
+                request.Tmv.NumberUpdates.Add(buffer);
+
+
+                sendReadRequestReply reply = storage.client.sendReadRequest(request);
 
                 UpdateMetaTimeStamp(reply.Tmv, r.Id);
                 _meta.lastChanges[r.Id] = new DIDAWorker.DIDAVersion { ReplicaId = reply.Version.ReplicaId, VersionNumber = reply.Version.VersionNumber};
@@ -109,7 +122,7 @@ namespace Worker
 
         public virtual DIDAWorker.DIDAVersion write(DIDAWorker.DIDAWriteRequest r)
         {
-            if (!timestamp.ContainsKey(r.Id))
+            if (!_meta.timeStamp.ContainsKey(r.Id))
                 CreateTimeStampKey(r.Id);
             int storageHash = LocateStorage(r.Id);
             Client storage = _clients[storageHash];
@@ -140,7 +153,7 @@ namespace Worker
 
         public virtual DIDAWorker.DIDAVersion updateIfValueIs(DIDAWorker.DIDAUpdateIfRequest r)
         {
-            if (!timestamp.ContainsKey(r.Id))
+            if (!_meta.timeStamp.ContainsKey(r.Id))
                 CreateTimeStampKey(r.Id);
             int storageHash = LocateStorage(r.Id);
             Client storage = _clients[storageHash];
@@ -183,17 +196,22 @@ namespace Worker
 
         private sendUpdateRequestReq CreateTimeStampValueRepeated(string key, sendUpdateRequestReq request)
         {
-            int[] timeStampValue = timestamp[key];
+            int[] timeStampValue = new int[allClients];
+            _meta.timeStamp[key].CopyTo(timeStampValue,0);
+
+            List<int> buffer = new List<int>();
             foreach (int t in timeStampValue)
             {
-                request.Tmv.NumberUpdates.Add(t);
+                buffer.Add(t);
             }
+            request.Tmv = new TimeStampValue();
+            request.Tmv.NumberUpdates.Add(buffer);
             return request;
         }
 
         private void CreateTimeStampKey(string key)
         {
-            timestamp.Add(key, new int[allClients]);
+            _meta.timeStamp.Add(key, new int[allClients]);
         }
 
         public void Update(MetaRecord meta)
